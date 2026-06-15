@@ -1,0 +1,36 @@
+{
+    "anims": [
+        {
+            "key": "campfire_idle",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "campfire",
+                    "frame": "campfire_idle_0"
+                },
+                {
+                    "key": "campfire",
+                    "frame": "campfire_idle_1"
+                },
+                {
+                    "key": "campfire",
+                    "frame": "campfire_idle_2"
+                },
+                {
+                    "key": "campfire",
+                    "frame": "campfire_idle_3"
+                },
+                {
+                    "key": "campfire",
+                    "frame": "campfire_idle_4"
+                },
+                {
+                    "key": "campfire",
+                    "frame": "campfire_idle_5"
+                }
+            ]
+        }
+    ]
+}

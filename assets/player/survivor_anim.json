@@ -1,0 +1,564 @@
+{
+    "anims": [
+        {
+            "key": "survivor_end_fishing_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_down_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_down_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_down_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_down_3"
+                }
+            ]
+        },
+        {
+            "key": "survivor_end_fishing_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_right_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_right_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_right_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_right_3"
+                }
+            ]
+        },
+        {
+            "key": "survivor_end_fishing_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_left_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_left_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_left_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_left_3"
+                }
+            ]
+        },
+        {
+            "key": "survivor_end_fishing_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_up_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_up_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_up_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_end_fishing_up_3"
+                }
+            ]
+        },
+        {
+            "key": "survivor_start_fishing_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_right_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_right_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_right_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_right_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_right_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_right_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_start_fishing_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_left_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_left_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_left_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_left_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_left_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_left_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_start_fishing_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_down_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_down_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_down_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_down_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_down_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_down_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_start_fishing_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_up_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_up_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_up_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_up_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_up_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_start_fishing_up_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_down_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_down_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_down_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_down_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_down_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_down_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_up_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_up_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_up_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_up_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_up_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_up_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_right_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_right_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_right_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_right_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_right_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_right_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_left_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_left_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_left_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_left_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_left_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_attack_left_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_walk_right",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_right_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_right_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_right_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_right_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_right_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_right_5"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_right_6"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_right_7"
+                }
+            ]
+        },
+        {
+            "key": "survivor_walk_left",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_left_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_left_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_left_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_left_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_left_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_left_5"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_left_6"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_left_7"
+                }
+            ]
+        },
+        {
+            "key": "survivor_walk_down",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_down_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_down_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_down_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_down_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_down_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_down_5"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_down_6"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_down_7"
+                }
+            ]
+        },
+        {
+            "key": "survivor_walk_up",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_up_0"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_up_1"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_up_2"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_up_3"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_up_4"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_up_5"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_up_6"
+                },
+                {
+                    "key": "survivor",
+                    "frame": "survivor_walk_up_7"
+                }
+            ]
+        },
+        {
+            "key": "survivor_idle_down",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_idle_down"
+                }
+            ]
+        },
+        {
+            "key": "survivor_idle_up",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_idle_up"
+                }
+            ]
+        },
+        {
+            "key": "survivor_idle_right",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_idle_right"
+                }
+            ]
+        },
+        {
+            "key": "survivor_idle_left",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor",
+                    "frame": "survivor_idle_left"
+                }
+            ]
+        }
+    ]
+}
