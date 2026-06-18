@@ -66,6 +66,10 @@ export default class GameScene extends Phaser.Scene {
 
     this.isGameOver = false;
 
+    this.input.addPointer(2);
+
+    console.log("pointer count:", this.input.manager.pointers.length);
+
     // 3. Create the tilemap data object
     const map = this.make.tilemap({ key: "test_map" });
 

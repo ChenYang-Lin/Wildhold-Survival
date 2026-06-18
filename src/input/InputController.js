@@ -92,8 +92,14 @@ export default class InputController {
         this.joyBase.y + thumbY,
       );
 
-      // normalized movement vector
-      this.state.moveVector.set(thumbX / 50, thumbY / 50);
+      // normalized movement vector with dead zone (don't make character move instanly when joystick just move tiny bit)
+      const deadzone = 14;
+
+      if (distance < deadzone) {
+        this.state.moveVector.set(0, 0);
+      } else {
+        this.state.moveVector.set(thumbX / 50, thumbY / 50);
+      }
     });
 
     // POINTER UP (joystick release + action release)
