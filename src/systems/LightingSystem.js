@@ -2,15 +2,20 @@ export default class LightingSystem {
   constructor(scene) {
     this.scene = scene;
 
+    this.lightSources = [];
+
     // Fog overlay and mask -----------------------------------------------------------------------------------------------------------------------------
     const cam = this.scene.cameras.main;
 
     this.darknessAlpha = 0;
+    this.glowAlpha = 0;
+    this.flickerRadiusOffset = 0;
+    this.nextFlicker = 0;
 
     this.lightSize = 512;
 
     this.visionRadius = 1000;
-    this.campfireRadius = 550;
+    this.campfireRadius = 280;
 
     this.darknessRT = this.scene.add
       .renderTexture(0, 0, cam.width, cam.height)
@@ -18,65 +23,32 @@ export default class LightingSystem {
       .setScrollFactor(0)
       .setDepth(9998);
 
-    this.createGradientTexture();
     this.createCampfireTexture();
     this.createCampfireGlowTexture();
     this.createPlayerTexture();
 
-    // this.lightStamp = this.scene.add.image(0, 0, "light-gradient");
-    // this.lightStamp.setTexture("light-gradient");
-    // this.lightStamp.setTexture("campfire-light");
-    // this.lightStamp.setVisible(false);
-
     this.playerLightStamp = this.scene.add.image(0, 0, "player-light");
-    this.campfireLightStamp = this.scene.add.image(0, 0, "light-gradient");
-    this.campfireGlow = this.scene.add.image(0, 0, "campfire-glow").setDepth(10); // prettier-ignore
+    this.campfireLightStamp = this.scene.add.image(0, 0, "campfire-light");
+    this.campfireGlow = this.scene.add.image(0, 0, "campfire-glow").setDepth(9999); // prettier-ignore
 
     this.playerLightStamp.setVisible(false);
     this.campfireLightStamp.setVisible(false);
     this.campfireGlow.setVisible(false);
 
-    // Campfire flicker
+    // resize
+    this.scene.scale.on("resize", (gameSize) => {
+      this.resize(gameSize.width, gameSize.height);
+    });
   }
 
-  createGradientTexture() {
-    if (this.scene.textures.exists("light-gradient")) {
-      return;
-    }
-    const size = this.lightSize;
-    const radius = size / 2;
+  resize(width, height) {
+    this.darknessRT.destroy();
 
-    const texture = this.scene.textures.createCanvas(
-      "light-gradient",
-      size,
-      size,
-    );
-
-    const ctx = texture.context;
-
-    const gradient = ctx.createRadialGradient(
-      radius,
-      radius,
-      0,
-      radius,
-      radius,
-      radius,
-    );
-
-    // gradient.addColorStop(0, "rgba(255,255,255,1)");
-    // gradient.addColorStop(0.8, "rgba(255,255,255,0.8)");
-    // gradient.addColorStop(1, "rgba(255,255,255,0)");
-
-    gradient.addColorStop(0.0, "rgba(255,255,255,1)");
-    gradient.addColorStop(0.3, "rgba(255,255,255,1)");
-    gradient.addColorStop(0.6, "rgba(255,255,255,0.7)");
-    gradient.addColorStop(0.8, "rgba(255,255,255,0.3)");
-    gradient.addColorStop(1.0, "rgba(255,255,255,0)");
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, size, size);
-
-    texture.refresh();
+    this.darknessRT = this.scene.add
+      .renderTexture(0, 0, width, height)
+      .setOrigin(0)
+      .setScrollFactor(0)
+      .setDepth(9998);
   }
 
   createCampfireTexture() {
@@ -103,9 +75,11 @@ export default class LightingSystem {
       radius,
     );
 
-    gradient.addColorStop(0.0, "rgba(255,255,255,1)");
-    gradient.addColorStop(0.8, "rgba(255,255,255,1)");
-    gradient.addColorStop(0.9, "rgba(255,255,255,0.5)");
+    gradient.addColorStop(0.0, "rgba(255,255,255,1.0)");
+    gradient.addColorStop(0.15, "rgba(255,255,255,1.0)");
+    gradient.addColorStop(0.35, "rgba(255,255,255,0.8)");
+    gradient.addColorStop(0.6, "rgba(255,255,255,0.45)");
+    gradient.addColorStop(0.85, "rgba(255,255,255,0.15)");
     gradient.addColorStop(1.0, "rgba(255,255,255,0)");
 
     ctx.fillStyle = gradient;
@@ -137,10 +111,9 @@ export default class LightingSystem {
       radius,
       radius,
     );
-
-    gradient.addColorStop(0.0, "rgba(255,220,120,0.4)");
-    gradient.addColorStop(0.6, "rgba(255,160,60,0.2)");
-    gradient.addColorStop(1.0, "rgba(255,100,0,0)");
+    gradient.addColorStop(0.0, "rgba(255,180,50,1)");
+    gradient.addColorStop(0.5, "rgba(255,120,0,0.7)");
+    gradient.addColorStop(1.0, "rgba(255,80,0,0)");
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, size, size);
@@ -172,9 +145,9 @@ export default class LightingSystem {
       radius,
     );
 
-    gradient.addColorStop(0.0, "rgba(255,255,255,0.35)");
-    gradient.addColorStop(0.5, "rgba(255,255,255,0.25)");
-    gradient.addColorStop(0.8, "rgba(255,255,255,0.10)");
+    gradient.addColorStop(0.0, "rgba(255,255,255,0.30)");
+    gradient.addColorStop(0.4, "rgba(255,255,255,0.22)");
+    gradient.addColorStop(0.8, "rgba(255,255,255,0.15)");
     gradient.addColorStop(1.0, "rgba(255,255,255,0)");
 
     ctx.fillStyle = gradient;
@@ -187,7 +160,7 @@ export default class LightingSystem {
     const cam = this.scene.cameras.main;
 
     this.darknessRT.clear();
-    this.darknessRT.fill(0x0a1020, this.darknessAlpha);
+    this.darknessRT.fill(0x081018, this.darknessAlpha);
 
     // Player vision
     const scale = (this.visionRadius * 2) / this.lightSize;
@@ -202,8 +175,8 @@ export default class LightingSystem {
     // Campfire vision
     this.flickerTime ??= 0;
     this.flickerTime += 0.05;
-    const campfireRadius = this.campfireRadius + Math.sin(this.flickerTime) * 8 + Phaser.Math.Between(-2, 2); // prettier-ignore
 
+    const campfireRadius = this.campfireRadius + Phaser.Math.Between(-8, 8);
     const campfireScale = (campfireRadius * 2) / this.lightSize;
 
     this.campfireLightStamp.setScale(campfireScale);
@@ -220,8 +193,12 @@ export default class LightingSystem {
       this.scene.campfire.body.center.y,
     );
 
+    this.campfireGlow.setVisible(this.scene.dayNightSystem.isNight);
+
     const glowScale = (this.campfireRadius * 2.2) / this.lightSize;
     this.campfireGlow.setScale(glowScale);
-    this.campfireGlow.setAlpha(0.3 + Math.sin(this.flickerTime) * 0.05);
+    this.campfireGlow.setAlpha(
+      this.glowAlpha + Math.sin(this.flickerTime) * 0.05,
+    );
   }
 }

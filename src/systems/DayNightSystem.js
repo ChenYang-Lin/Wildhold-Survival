@@ -29,7 +29,8 @@ export default class DayNightSystem {
     this.scene.tweens.add({
       targets: this.scene.lightingSystem,
       darknessAlpha: 0.95,
-      visionRadius: 550,
+      visionRadius: 200,
+      glowAlpha: 0.3,
       duration: 1000,
       ease: "Sine.easeInOut",
     });
@@ -47,6 +48,7 @@ export default class DayNightSystem {
       targets: this.scene.lightingSystem,
       darknessAlpha: 0,
       visionRadius: 1000,
+      glowAlpha: 0,
       duration: 1000,
       ease: "Sine.easeInOut",
     });
