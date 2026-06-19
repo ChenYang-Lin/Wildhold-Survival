@@ -16,7 +16,7 @@ export default class HotbarUI {
     this.combatButton.isUI = true;
 
     this.buildButton = this.scene.add.rectangle(500, this.scene.scale.height - 100, 100, 40, 0x33aa33).setInteractive().setScrollFactor(0).setDepth(10000); //prettier-ignore
-    this.combatText = this.scene.add.text(500, this.scene.scale.height - 100, "Build", { fontSize: "18px", color: "#ffffff" }).setOrigin(0.5).setScrollFactor(0).setDepth(10000); // prettier-ignore
+    this.buildText = this.scene.add.text(500, this.scene.scale.height - 100, "Build", { fontSize: "18px", color: "#ffffff" }).setOrigin(0.5).setScrollFactor(0).setDepth(10000); // prettier-ignore
     this.buildButton.isUI = true;
 
     // Left/Right buttons - for switch items
@@ -43,6 +43,34 @@ export default class HotbarUI {
     this.rightButton.on("pointerdown", () => {
       this.scene.hotbarSystem.next();
     });
+
+    this.resetUIPosition();
+  }
+
+  resetUIPosition() {
+    const w = Math.min(this.scene.scale.width, window.innerWidth);
+
+    const h = Math.min(this.scene.scale.height, window.innerHeight);
+
+    const bottomOffset = 30;
+
+    this.itemText.setPosition(w / 2, h - 30 - bottomOffset);
+
+    this.combatButton.setPosition(w / 2 - 55, h - 80 - bottomOffset);
+
+    this.combatText.setPosition(w / 2 - 55, h - 80 - bottomOffset);
+
+    this.buildButton.setPosition(w / 2 + 55, h - 80 - bottomOffset);
+
+    this.buildText.setPosition(w / 2 + 55, h - 80 - bottomOffset);
+
+    this.leftButton.setPosition(w / 2 - 125, h - 30 - bottomOffset);
+
+    this.leftButtonText.setPosition(w / 2 - 125, h - 30 - bottomOffset);
+
+    this.rightButton.setPosition(w / 2 + 125, h - 30 - bottomOffset);
+
+    this.rightButtonText.setPosition(w / 2 + 125, h - 30 - bottomOffset);
   }
 
   update() {

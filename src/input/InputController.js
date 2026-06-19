@@ -196,13 +196,15 @@ export default class InputController {
 
   resetUIPosition() {
     const w = this.scene.scale.width;
-    const h = this.scene.scale.height;
+    const h = Math.min(this.scene.scale.height, window.innerHeight); // mobile screen shows windows.innerHeight is bigger than scene.scale.height
 
-    this.joyBase.setPosition(120, h - 120);
-    this.joyThumb.setPosition(120, h - 120);
+    this.joyBase.setPosition(120, h - 100);
+    this.joyThumb.setPosition(120, h - 100);
 
     this.actionButtonUI.button.setPosition(w - 100, h - 100);
     this.actionButtonUI.text.setPosition(w - 100, h - 100);
+
+    this.scene.hotbarUI?.resetUIPosition();
   }
 
   update() {
