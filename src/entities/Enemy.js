@@ -249,6 +249,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   enterRetreat() {
     this.aiState = this.STATE_RETREAT;
+
+    this.retreatDirection = Phaser.Math.Angle.Between(
+      this.x,
+      this.y,
+      this.spawnX,
+      this.spawnY,
+    );
   }
 
   updateChase() {
@@ -288,11 +295,37 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateRetreat() {
-    this.setVelocity(0, -this.speed * 2);
+    const dist = Phaser.Math.Distance.Between(
+      this.x,
+      this.y,
+      this.spawnX,
+      this.spawnY,
+    );
 
-    if (this.y < -100) {
-      this.destroy();
+    if (dist < 20) {
+      this.die();
+      return;
     }
+
+    this.scene.physics.moveTo(this, this.spawnX, this.spawnY, this.speed * 1.5);
+
+    if (
+      this.body.blocked.left ||
+      this.body.blocked.right ||
+      this.body.blocked.up ||
+      this.body.blocked.down
+    ) {
+      this.retreatDirection += Phaser.Math.FloatBetween(-1, 1);
+    }
+
+    this.scene.physics.velocityFromRotation(
+      this.retreatDirection,
+      this.speed * 1.5,
+      this.body.velocity,
+    );
+
+    this.updateFacing();
+    this.anims.play(`goblin_walk_${this.facing}`, true);
   }
 
   update() {
