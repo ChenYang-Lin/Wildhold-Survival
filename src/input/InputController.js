@@ -1,4 +1,5 @@
 import InputState from "./InputState.js";
+import ActionButtonUI from "./../ui/ActionButtonUI.js";
 
 export default class InputController {
   constructor(scene) {
@@ -19,21 +20,26 @@ export default class InputController {
   }
 
   setupMobile() {
+    // Action button
+    this.actionButtonUI = new ActionButtonUI(this.scene);
+
     // JOYSTICK --------------------------------------------------------------------------------------------------------------------
     this.joystickActive = false;
     this.joyPointerId = null;
 
+    const h = this.scene.scale.height;
+
     this.joyBase = this.scene.add
-      .circle(120, 480, 50, 0x000000, 0.3)
+      .circle(120, h - 120, 50, 0x000000, 0.3)
       .setScrollFactor(0)
       .setDepth(9999);
 
     this.joyThumb = this.scene.add
-      .circle(120, 480, 25, 0xffffff, 0.5)
+      .circle(120, h - 120, 25, 0xffffff, 0.5)
       .setScrollFactor(0)
       .setDepth(10000);
 
-    this.scene.actionButtonUI.button.on("pointerdown", (pointer) => {
+    this.actionButtonUI.button.on("pointerdown", (pointer) => {
       console.log("BUTTON CLICKED");
 
       this.state.actionPointerId = pointer.id;
@@ -41,7 +47,7 @@ export default class InputController {
       this.state.actionHeld = true;
     });
 
-    this.scene.actionButtonUI.button.on("pointerup", () => {
+    this.actionButtonUI.button.on("pointerup", () => {
       this.state.actionHeld = false;
       this.state.actionReleased = true;
     });
@@ -56,8 +62,9 @@ export default class InputController {
         this.joyPointerId = pointer.id;
         this.joystickActive = true;
 
-        this.joyBase.setPosition(pointer.x, pointer.y);
-        this.joyThumb.setPosition(pointer.x, pointer.y);
+        // Make the fixed position joystick to Floating joystick
+        // this.joyBase.setPosition(pointer.x, pointer.y);
+        // this.joyThumb.setPosition(pointer.x, pointer.y);
 
         this.state.moveVector.set(0, 0);
       }
@@ -80,7 +87,15 @@ export default class InputController {
       const dx = pointer.x - this.joyBase.x;
       const dy = pointer.y - this.joyBase.y;
 
-      const distance = Math.min(Math.sqrt(dx * dx + dy * dy), 50);
+      const distance = Math.min(
+        Phaser.Math.Distance.Between(
+          this.joyBase.x,
+          this.joyBase.y,
+          pointer.x,
+          pointer.y,
+        ),
+        50,
+      );
 
       const angle = Math.atan2(dy, dx);
 
@@ -114,6 +129,14 @@ export default class InputController {
         this.state.moveVector.set(0, 0);
       }
     });
+
+    // Screen resize
+    this.scene.scale.on("resize", () => {
+      this.resetUIPosition();
+    });
+
+    // make sure every ui is at correct position
+    this.resetUIPosition();
   }
 
   setupPC() {
@@ -171,14 +194,16 @@ export default class InputController {
     return objects.some((obj) => obj.isUI);
   }
 
-  // consumeAction() {
-  //   if (this.state.actionPressed) {
-  //     this.state.actionPressed = false;
-  //     return true;
-  //   }
+  resetUIPosition() {
+    const w = this.scene.scale.width;
+    const h = this.scene.scale.height;
 
-  //   return false;
-  // }
+    this.joyBase.setPosition(120, h - 120);
+    this.joyThumb.setPosition(120, h - 120);
+
+    this.actionButtonUI.button.setPosition(w - 100, h - 100);
+    this.actionButtonUI.text.setPosition(w - 100, h - 100);
+  }
 
   update() {
     if (!this.state.isMobile) {
@@ -195,6 +220,8 @@ export default class InputController {
       if (this.keys.right.isDown) this.state.moveVector.x = 1;
       if (this.keys.up.isDown) this.state.moveVector.y = -1;
       if (this.keys.down.isDown) this.state.moveVector.y = 1;
+    } else {
+      this.actionButtonUI.update();
     }
 
     // Restart game

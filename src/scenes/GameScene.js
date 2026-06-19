@@ -14,7 +14,6 @@ import HotbarSystem from "../systems/HotbarSystem.js";
 import InventorySystem from "../systems/InventorySystem.js";
 import LightingSystem from "../systems/LightingSystem.js";
 import ResourceSystem from "../systems/ResourceSystem.js";
-import ActionButtonUI from "../ui/ActionButtonUI.js";
 import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
 
@@ -42,7 +41,6 @@ export default class GameScene extends Phaser.Scene {
     this.player = new Player(this, 32, 32);
     this.player.moveToGrid(20, 20);
     this.inventorySystem = new InventorySystem(this);
-    this.actionButtonUI = new ActionButtonUI(this);
     this.inputController = new InputController(this);
     this.actionSystem = new ActionSystem(
       this,
@@ -66,9 +64,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.isGameOver = false;
 
-    this.input.addPointer(2);
-
-    console.log("pointer count:", this.input.manager.pointers.length);
+    this.input.addPointer(4);
 
     // 3. Create the tilemap data object
     const map = this.make.tilemap({ key: "test_map" });
@@ -118,6 +114,14 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.combatSystem.enemies, this.trees);
   }
 
+  getScreenWidth() {
+    return this.scale.width;
+  }
+
+  getScreenHeight() {
+    return this.scale.height;
+  }
+
   spawnTrees() {
     for (let i = 0; i < 15; i++) {
       let x = Phaser.Math.Between(100, 1500);
@@ -139,7 +143,6 @@ export default class GameScene extends Phaser.Scene {
     this.combatSystem.update();
     this.healthUI.update();
     this.hotbarUI.update();
-    this.actionButtonUI.update();
     this.dayNightSystem.update(delta);
     this.campfire.update();
 
