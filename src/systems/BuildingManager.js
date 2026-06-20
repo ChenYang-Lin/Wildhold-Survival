@@ -95,6 +95,9 @@ export default class BuildingManager {
         this.grid.set(`${gridX + x},${gridY + y}`, obj);
       }
     }
+
+    // Objective hook
+    this.scene.objectiveSystem.onBuildingPlaced(type);
     return obj;
   }
 

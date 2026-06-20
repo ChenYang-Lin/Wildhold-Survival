@@ -13,6 +13,7 @@ import GhostPreviewSystem from "../systems/GhostPreviewSystem.js";
 import HotbarSystem from "../systems/HotbarSystem.js";
 import InventorySystem from "../systems/InventorySystem.js";
 import LightingSystem from "../systems/LightingSystem.js";
+import ObjectiveSystem from "../systems/ObjectiveSystem.js";
 import ResourceSystem from "../systems/ResourceSystem.js";
 import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
@@ -58,6 +59,7 @@ export default class GameScene extends Phaser.Scene {
     this.hotbarSystem = new HotbarSystem(this);
     this.hotbarUI = new HotbarUI(this);
     this.dayNightSystem = new DayNightSystem(this);
+    this.objectiveSystem = new ObjectiveSystem(this);
     // Campfire
     this.campfire = new Campfire(this, 32, 32);
     this.campfire.moveToGrid(25, 19);

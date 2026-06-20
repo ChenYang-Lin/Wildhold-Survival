@@ -20,6 +20,10 @@ export default class InventorySystem {
   }
 
   addItem(id, type, amount) {
+    if (id === "wood") {
+      this.scene.objectiveSystem.addWood(amount);
+    }
+
     // stack existing
     for (let slot of this.inventory) {
       if (slot && slot.id === id) {
