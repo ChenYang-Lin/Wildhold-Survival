@@ -1,5 +1,5 @@
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y) {
+  constructor(scene, x, y, stats = {}) {
     super(scene, x, y, "goblin", "goblin_idle_down");
     this.scene = scene;
 
@@ -11,22 +11,23 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.body.setOffset(80, 96); // 192 x 192, 32 + 32 + 16, 32 + 32 + 16 + 16
 
     this.facing = "down";
-    this.hp = 3;
+    this.hp = stats.hp ?? 3;
     this.maxHP = this.hp;
-    this.speed = 50;
+    this.speed = stats.speed ?? 50;
+
+    // Attack
+    this.attackRange = 46;
+    this.attackDamage = stats.damage ?? 1;
+    this.attackCooldown = 1000;
+    this.canAttack = true;
+
     this.target = null;
 
     // Spawn location
     this.spawnX = x;
     this.spawnY = y;
 
-    // Attack
-    this.attackRange = 46;
-    this.attackDamage = 1;
-    this.attackCooldown = 1000;
-    this.canAttack = true;
-
-    // HP
+    // HP UI
     this.hpBar = this.scene.add.graphics();
     this.hpBar.setDepth(5000);
 
@@ -145,6 +146,15 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.destroy();
   }
 
+  // Enemy die instantly on retreat (temporary function, might change retreat function)
+  retreatEnemies() {
+    const enemies = this.scene.combatSystem.getEnemies().getChildren();
+
+    enemies.forEach((enemy) => {
+      enemy.enterDead();
+    });
+  }
+
   updateTarget() {
     if (
       this.target &&
@@ -248,6 +258,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   enterRetreat() {
+    this.retreatEnemies(); // temperary solution, might change the way enemy retreat;
+    return;
     this.aiState = this.STATE_RETREAT;
 
     this.retreatDirection = Phaser.Math.Angle.Between(

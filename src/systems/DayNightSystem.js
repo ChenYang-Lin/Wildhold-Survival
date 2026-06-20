@@ -57,12 +57,33 @@ export default class DayNightSystem {
     console.log("Day started");
   }
 
+  getEnemyCount() {
+    return 4 + this.day;
+  }
+
+  getEnemyStats() {
+    return {
+      hp: 3 + Math.floor(this.day / 2),
+      damage: 1 + Math.floor(this.day / 4),
+    };
+  }
+
   spawnNightEnemies() {
-    const count = 3 + this.day;
+    const count = this.getEnemyCount();
+    const stats = this.getEnemyStats();
+
+    this.spawnPoints = [
+      { x: 50, y: 50 },
+      { x: 1550, y: 50 },
+      { x: 50, y: 1150 },
+      { x: 1550, y: 1150 },
+    ];
+
     for (let i = 0; i < count; i++) {
       const x = Phaser.Math.Between(0, 1600);
       const y = Phaser.Math.Between(0, 1200);
-      this.scene.combatSystem.spawnEnemy(x, y);
+      const point = Phaser.Utils.Array.GetRandom(this.spawnPoints);
+      this.scene.combatSystem.spawnEnemy(x, y, stats);
       // const point = Phaser.Utils.Array.GetRandom(this.spawnPoints);
       // this.scene.combatSystem.spawnEnemy(point.x, point.y);
     }

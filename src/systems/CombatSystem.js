@@ -11,12 +11,11 @@ export default class CombatSystem {
     return this.enemies;
   }
 
-  spawnEnemy() {
-    const x = Phaser.Math.Between(0, 1600);
-    const y = Phaser.Math.Between(0, 1200);
-
-    const enemy = new Enemy(this.scene, x, y);
+  spawnEnemy(x, y, stats = {}) {
+    const enemy = new Enemy(this.scene, x, y, stats);
     this.enemies.add(enemy);
+
+    return enemy;
   }
 
   spawnEnemyEdge() {
