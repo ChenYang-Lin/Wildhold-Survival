@@ -6,14 +6,32 @@ export default class ObjectiveSystem {
 
     this.objectives = [
       {
-        id: "wood",
+        type: "collect",
+        item: "wood",
         text: "Gather 10 Wood",
         target: 10,
         progress: 0,
       },
+
       {
-        id: "wall",
+        type: "build",
+        building: "wall",
         text: "Build 1 Wall",
+        target: 1,
+        progress: 0,
+      },
+
+      {
+        type: "survive",
+        text: "Survive the first night",
+        target: 1,
+        progress: 0,
+      },
+
+      {
+        type: "build",
+        building: "tower",
+        text: "Build a tower",
         target: 1,
         progress: 0,
       },
@@ -49,51 +67,6 @@ export default class ObjectiveSystem {
     this.updateUI();
   }
 
-  addWood(amount) {
-    const obj = this.getCurrentObjective();
-
-    if (!obj) return;
-
-    if (obj.id !== "wood") return;
-
-    obj.progress++;
-
-    if (obj.progress >= obj.target) {
-      this.completeObjective();
-    }
-
-    this.updateUI();
-    // this.woodCollected += amount;
-
-    // if (this.woodCollected > this.woodGoal) {
-    //   this.woodCollected = this.woodGoal;
-    // }
-
-    // this.updateUI();
-
-    // if (this.woodCollected >= this.woodGoal) {
-    //   console.log("Objective Complete");
-    // }
-  }
-
-  onBuildingPlaced(id) {
-    const obj = this.getCurrentObjective();
-
-    if (!obj) return;
-
-    if (obj.id !== "wall") return;
-
-    if (id !== "wall") return;
-
-    obj.progress++;
-
-    if (obj.progress >= obj.target) {
-      this.completeObjective();
-    }
-
-    this.updateUI();
-  }
-
   updateUI() {
     const obj = this.getCurrentObjective();
 
@@ -105,5 +78,48 @@ export default class ObjectiveSystem {
     this.text.setText(
       `Objective:\n${obj.text} (${obj.progress}/${obj.target})`,
     );
+  }
+
+  advanceObjective(amount = 1) {
+    const obj = this.getCurrentObjective();
+
+    if (!obj) return;
+
+    obj.progress += amount;
+
+    if (obj.progress >= obj.target) {
+      this.completeObjective();
+    }
+
+    this.updateUI();
+  }
+
+  addResource(itemId, amount) {
+    const obj = this.getCurrentObjective();
+
+    if (!obj) return;
+    if (obj.type !== "collect") return;
+    if (obj.item !== itemId) return;
+
+    this.advanceObjective(amount);
+  }
+
+  onBuildingPlaced(id) {
+    const obj = this.getCurrentObjective();
+
+    if (!obj) return;
+    if (obj.type !== "build") return;
+    if (id !== obj.building) return;
+
+    this.advanceObjective();
+  }
+
+  onSurviveNight() {
+    const obj = this.getCurrentObjective();
+
+    if (!obj) return;
+    if (obj.type !== "survive") return;
+
+    this.advanceObjective();
   }
 }

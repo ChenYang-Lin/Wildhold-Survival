@@ -3,9 +3,9 @@ export default class InventorySystem {
     this.scene = scene;
 
     this.inventory = [
-      { id: "wood", amount: 50 },
-      { id: "stone", amount: 20 },
-      { id: "apple", amount: 3 },
+      { id: "wood", type: "resource", amount: 50 },
+      { id: "stone", type: "resource", amount: 20 },
+      { id: "apple", type: "resource", amount: 3 },
     ];
 
     this.inventoryText = this.scene.add
@@ -20,8 +20,8 @@ export default class InventorySystem {
   }
 
   addItem(id, type, amount) {
-    if (id === "wood") {
-      this.scene.objectiveSystem.addWood(amount);
+    if (type === "resource") {
+      this.scene.objectiveSystem.addResource(id, amount);
     }
 
     // stack existing
