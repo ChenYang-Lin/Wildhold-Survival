@@ -1,0 +1,281 @@
+{
+    "frames": [
+        {
+            "filename": "tower_1_lv1",
+            "frame": {
+                "w": 64,
+                "h": 128,
+                "x": 0,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_weapon_0",
+            "frame": {
+                "w": 96,
+                "h": 96,
+                "x": 64,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_weapon_7",
+            "frame": {
+                "w": 96,
+                "h": 96,
+                "x": 64,
+                "y": 96
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_weapon_1",
+            "frame": {
+                "w": 96,
+                "h": 96,
+                "x": 160,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_weapon_2",
+            "frame": {
+                "w": 96,
+                "h": 96,
+                "x": 160,
+                "y": 96
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_weapon_3",
+            "frame": {
+                "w": 96,
+                "h": 96,
+                "x": 0,
+                "y": 192
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_weapon_4",
+            "frame": {
+                "w": 96,
+                "h": 96,
+                "x": 96,
+                "y": 192
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_weapon_5",
+            "frame": {
+                "w": 96,
+                "h": 96,
+                "x": 256,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_weapon_6",
+            "frame": {
+                "w": 96,
+                "h": 96,
+                "x": 256,
+                "y": 96
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_impact_0",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 0,
+                "y": 128
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_impact_1",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 192,
+                "y": 192
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_impact_5",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 192,
+                "y": 256
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_impact_2",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 256,
+                "y": 192
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_impact_3",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 256,
+                "y": 256
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_impact_4",
+            "frame": {
+                "w": 64,
+                "h": 64,
+                "x": 0,
+                "y": 320
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_5",
+            "frame": {
+                "w": 10,
+                "h": 10,
+                "x": 320,
+                "y": 192
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_1",
+            "frame": {
+                "w": 10,
+                "h": 10,
+                "x": 330,
+                "y": 192
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_0",
+            "frame": {
+                "w": 10,
+                "h": 10,
+                "x": 340,
+                "y": 192
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_2",
+            "frame": {
+                "w": 10,
+                "h": 10,
+                "x": 0,
+                "y": 288
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_4",
+            "frame": {
+                "w": 10,
+                "h": 10,
+                "x": 0,
+                "y": 298
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "tower_1_lv1_projectile_3",
+            "frame": {
+                "w": 10,
+                "h": 10,
+                "x": 0,
+                "y": 308
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        }
+    ],
+    "meta": {
+        "description": "Atlas generado con Atlas Packer Gamma V2",
+        "web": "https://gammafp.github.io/atlas-packer-phaser/"
+    }
+}

@@ -1,4 +1,5 @@
 import { BUILDINGS } from "../data/buildings.js";
+import Tower from "../entities/Tower.js";
 import Wall from "../entities/Wall.js";
 
 export default class BuildingManager {
@@ -16,8 +17,8 @@ export default class BuildingManager {
 
     for (let x = 0; x < b.width; x++) {
       for (let y = 0; y < b.height; y++) {
-        const checkX = gridX + x;
-        const checkY = gridY + y;
+        const checkX = gridX + x + (b.footprintOffsetX || 0);
+        const checkY = gridY + y + (b.footprintOffsetY || 0);
 
         const mapWidthTiles = 1600 / 32;
         const mapHeightTiles = 1200 / 32;
@@ -73,26 +74,43 @@ export default class BuildingManager {
     return this.buildings.getChildren().filter((b) => b instanceof Wall);
   }
 
+  getBuildingWorldPosition(building, gridX, gridY) {
+    return {
+      x:
+        gridX * this.tileSize +
+        building.footprintWidth / 2 +
+        (building.spriteWidth - building.footprintWidth) / 2,
+      y:
+        gridY * this.tileSize +
+        building.footprintHeight / 2 +
+        (building.spriteHeight - building.footprintHeight) / 2,
+    };
+  }
+
   placeBuilding(type, gridX, gridY) {
     if (!this.canPlace(type, gridX, gridY)) return false;
 
     const building = BUILDINGS[type];
 
-    const worldX = gridX * this.tileSize + (building.width * this.tileSize) / 2;
-    const worldY = gridY * this.tileSize + (building.height * this.tileSize ) / 2; // prettier-ignore
+    const worldX = this.getBuildingWorldPosition(building, gridX, gridY).x;
+    const worldY = this.getBuildingWorldPosition(building, gridX, gridY).y;
 
     let obj;
 
     if (type === "wall") {
       obj = new Wall(this.scene, worldX, worldY);
       this.buildings.add(obj);
-      console.log(obj.body instanceof Phaser.Physics.Arcade.StaticBody);
+    } else if (type === "tower") {
+      obj = new Tower(this.scene, worldX, worldY);
+      this.buildings.add(obj);
     }
 
     // mark occupied tiles
     for (let x = 0; x < building.width; x++) {
       for (let y = 0; y < building.height; y++) {
-        this.grid.set(`${gridX + x},${gridY + y}`, obj);
+        const occupiedX = gridX + x + (building.footprintOffsetX || 0);
+        const occupiedY = gridY + y + (building.footprintOffsetY || 0);
+        this.grid.set(`${occupiedX},${occupiedY}`, obj);
       }
     }
 

@@ -1,6 +1,7 @@
 import Campfire from "../entities/Campfire.js";
 import Enemy from "../entities/Enemy.js";
 import Player from "../entities/Player.js";
+import Tower from "../entities/Tower.js";
 import Tree from "../entities/Tree.js";
 import InputController from "../input/InputController.js";
 import ActionSystem from "../systems/ActionSystem.js";
@@ -27,6 +28,7 @@ export default class GameScene extends Phaser.Scene {
     Player.preload(this);
     Enemy.preload(this);
     Campfire.preload(this);
+    Tower.preload(this);
     this.load.image("wall", "assets/wall.png");
     this.load.image("tree", "assets/tree.png");
     this.load.image("wood", "assets/wood.png");
@@ -40,7 +42,7 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.player = new Player(this, 32, 32);
-    this.player.moveToGrid(20, 20);
+    this.player.moveToGrid(20, 25);
     this.inventorySystem = new InventorySystem(this);
     this.inputController = new InputController(this);
     this.actionSystem = new ActionSystem(
@@ -62,10 +64,14 @@ export default class GameScene extends Phaser.Scene {
     this.objectiveSystem = new ObjectiveSystem(this);
     // Campfire
     this.campfire = new Campfire(this, 32, 32);
-    this.campfire.moveToGrid(25, 19);
+    this.campfire.moveToGrid(25, 25);
+
+    // Projectile group
+    this.projectiles = this.add.group({
+      runChildUpdate: true,
+    });
 
     this.isGameOver = false;
-
     this.input.addPointer(4);
 
     // 3. Create the tilemap data object
@@ -87,6 +93,10 @@ export default class GameScene extends Phaser.Scene {
     this.spawnTrees();
 
     // // TEST
+
+    this.testTower = new Tower(this, 25 * 32, 22 * 32);
+    this.buildingManager.buildings.add(this.testTower);
+
     // this.ghostPreview.setBuilding("wall");
     this.input.keyboard.on("keydown-T", () => {
       console.log(this.hotbarSystem.getSelectedItem());
@@ -114,6 +124,13 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings,); // prettier-ignore
     this.physics.add.collider(this.combatSystem.enemies, this.campfire);
     this.physics.add.collider(this.combatSystem.enemies, this.trees);
+    this.physics.add.overlap(
+      this.projectiles,
+      this.combatSystem.getEnemies(),
+      (projectile, enemy) => {
+        projectile.hit(enemy);
+      },
+    );
   }
 
   getScreenWidth() {
@@ -147,6 +164,13 @@ export default class GameScene extends Phaser.Scene {
     this.hotbarUI.update();
     this.dayNightSystem.update(delta);
     this.campfire.update();
+
+    // update buildings that has update funtion
+    this.buildingManager.buildings.children.iterate((building) => {
+      if (building.update) {
+        building.update();
+      }
+    });
 
     // update fog overlay
     this.lightingSystem.update();

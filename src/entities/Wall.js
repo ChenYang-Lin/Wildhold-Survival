@@ -1,3 +1,5 @@
+import { BUILDINGS } from "../data/buildings.js";
+
 export default class Wall extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "wall");
@@ -6,6 +8,10 @@ export default class Wall extends Phaser.Physics.Arcade.Sprite {
 
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this, true);
+
+    const offsetX = BUILDINGS["wall"].footprintOffsetX * 32;
+    const offsetY = BUILDINGS["wall"].footprintOffsetY * 32;
+    this.body.setOffset(offsetX, offsetY); // prettier-ignore
 
     this.setImmovable(true);
 

@@ -1,0 +1,108 @@
+{
+  "anims": [
+    {
+      "key": "tower_1_lv1_projectile_impact",
+      "type": "frames",
+      "repeat": -1,
+      "frameRate": 12,
+      "frames": [
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_impact_0"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_impact_1"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_impact_2"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_impact_3"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_impact_4"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_impact_5"
+        }
+      ]
+    },
+    {
+      "key": "tower_1_lv1_projectile",
+      "type": "frames",
+      "repeat": -1,
+      "frameRate": 12,
+      "frames": [
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_0"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_1"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_2"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_3"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_4"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_projectile_5"
+        }
+      ]
+    },
+    {
+      "key": "tower_1_lv1_weapon",
+      "type": "frames",
+      "repeat": 0,
+      "frameRate": 12,
+      "frames": [
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_weapon_0"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_weapon_1"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_weapon_2"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_weapon_3"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_weapon_4"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_weapon_5"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_weapon_6"
+        },
+        {
+          "key": "tower",
+          "frame": "tower_1_lv1_weapon_7"
+        }
+      ]
+    }
+  ]
+}

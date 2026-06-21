@@ -1,4 +1,4 @@
-import { BUILD_CATALOG } from "../data/buildCatalog.js";
+import { BUILDINGS } from "../data/buildings.js";
 
 export default class ActionSystem {
   constructor(scene, player, inputController) {
@@ -14,7 +14,7 @@ export default class ActionSystem {
     const gridY = Math.floor(state.aimWorldY / 32);
 
     // Check if there is enough resource for placing selected building (wall, tower, etc)
-    const recipe = BUILD_CATALOG.find((b) => b.id === item.id);
+    const recipe = BUILDINGS[item.id];
 
     if (!recipe) return;
 

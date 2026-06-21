@@ -4,6 +4,8 @@ export default class GhostPreviewSystem {
   constructor(scene) {
     this.scene = scene;
 
+    this.tileSize = 32;
+
     this.currentBuildingType = null;
     this.preview = null;
   }
@@ -51,8 +53,8 @@ export default class GhostPreviewSystem {
     const gridX = Math.floor(state.aimWorldX / 32);
     const gridY = Math.floor(state.aimWorldY / 32);
 
-    const worldX = gridX * 32 + (building.width * 32) / 2;
-    const worldY = gridY * 32 + (building.height * 32) / 2;
+    const worldX = this.scene.buildingManager.getBuildingWorldPosition(building, gridX, gridY).x; // prettier-ignore
+    const worldY = this.scene.buildingManager.getBuildingWorldPosition(building, gridX, gridY).y; // prettier-ignore
 
     this.preview.setVisible(true);
     this.preview.setPosition(worldX, worldY);

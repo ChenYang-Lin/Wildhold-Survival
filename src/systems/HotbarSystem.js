@@ -14,7 +14,7 @@ export default class HotbarSystem {
       // return this.scene.blueprintSystem ? this.scene.blueprintSystem.getUnlockedWeapons() : ["woodenSword", "ironSword", "bow"]; // prettier-ignore
     }
 
-    return this.scene.blueprintSystem ? this.scene.blueprintSystem.getUnlockedBuildings() : ["wall"]; // prettier-ignore
+    return this.scene.blueprintSystem ? this.scene.blueprintSystem.getUnlockedBuildings() : ["wall", "tower"]; // prettier-ignore
   }
 
   getSelectedItem() {
