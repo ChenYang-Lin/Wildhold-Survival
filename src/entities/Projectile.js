@@ -31,7 +31,6 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite {
     if (this.target?.active) {
       const desiredAngle = Phaser.Math.Angle.Between(this.x, this.y, this.target.body.center.x, this.target.body.center.y); // prettier-ignore
 
-      this.rotation = Phaser.Math.Angle.RotateTo(this.rotation, desiredAngle, this.turnSpeed); // prettier-ignore
       this.rotation = desiredAngle;
     }
 

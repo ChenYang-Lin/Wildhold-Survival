@@ -1,3 +1,4 @@
+import Archer from "../entities/Archer.js";
 import Campfire from "../entities/Campfire.js";
 import Enemy from "../entities/Enemy.js";
 import Player from "../entities/Player.js";
@@ -27,11 +28,14 @@ export default class GameScene extends Phaser.Scene {
   preload() {
     Player.preload(this);
     Enemy.preload(this);
+    Archer.preload(this);
     Campfire.preload(this);
     Tower.preload(this);
     this.load.image("wall", "assets/wall.png");
     this.load.image("tree", "assets/tree.png");
     this.load.image("wood", "assets/wood.png");
+
+    this.load.image("arrow", "assets/arrow.png");
 
     // 1. Load the tileset image asset
     this.load.image("tileset_objects", "assets/map/tileset_objects.png");
@@ -68,6 +72,9 @@ export default class GameScene extends Phaser.Scene {
 
     // Projectile group
     this.projectiles = this.add.group({
+      runChildUpdate: true,
+    });
+    this.enemyProjectiles = this.add.group({
       runChildUpdate: true,
     });
 
@@ -123,6 +130,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.trees);
     this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings,); // prettier-ignore
     this.physics.add.collider(this.combatSystem.enemies, this.campfire);
+
     this.physics.add.collider(this.combatSystem.enemies, this.trees);
     this.physics.add.overlap(
       this.projectiles,

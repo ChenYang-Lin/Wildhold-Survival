@@ -1,3 +1,4 @@
+import Archer from "../entities/Archer.js";
 import Enemy from "../entities/Enemy.js";
 
 export default class CombatSystem {
@@ -13,7 +14,9 @@ export default class CombatSystem {
 
   spawnEnemy(x, y, stats = {}) {
     const enemy = new Enemy(this.scene, x, y, stats);
+    const archer = new Archer(this.scene, x, y);
     this.enemies.add(enemy);
+    this.enemies.add(archer);
 
     return enemy;
   }

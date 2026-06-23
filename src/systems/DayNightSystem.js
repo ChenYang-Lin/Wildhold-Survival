@@ -6,7 +6,8 @@ export default class DayNightSystem {
 
     this.isNight = false;
 
-    this.dayDuration = 10000;
+    this.dayDuration = 20000;
+    // this.dayDuration = 5000;
     this.nightDuration = 20000;
 
     this.timer = this.dayDuration;
@@ -61,7 +62,7 @@ export default class DayNightSystem {
   }
 
   getEnemyCount() {
-    return 4 + this.day;
+    return 1 + this.day;
   }
 
   getEnemyStats() {

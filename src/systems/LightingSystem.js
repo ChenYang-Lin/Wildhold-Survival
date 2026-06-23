@@ -15,7 +15,7 @@ export default class LightingSystem {
     this.lightSize = 512;
 
     this.visionRadius = 1000;
-    this.campfireRadius = 280;
+    this.campfireRadius = 350;
 
     this.darknessRT = this.scene.add
       .renderTexture(0, 0, cam.width, cam.height)

@@ -1,0 +1,468 @@
+{
+    "anims": [
+        {
+            "key": "goblin_archer_attack_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_00"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_01"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_02"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_03"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_04"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_05"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_06"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_07"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_08"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_09"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_10"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_right_11"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_attack_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_00"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_01"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_02"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_03"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_04"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_05"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_06"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_07"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_08"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_09"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_10"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_left_11"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_attack_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_00"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_01"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_02"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_03"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_04"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_05"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_06"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_07"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_08"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_09"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_10"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_down_11"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_attack_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_00"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_01"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_02"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_03"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_04"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_05"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_06"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_07"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_08"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_09"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_10"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_attack_up_11"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_walk_right",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_right_0"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_right_1"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_right_2"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_right_3"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_right_4"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_right_5"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_right_6"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_right_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_walk_left",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_left_0"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_left_1"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_left_2"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_left_3"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_left_4"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_left_5"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_left_6"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_left_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_walk_down",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_down_0"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_down_1"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_down_2"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_down_3"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_down_4"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_down_5"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_down_6"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_down_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_walk_up",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_up_0"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_up_1"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_up_2"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_up_3"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_up_4"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_up_5"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_up_6"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_walk_up_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_death",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_death_0"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_death_1"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_death_2"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_death_3"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_death_4"
+                },
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_death_5"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_idle_right",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_idle_right"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_idle_left",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_idle_left"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_idle_down",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_idle_down"
+                }
+            ]
+        },
+        {
+            "key": "goblin_archer_idle_up",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_archer",
+                    "frame": "goblin_archer_idle_up"
+                }
+            ]
+        }
+    ]
+}

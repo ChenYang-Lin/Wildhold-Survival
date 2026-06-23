@@ -18,7 +18,7 @@ export default class Tower extends Phaser.Physics.Arcade.Sprite {
     console.log("placed a tower at: ", this.body.center.x, this.body.center.y);
 
     // Add Weapon to the Tower
-    this.weapon = this.scene.add.sprite(this.body.center.x, this.body.center.y - 32, "tower", "tower_1_lv1_weapon_0").setDepth(this.depth + 1); // prettier-ignore
+    this.weapon = this.scene.add.sprite(this.body.center.x, this.body.center.y - 36, "tower", "tower_1_lv1_weapon_0").setDepth(this.depth + 1); // prettier-ignore
 
     this.range = 200;
     this.damage = 1;
