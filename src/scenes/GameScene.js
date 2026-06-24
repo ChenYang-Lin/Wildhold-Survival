@@ -101,9 +101,6 @@ export default class GameScene extends Phaser.Scene {
 
     // // TEST
 
-    this.testTower = new Tower(this, 25 * 32, 22 * 32);
-    this.buildingManager.buildings.add(this.testTower);
-
     // this.ghostPreview.setBuilding("wall");
     this.input.keyboard.on("keydown-T", () => {
       console.log(this.hotbarSystem.getSelectedItem());

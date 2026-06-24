@@ -12,12 +12,23 @@ export default class CombatSystem {
     return this.enemies;
   }
 
-  spawnEnemy(x, y, stats = {}) {
-    const enemy = new Enemy(this.scene, x, y, stats);
-    const archer = new Archer(this.scene, x, y);
-    this.enemies.add(enemy);
-    this.enemies.add(archer);
+  spawnEnemy(x, y, stats = {}, day) {
+    let enemyType = "goblin";
 
+    if (this.day >= 3) {
+      if (Math.random() < 0.2) {
+        enemyType = "archer";
+      }
+    }
+
+    let enemy;
+    if (enemyType === "goblin") {
+      enemy = new Enemy(this.scene, x, y, stats);
+    } else {
+      enemy = new Archer(this.scene, x, y, stats);
+    }
+
+    this.enemies.add(enemy);
     return enemy;
   }
 

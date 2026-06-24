@@ -87,7 +87,7 @@ export default class DayNightSystem {
       const x = Phaser.Math.Between(0, 1600);
       const y = Phaser.Math.Between(0, 1200);
       const point = Phaser.Utils.Array.GetRandom(this.spawnPoints);
-      this.scene.combatSystem.spawnEnemy(x, y, stats);
+      this.scene.combatSystem.spawnEnemy(x, y, stats, this.day);
       // const point = Phaser.Utils.Array.GetRandom(this.spawnPoints);
       // this.scene.combatSystem.spawnEnemy(point.x, point.y);
     }

@@ -182,7 +182,7 @@ export default class Archer extends Phaser.Physics.Arcade.Sprite {
       this.shootArrow();
     });
 
-    this.scene.time.delayedCall(800, () => {
+    this.scene.time.delayedCall(1200, () => {
       if (!this.active) return;
       if (this.aiState === this.STATE_DEAD) return;
 

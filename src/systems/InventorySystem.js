@@ -3,9 +3,9 @@ export default class InventorySystem {
     this.scene = scene;
 
     this.inventory = [
-      { id: "wood", type: "resource", amount: 50 },
-      { id: "stone", type: "resource", amount: 20 },
-      { id: "apple", type: "resource", amount: 3 },
+      { id: "wood", type: "resource", amount: 0 },
+      { id: "stone", type: "resource", amount: 0 },
+      { id: "apple", type: "resource", amount: 0 },
     ];
 
     this.inventoryText = this.scene.add
