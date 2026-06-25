@@ -15,7 +15,7 @@ export default class CombatSystem {
   spawnEnemy(x, y, stats = {}, day) {
     let enemyType = "goblin";
 
-    if (this.day >= 3) {
+    if (day >= 3) {
       if (Math.random() < 0.2) {
         enemyType = "archer";
       }

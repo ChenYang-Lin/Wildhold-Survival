@@ -18,6 +18,18 @@ export default class Wall extends Phaser.Physics.Arcade.Sprite {
     this.maxHP = 10;
     this.hp = this.maxHP;
 
+    // Todo: Need to delete event after wall destroyed
+    this.regenEvent = this.scene.time.addEvent({
+      delay: 5000,
+      loop: true,
+      callback: () => {
+        if (!this.active) return;
+        if (this.hp < this.maxHP && !this.scene.dayNightSystem.isNight) {
+          this.hp++;
+        }
+      },
+    });
+
     this.setDepth(this.body.center.y);
   }
 
@@ -52,6 +64,10 @@ export default class Wall extends Phaser.Physics.Arcade.Sprite {
 
   die() {
     this.scene.buildingManager.removeBuilding(this);
+
+    if (this.regenEvent) {
+      this.regenEvent.remove();
+    }
 
     this.destroy();
   }
