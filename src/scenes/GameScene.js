@@ -2,6 +2,7 @@ import Archer from "../entities/Archer.js";
 import Campfire from "../entities/Campfire.js";
 import Enemy from "../entities/Enemy.js";
 import Player from "../entities/Player.js";
+import Rock from "../entities/Rock.js";
 import Tower from "../entities/Tower.js";
 import Tree from "../entities/Tree.js";
 import InputController from "../input/InputController.js";
@@ -34,6 +35,8 @@ export default class GameScene extends Phaser.Scene {
     this.load.image("wall", "assets/wall.png");
     this.load.image("tree", "assets/tree.png");
     this.load.image("wood", "assets/wood.png");
+    this.load.image("rock", "assets/rock.png");
+    this.load.image("stone", "assets/stone.png");
 
     this.load.image("arrow", "assets/arrow.png");
 
@@ -98,8 +101,12 @@ export default class GameScene extends Phaser.Scene {
 
     this.trees = this.physics.add.staticGroup();
     this.spawnTrees();
+    this.rocks = this.physics.add.staticGroup();
 
     // // TEST
+    this.rocks.add(new Rock(this, 500, 500));
+    this.rocks.add(new Rock(this, 700, 500));
+    this.rocks.add(new Rock(this, 900, 500));
 
     // this.ghostPreview.setBuilding("wall");
     this.input.keyboard.on("keydown-T", () => {
@@ -125,6 +132,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.campfire);
     this.physics.add.collider(this.player, this.buildingManager.buildings);
     this.physics.add.collider(this.player, this.trees);
+    this.physics.add.collider(this.player, this.rocks);
     this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings,); // prettier-ignore
     this.physics.add.collider(this.combatSystem.enemies, this.campfire);
 

@@ -29,6 +29,14 @@ export default class ObjectiveSystem {
       },
 
       {
+        type: "collect",
+        item: "stone",
+        text: "Gather 10 Stone",
+        target: 10,
+        progress: 0,
+      },
+
+      {
         type: "build",
         building: "tower",
         text: "Build a tower",

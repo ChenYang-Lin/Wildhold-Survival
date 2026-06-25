@@ -157,6 +157,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       hitTrees.add(tree);
       tree.takeDamage(1);
     });
+
+    // Rock
+    const hitRocks = new Set();
+    this.scene.physics.add.overlap(hitbox, this.scene.rocks, (_, rock) => {
+      if (hitRocks.has(rock)) return;
+
+      hitRocks.add(rock);
+      rock.takeDamage(1);
+    });
+
+    // Clear hitbox
     this.scene.time.delayedCall(80, () => {
       hitbox.destroy();
     });
