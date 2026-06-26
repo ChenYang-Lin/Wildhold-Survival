@@ -10,6 +10,7 @@ export default class Tower extends Building {
     const offsetX = BUILDINGS["tower"].footprintOffsetX * 32;
     const offsetY = BUILDINGS["tower"].footprintOffsetY * 32;
     this.body.setOffset(offsetX, offsetY); // prettier-ignore
+    this.setDepth(this.body.center.y);
 
     // Add Weapon to the Tower
     this.weapon = this.scene.add.sprite(this.body.center.x, this.body.center.y - 36, "tower", "tower_1_lv1_weapon_0").setDepth(this.depth + 1); // prettier-ignore
@@ -18,8 +19,6 @@ export default class Tower extends Building {
     this.damage = 1;
     this.fireRate = 1000;
     this.canShoot = true;
-
-    this.setDepth(this.body.center.y);
   }
 
   static preload(scene) {
