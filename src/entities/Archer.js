@@ -200,6 +200,12 @@ export default class Archer extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
+    const tower = this.scene.buildingManager.getNearestTower(this.body.center.x, this.body.center.y, 150); // prettier-ignore
+    if (tower) {
+      this.target = tower;
+      return;
+    }
+
     const player = this.scene.player;
 
     const distToPlayer = this.distanceToTarget(player);

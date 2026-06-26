@@ -12,6 +12,23 @@ export default class BuildingManager {
     this.tileSize = 32;
   }
 
+  getNearestTower(x, y, maxDistance) {
+    const towers = this.getTowers();
+
+    let nearestTower = null;
+    let nearestDistance = maxDistance;
+
+    towers.forEach((tower) => {
+      let dist = Phaser.Math.Distance.Between(tower.body.center.x, tower.body.center.y, x, y); // prettier-ignore
+      if (dist < nearestDistance) {
+        nearestDistance = dist;
+        nearestTower = tower;
+      }
+    });
+
+    return nearestTower;
+  }
+
   canPlace(type, gridX, gridY) {
     const b = BUILDINGS[type];
 
@@ -72,6 +89,10 @@ export default class BuildingManager {
 
   getWalls() {
     return this.buildings.getChildren().filter((b) => b instanceof Wall);
+  }
+
+  getTowers() {
+    return this.buildings.getChildren().filter((b) => b instanceof Tower);
   }
 
   getBuildingWorldPosition(building, gridX, gridY) {

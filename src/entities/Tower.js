@@ -60,11 +60,7 @@ export default class Tower extends Phaser.Physics.Arcade.Sprite {
   shoot(target) {
     this.canShoot = false;
 
-    this.weapon.play("tower_1_lv1_weapon");
-
-    this.weapon.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-      this.weapon.setFrame("tower_1_lv1_weapon_0");
-    });
+    this.playShootAnimation();
 
     this.scene.time.delayedCall(500, () => {
       if (!this.active) return;
@@ -72,6 +68,18 @@ export default class Tower extends Phaser.Physics.Arcade.Sprite {
       this.spawnProjectile(target);
     });
 
+    this.startCooldown();
+  }
+
+  playShootAnimation() {
+    this.weapon.play("tower_1_lv1_weapon");
+
+    this.weapon.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+      this.weapon.setFrame("tower_1_lv1_weapon_0");
+    });
+  }
+
+  startCooldown() {
     this.scene.time.delayedCall(this.fireRate, () => {
       if (this.active) {
         this.canShoot = true;

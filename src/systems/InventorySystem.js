@@ -2,8 +2,14 @@ export default class InventorySystem {
   constructor(scene) {
     this.scene = scene;
 
+    // this.inventory = [
+    //   { id: "wood", type: "resource", amount: 0 },
+    //   { id: "stone", type: "resource", amount: 0 },
+    //   { id: "apple", type: "resource", amount: 0 },
+    // ];
+
     this.inventory = [
-      { id: "wood", type: "resource", amount: 0 },
+      { id: "wood", type: "resource", amount: 10 },
       { id: "stone", type: "resource", amount: 0 },
       { id: "apple", type: "resource", amount: 0 },
     ];
