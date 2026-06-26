@@ -18,6 +18,8 @@ export default class Tower extends Building {
     this.damage = 1;
     this.fireRate = 1000;
     this.canShoot = true;
+
+    this.setDepth(this.body.center.y);
   }
 
   static preload(scene) {

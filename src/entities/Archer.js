@@ -84,7 +84,7 @@ export default class Archer extends Phaser.Physics.Arcade.Sprite {
   }
 
   // check if target in attack range
-  canAttackTarget() {
+  isTargetInAttackRange() {
     return (
       this.target && this.distanceToTarget(this.target) <= this.attackRange
     );
@@ -161,7 +161,8 @@ export default class Archer extends Phaser.Physics.Arcade.Sprite {
   }
 
   shootArrow() {
-    const projectile = new EnemyProjetile(this.scene, this.body.center.x, this.body.center.y, this.target, this.attackDamage); // prettier-ignore
+    const angle = Phaser.Math.Angle.Between(this.body.center.x, this.body.center.y, this.target.body.center.x, this.target.body.center.y); // prettier-ignore
+    const projectile = new EnemyProjetile(this.scene, this.body.center.x, this.body.center.y, angle, this.attackDamage); // prettier-ignore
 
     this.scene.enemyProjectiles.add(projectile);
   }
@@ -174,10 +175,6 @@ export default class Archer extends Phaser.Physics.Arcade.Sprite {
       if (this.aiState === this.STATE_DEAD) return;
 
       if (!this.target) return;
-
-      if (!this.canAttackTarget()) {
-        return;
-      }
 
       this.shootArrow();
     });
@@ -306,7 +303,7 @@ export default class Archer extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
-    if (this.target && this.canAttackTarget()) {
+    if (this.target && this.isTargetInAttackRange()) {
       this.enterWindup();
     }
   }

@@ -8,5 +8,7 @@ export default class Wall extends Building {
     const offsetX = BUILDINGS["wall"].footprintOffsetX * 32;
     const offsetY = BUILDINGS["wall"].footprintOffsetY * 32;
     this.body.setOffset(offsetX, offsetY); // prettier-ignore
+
+    this.setDepth(this.body.center.y);
   }
 }

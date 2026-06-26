@@ -11,6 +11,9 @@ export default class Building extends Phaser.Physics.Arcade.Sprite {
     this.maxHP = 10;
     this.hp = this.maxHP;
 
+    // Health bar
+    this.hpBar = this.scene.add.graphics();
+
     // Health regeneration
     this.regenEvent = this.scene.time.addEvent({
       delay: 5000,
@@ -18,29 +21,50 @@ export default class Building extends Phaser.Physics.Arcade.Sprite {
       callback: () => {
         if (!this.active) return;
         if (this.hp < this.maxHP && !this.scene.dayNightSystem.isNight) {
-          this.hp++;
+          this.setHP(this.hp + 1);
         }
       },
     });
+  }
 
-    this.setDepth(this.body.center.y);
+  setHP(newHP) {
+    this.hp = Phaser.Math.Clamp(newHP, 0, this.maxHP);
+    this.drawHealthBar();
+  }
+
+  drawHealthBar() {
+    if (!this.active) return;
+
+    this.hpBar.clear();
+
+    const percent = this.hp / this.maxHP;
+
+    const width = this.body.width;
+    const height = 5;
+
+    const x = this.body.center.x - width / 2;
+    const y = this.body.top - 10;
+
+    this.hpBar.fillStyle(0x222222);
+    this.hpBar.fillRect(x, y, width, height);
+
+    this.hpBar.fillStyle(0x00ff00);
+    this.hpBar.fillRect(x, y, width * percent, height);
+
+    this.hpBar.setDepth(this.depth + 1);
+
+    if (this.hp === this.maxHP) {
+      this.hpBar.clear();
+      return;
+    }
   }
 
   takeDamage(amount, source) {
     if (!this.active) return;
 
-    this.hp -= amount;
+    this.setHP(this.hp - amount);
 
     this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff8844"); // prettier-ignore
-
-    // Show healthBar
-    this.showHealthBar();
-
-    this.hideHealthBarEvent?.remove();
-
-    this.hideHealthBarEvent = this.scene.time.delayedCall(3000, () => {
-      this.hideHealthBar();
-    });
 
     // Damage flash
     this.setTint(0xff4444);
@@ -60,6 +84,10 @@ export default class Building extends Phaser.Physics.Arcade.Sprite {
     if (this.regenEvent) {
       this.regenEvent.remove();
       this.regenEvent = null;
+    }
+
+    if (this.hpBar) {
+      this.hpBar.destroy();
     }
 
     this.scene.buildingManager.removeBuilding(this);
