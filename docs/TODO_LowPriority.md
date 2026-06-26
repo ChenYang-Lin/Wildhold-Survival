@@ -1,0 +1,8 @@
+- [ ] Fade building HP bars after 3 seconds.
+- [ ] Different wall damage sprites.
+- [ ] Click building to inspect HP.
+- [ ] Camera shake on building destruction.
+- [ ] Better hit particles.
+- [ ] Better projectile trails.
+- [ ] Building placement sound.
+- [ ] Tower recoil animation.

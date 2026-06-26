@@ -1,21 +1,15 @@
 import { BUILDINGS } from "../data/buildings.js";
+import Building from "./Building.js";
 import Projectile from "./Projectile.js";
 
-export default class Tower extends Phaser.Physics.Arcade.Sprite {
+export default class Tower extends Building {
   constructor(scene, x, y) {
     super(scene, x, y, "tower", "tower_1_lv1");
-    this.scene = scene;
-
-    this.scene.add.existing(this);
-    this.scene.physics.add.existing(this, true);
 
     this.body.setSize(64, 64);
     const offsetX = BUILDINGS["tower"].footprintOffsetX * 32;
     const offsetY = BUILDINGS["tower"].footprintOffsetY * 32;
     this.body.setOffset(offsetX, offsetY); // prettier-ignore
-    this.setDepth(this.body.center.y);
-
-    console.log("placed a tower at: ", this.body.center.x, this.body.center.y);
 
     // Add Weapon to the Tower
     this.weapon = this.scene.add.sprite(this.body.center.x, this.body.center.y - 36, "tower", "tower_1_lv1_weapon_0").setDepth(this.depth + 1); // prettier-ignore
@@ -98,6 +92,12 @@ export default class Tower extends Phaser.Physics.Arcade.Sprite {
     const projectile = new Projectile(this.scene, spawnX, spawnY, target, this.damage, angle); // prettier-ignore
 
     this.scene.projectiles.add(projectile);
+  }
+
+  die() {
+    this.weapon.destroy();
+
+    super.die();
   }
 
   update() {
