@@ -19,6 +19,8 @@ export default class Tower extends Building {
     this.damage = 1;
     this.fireRate = 1000;
     this.canShoot = true;
+
+    this.targetMode = "closest";
   }
 
   static preload(scene) {
@@ -27,6 +29,16 @@ export default class Tower extends Building {
   }
 
   findTarget() {
+    switch (this.targetMode) {
+      case "closest":
+        return this.findClosestTarget();
+
+      default:
+        return this.findClosestTarget();
+    }
+  }
+
+  findClosestTarget() {
     let closest = null;
     let closestDist = Infinity;
 
@@ -35,7 +47,9 @@ export default class Tower extends Building {
     for (const enemy of enemies) {
       if (!enemy.active) continue;
 
-      const dist = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y); // prettier-ignore
+      const dist = Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, enemy.body.center.x, enemy.body.center.y); // prettier-ignore
+
+      if (dist > this.range) continue;
 
       if (dist < this.range && dist < closestDist) {
         closest = enemy;
@@ -45,6 +59,10 @@ export default class Tower extends Building {
 
     return closest;
   }
+
+  findFurthestTarget() {}
+
+  findLowestHP() {}
 
   rotateWeapon(target) {
     const angle = Phaser.Math.Angle.Between(this.body.center.x, this.body.center.y, target.body.center.x, target.body.center.y); // prettier-ignore
@@ -106,8 +124,9 @@ export default class Tower extends Building {
 
     if (!target) return;
 
+    this.rotateWeapon(target);
+
     if (this.canShoot) {
-      this.rotateWeapon(target);
       this.shoot(target);
     }
   }

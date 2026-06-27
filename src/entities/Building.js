@@ -51,7 +51,7 @@ export default class Building extends Phaser.Physics.Arcade.Sprite {
     this.hpBar.fillStyle(0x00ff00);
     this.hpBar.fillRect(x, y, width * percent, height);
 
-    this.hpBar.setDepth(this.depth + 1);
+    this.hpBar.setDepth(this.depth + 10);
 
     if (this.hp === this.maxHP) {
       this.hpBar.clear();
