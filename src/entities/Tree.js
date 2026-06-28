@@ -34,6 +34,7 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
       );
     }
 
+    this.scene.treeManager.onTreeDestroyed(this);
     this.destroy();
   }
 }

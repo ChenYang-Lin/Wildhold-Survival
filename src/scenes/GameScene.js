@@ -18,6 +18,7 @@ import InventorySystem from "../systems/InventorySystem.js";
 import LightingSystem from "../systems/LightingSystem.js";
 import ObjectiveSystem from "../systems/ObjectiveSystem.js";
 import ResourceSystem from "../systems/ResourceSystem.js";
+import TreeManager from "../systems/TreeManager.js";
 import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
 
@@ -62,13 +63,15 @@ export default class GameScene extends Phaser.Scene {
     this.lightingSystem = new LightingSystem(this);
     this.combatSystem = new CombatSystem(this);
     this.healthUI = new HealthUI(this);
-    this.resourceSystem = new ResourceSystem(this);
     this.damageTextSystem = new DamageTextSystem(this);
     this.equipmentSystem = new EquipmentSystem(this);
     this.hotbarSystem = new HotbarSystem(this);
     this.hotbarUI = new HotbarUI(this);
     this.dayNightSystem = new DayNightSystem(this);
+    this.resourceSystem = new ResourceSystem(this);
     this.objectiveSystem = new ObjectiveSystem(this);
+    this.treeManager = new TreeManager(this);
+
     // Campfire
     this.campfire = new Campfire(this, 32, 32);
     this.campfire.moveToGrid(25, 25);
