@@ -40,7 +40,7 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
         break;
 
       case TREE_STAGE.YOUNG:
-        this.hp = 2;
+        this.hp = 3;
         this.maxHP = 3;
 
         this.body.enable = true;
