@@ -42,7 +42,13 @@ export default class TreeManager {
       }
 
       if (record.tree.stage === TREE_STAGE.SAPLING) {
-        record.tree.setStage(TREE_STAGE.TREE);
+        record.tree.setStage(TREE_STAGE.YOUNG);
+
+        continue;
+      }
+
+      if (record.tree.stage === TREE_STAGE.YOUNG) {
+        record.tree.setStage(TREE_STAGE.MATURE);
 
         record.finished = true;
       }

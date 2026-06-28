@@ -33,8 +33,8 @@ export default class GameScene extends Phaser.Scene {
     Archer.preload(this);
     Campfire.preload(this);
     Tower.preload(this);
+    this.load.atlas("tree", "assets/tree.png", "assets/tree_atlas.json");
     this.load.image("wall", "assets/wall.png");
-    this.load.image("tree", "assets/tree.png");
     this.load.image("wood", "assets/wood.png");
     this.load.image("rock", "assets/rock.png");
     this.load.image("stone", "assets/stone.png");

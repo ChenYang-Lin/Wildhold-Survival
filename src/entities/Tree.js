@@ -2,7 +2,7 @@ import { TREE_STAGE } from "../data/treeStages.js";
 
 export default class Tree extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
-    super(scene, x, y, "tree");
+    super(scene, x, y, "tree", "tree_mature");
 
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this, true);
@@ -11,8 +11,8 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(32, 32);
     this.body.setOffset(48, 160); // 128 x 192, 32 + 16, 160 + 0
 
-    this.stage = TREE_STAGE.TREE;
-    this.setStage(TREE_STAGE.TREE);
+    this.stage = TREE_STAGE.MATURE;
+    this.setStage(TREE_STAGE.MATURE);
 
     this.setDepth(this.body.center.y);
   }
@@ -26,27 +26,34 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
         this.maxHP = 0;
 
         this.body.enable = false;
-        this.setScale(0.4);
+        this.setFrame("tree_sprout");
 
         break;
 
       case TREE_STAGE.SAPLING:
-        this.hp = 2;
-        this.maxHP = 2;
+        this.hp = 1;
+        this.maxHP = 1;
 
         this.body.enable = true;
-
-        this.setScale(0.7);
+        this.setFrame("tree_sapling");
 
         break;
 
-      case TREE_STAGE.TREE:
+      case TREE_STAGE.YOUNG:
+        this.hp = 2;
+        this.maxHP = 3;
+
+        this.body.enable = true;
+        this.setFrame("tree_young");
+
+        break;
+
+      case TREE_STAGE.MATURE:
         this.hp = 5;
         this.maxHP = 5;
 
         this.body.enable = true;
-
-        this.setScale(1);
+        this.setFrame("tree_mature");
 
         break;
     }
@@ -67,8 +74,14 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
   die() {
     this.scene.treeManager.onTreeDestroyed(this);
 
+    let numOfDrops = 0;
+
+    if (this.stage === TREE_STAGE.SAPLING) numOfDrops = 1;
+    else if (this.stage === TREE_STAGE.YOUNG) numOfDrops = 3;
+    else if (this.stage === TREE_STAGE.MATURE) numOfDrops = 5;
+
     // Spawn drops
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < numOfDrops; i++) {
       this.scene.resourceSystem.spawnDrop(
         "wood",
         this.x + Phaser.Math.Between(-10, 10),
