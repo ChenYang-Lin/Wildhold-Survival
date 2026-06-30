@@ -22,6 +22,8 @@ export default class Rock extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
+    this.scene.rockManager.onRockDestroyed(this);
+
     for (let i = 0; i < 3; i++) {
       this.scene.resourceSystem.spawnDrop(
         "stone",

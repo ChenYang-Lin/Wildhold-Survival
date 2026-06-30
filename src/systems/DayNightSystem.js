@@ -38,6 +38,7 @@ export default class DayNightSystem {
 
     this.spawnNightEnemies();
     this.scene.treeManager.advanceGrowth();
+    this.scene.rockManager.advanceRespawn();
     console.log("Night started");
   }
 

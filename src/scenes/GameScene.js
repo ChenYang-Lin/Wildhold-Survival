@@ -18,6 +18,7 @@ import InventorySystem from "../systems/InventorySystem.js";
 import LightingSystem from "../systems/LightingSystem.js";
 import ObjectiveSystem from "../systems/ObjectiveSystem.js";
 import ResourceSystem from "../systems/ResourceSystem.js";
+import RockManager from "../systems/RockManager.js";
 import TreeManager from "../systems/TreeManager.js";
 import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
@@ -71,6 +72,7 @@ export default class GameScene extends Phaser.Scene {
     this.resourceSystem = new ResourceSystem(this);
     this.objectiveSystem = new ObjectiveSystem(this);
     this.treeManager = new TreeManager(this);
+    this.rockManager = new RockManager(this);
 
     // Campfire
     this.campfire = new Campfire(this, 32, 32);
