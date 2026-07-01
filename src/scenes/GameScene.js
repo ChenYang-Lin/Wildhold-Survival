@@ -105,13 +105,8 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.trees = this.physics.add.staticGroup();
-    this.spawnTrees();
     this.rocks = this.physics.add.staticGroup();
-
-    // // TEST
-    this.rocks.add(new Rock(this, 500, 500));
-    this.rocks.add(new Rock(this, 700, 500));
-    this.rocks.add(new Rock(this, 900, 500));
+    this.spawnResources();
 
     // this.ghostPreview.setBuilding("wall");
     this.input.keyboard.on("keydown-T", () => {
@@ -159,13 +154,20 @@ export default class GameScene extends Phaser.Scene {
     return this.scale.height;
   }
 
-  spawnTrees() {
-    for (let i = 0; i < 15; i++) {
+  spawnResources() {
+    let count = 0;
+    for (let i = 0; i < 30; i++) {
       let x = Phaser.Math.Between(100, 1500);
       let y = Phaser.Math.Between(100, 1500);
 
-      let tree = new Tree(this, x, y);
-      this.trees.add(tree);
+      if (count % 2 === 0) {
+        let tree = new Tree(this, x, y);
+        this.trees.add(tree);
+      } else {
+        let rock = new Rock(this, x, y);
+        this.rocks.add(rock);
+      }
+      count++;
     }
   }
 
