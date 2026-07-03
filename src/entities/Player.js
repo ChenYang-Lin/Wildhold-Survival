@@ -193,6 +193,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
+  stopMovement() {
+    this.body.stop();
+  }
+
   die() {
     if (this.scene.gameStateManager.isGameOver()) return;
 

@@ -1,3 +1,4 @@
+// Entities
 import Archer from "../entities/Archer.js";
 import Campfire from "../entities/Campfire.js";
 import Enemy from "../entities/Enemy.js";
@@ -5,6 +6,8 @@ import Player from "../entities/Player.js";
 import Rock from "../entities/Rock.js";
 import Tower from "../entities/Tower.js";
 import Tree from "../entities/Tree.js";
+
+// Systems
 import WaveManager from "../systems/WaveManager.js";
 import InputController from "../input/InputController.js";
 import ActionSystem from "../systems/ActionSystem.js";
@@ -22,10 +25,12 @@ import ResourceManager from "../systems/ResourceManger.js";
 import ResourceSystem from "../systems/ResourceSystem.js";
 import RockManager from "../systems/RockManager.js";
 import TreeManager from "../systems/TreeManager.js";
+import GameStateManager from "../systems/GameStateManager.js";
+import WaveUISystem from "../systems/WaveUISystem.js";
+
+// UI
 import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
-import WaveUISystem from "../systems/WaveUISystem.js";
-import GameStateManager from "../systems/GameStateManager.js";
 import GameOverUI from "../ui/GameOverUI.js";
 
 export default class GameScene extends Phaser.Scene {
@@ -55,26 +60,15 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.input.addPointer(4);
+
     this.createEntities();
     this.createSystems();
     this.createUI();
 
-    this.input.addPointer(4);
+    this.createMap();
 
-    // 3. Create the tilemap data object
-    const map = this.make.tilemap({ key: "test_map" });
-
-    // 4. Link the Tiled Tileset Name to the Phaser Image Texture
-    // WARNING: 'Name_In_Tiled' must exactly match the name of the tileset inside the Tiled software!
-    const tileset = map.addTilesetImage("tileset_objects", "tileset_objects");
-
-    // 5. Create your visual layers
-    // 'Layer_Name_In_Tiled' must match your layer names on the right panel in Tiled
-    const groundLayer = map.createLayer("Tile Layer 1", tileset, 0, 0);
-
-    this.scale.on("resize", (gameSize) => {
-      // this.lightingSystem.darkness.setSize(gameSize.width, gameSize.height);
-    });
+    this.createWorld();
 
     // Set boundry ----------------------------------------------------------------------------------------------------------
     this.physics.world.setBounds(0, 0, 1600, 1200);
@@ -84,35 +78,7 @@ export default class GameScene extends Phaser.Scene {
     // Camera ----------------------------------------------------------------------------------------------------------
     this.cameras.main.startFollow(this.player, false);
 
-    // Projectile group
-    this.projectiles = this.add.group({
-      runChildUpdate: true,
-    });
-    this.enemyProjectiles = this.add.group({
-      runChildUpdate: true,
-    });
-
-    this.trees = this.physics.add.staticGroup();
-    this.rocks = this.physics.add.staticGroup();
-    this.spawnResources();
-
-    // collider
-    this.physics.add.collider(this.player, this.combatSystem.enemies);
-    this.physics.add.collider(this.player, this.campfire);
-    this.physics.add.collider(this.player, this.buildingManager.buildings);
-    this.physics.add.collider(this.player, this.trees);
-    this.physics.add.collider(this.player, this.rocks);
-    this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings,); // prettier-ignore
-    this.physics.add.collider(this.combatSystem.enemies, this.campfire);
-
-    this.physics.add.collider(this.combatSystem.enemies, this.trees);
-    this.physics.add.overlap(
-      this.projectiles,
-      this.combatSystem.getEnemies(),
-      (projectile, enemy) => {
-        projectile.hit(enemy);
-      },
-    );
+    this.setupCollisions();
   }
 
   createEntities() {
@@ -150,6 +116,51 @@ export default class GameScene extends Phaser.Scene {
     this.gameOverUI = new GameOverUI(this);
   }
 
+  setupCollisions() {
+    this.physics.add.collider(this.player, this.combatSystem.enemies);
+    this.physics.add.collider(this.player, this.campfire);
+    this.physics.add.collider(this.player, this.buildingManager.buildings);
+    this.physics.add.collider(this.player, this.trees);
+    this.physics.add.collider(this.player, this.rocks);
+    this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings,); // prettier-ignore
+    this.physics.add.collider(this.combatSystem.enemies, this.campfire);
+
+    this.physics.add.collider(this.combatSystem.enemies, this.trees);
+    this.physics.add.overlap(
+      this.projectiles,
+      this.combatSystem.getEnemies(),
+      (projectile, enemy) => {
+        projectile.hit(enemy);
+      },
+    );
+  }
+
+  createMap() {
+    // 3. Create the tilemap data object
+    const map = this.make.tilemap({ key: "test_map" });
+
+    // 4. Link the Tiled Tileset Name to the Phaser Image Texture
+    // WARNING: 'Name_In_Tiled' must exactly match the name of the tileset inside the Tiled software!
+    const tileset = map.addTilesetImage("tileset_objects", "tileset_objects");
+
+    // 5. Create your visual layers
+    // 'Layer_Name_In_Tiled' must match your layer names on the right panel in Tiled
+    const groundLayer = map.createLayer("Tile Layer 1", tileset, 0, 0);
+  }
+
+  createWorld() {
+    this.projectiles = this.add.group({
+      runChildUpdate: true,
+    });
+    this.enemyProjectiles = this.add.group({
+      runChildUpdate: true,
+    });
+
+    this.trees = this.physics.add.staticGroup();
+    this.rocks = this.physics.add.staticGroup();
+    this.resourceManager.spawnInitialResources();
+  }
+
   getScreenWidth() {
     return this.scale.width;
   }
@@ -158,26 +169,9 @@ export default class GameScene extends Phaser.Scene {
     return this.scale.height;
   }
 
-  spawnResources() {
-    let count = 0;
-    for (let i = 0; i < 30; i++) {
-      let x = Phaser.Math.Between(100, 1500);
-      let y = Phaser.Math.Between(100, 1500);
-
-      if (count % 2 === 0) {
-        let tree = new Tree(this, x, y);
-        this.trees.add(tree);
-      } else {
-        let rock = new Rock(this, x, y);
-        this.rocks.add(rock);
-      }
-      count++;
-    }
-  }
-
   update(time, delta) {
     if (this.gameStateManager.isPaused()) {
-      this.player.body.stop();
+      this.player.stopMovement();
       return;
     }
 
