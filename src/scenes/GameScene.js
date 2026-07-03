@@ -5,6 +5,7 @@ import Player from "../entities/Player.js";
 import Rock from "../entities/Rock.js";
 import Tower from "../entities/Tower.js";
 import Tree from "../entities/Tree.js";
+import WaveManager from "../systems/WaveManager.js";
 import InputController from "../input/InputController.js";
 import ActionSystem from "../systems/ActionSystem.js";
 import BuildingManager from "../systems/BuildingManager.js";
@@ -75,6 +76,7 @@ export default class GameScene extends Phaser.Scene {
     this.treeManager = new TreeManager(this);
     this.rockManager = new RockManager(this);
     this.resourceManager = new ResourceManager(this);
+    this.waveManager = new WaveManager(this);
 
     // Campfire
     this.campfire = new Campfire(this, 32, 32);

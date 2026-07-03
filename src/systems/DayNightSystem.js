@@ -37,6 +37,7 @@ export default class DayNightSystem {
     });
 
     this.spawnNightEnemies();
+    this.scene.waveManager.startNight();
 
     this.scene.resourceManager.advanceDay();
     console.log("Night started");
@@ -57,6 +58,7 @@ export default class DayNightSystem {
     });
 
     this.retreatEnemies();
+    this.scene.waveManager.endNight();
 
     this.scene.objectiveSystem.onSurviveNight();
 

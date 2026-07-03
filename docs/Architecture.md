@@ -253,3 +253,14 @@ Build Mode:
 Consumables:
 
 - Dedicated quick-use slot
+
+WaveManager
+├── currentWave
+├── enemiesRemaining
+├── enemiesAlive
+├── startWave()
+├── spawnEnemy()
+├── onEnemyKilled()
+├── isWaveFinished()
+├── endWave()
+└── nextWave()
