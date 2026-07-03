@@ -12,55 +12,16 @@ export default class CombatSystem {
     return this.enemies;
   }
 
-  spawnEnemy(x, y, stats = {}, day) {
-    let enemyType = "goblin";
-
-    if (day >= 3) {
-      if (Math.random() < 0.2) {
-        enemyType = "archer";
-      }
-    }
-
+  spawnEnemy(x, y, stats = {}, type) {
     let enemy;
-    if (enemyType === "goblin") {
+    if (type === "goblin") {
       enemy = new Enemy(this.scene, x, y, stats);
-    } else {
+    } else if (type === "archer") {
       enemy = new Archer(this.scene, x, y, stats);
     }
 
     this.enemies.add(enemy);
     return enemy;
-  }
-
-  spawnEnemyEdge() {
-    const side = Phaser.Math.Between(0, 3);
-
-    let x, y;
-
-    if (side === 0) {
-      // top
-      x = Phaser.Math.Between(0, 1600);
-      y = 0;
-    } else if (side === 1) {
-      // bottom
-      x = Phaser.Math.Between(0, 1600);
-      y = 1200;
-    } else if (side === 2) {
-      // left
-      x = 0;
-      y = Phaser.Math.Between(0, 1200);
-    } else {
-      // right
-      x = 1600;
-      y = Phaser.Math.Between(0, 1200);
-    }
-
-    const enemy = new Enemy(this.scene, x, y);
-    this.enemies.add(enemy);
-    // enemy.hp = 3;
-    // enemy.speed = 50 + this.wave * 5;
-    enemy.hp = 2 + Math.floor(this.scene.wave * 0.5);
-    enemy.speed = 50 + this.scene.wave * 3;
   }
 
   update() {

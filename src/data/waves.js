@@ -1,22 +1,32 @@
 export const WAVES = [
   {
-    goblin: 5,
-    archer: 0,
+    enemies: [
+      { type: "goblin", count: 3 },
+      { type: "archer", count: 0 },
+    ],
   },
   {
-    goblin: 8,
-    archer: 0,
+    enemies: [
+      { type: "goblin", count: 8 },
+      { type: "archer", count: 0 },
+    ],
   },
   {
-    goblin: 10,
-    archer: 2,
+    enemies: [
+      { type: "goblin", count: 10 },
+      { type: "archer", count: 2 },
+    ],
   },
   {
-    goblin: 12,
-    archer: 4,
+    enemies: [
+      { type: "goblin", count: 12 },
+      { type: "archer", count: 4 },
+    ],
   },
   {
-    goblin: 15,
-    archer: 5,
+    enemies: [
+      { type: "goblin", count: 15 },
+      { type: "archer", count: 5 },
+    ],
   },
 ];
