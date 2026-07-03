@@ -1,3 +1,5 @@
+import { GAME_STATE } from "../data/GameState.js";
+
 export default class Campfire extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "campfire", "campfire_idle");
@@ -59,59 +61,12 @@ export default class Campfire extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
-    if (this.scene.isGameOver) return;
+    if (this.scene.gameStateManager.isGameOver()) return;
 
-    this.scene.isGameOver = true;
-    this.scene.physics.pause();
+    this.scene.gameStateManager.setState(GAME_STATE.GAME_OVER);
 
-    const centerX = this.scene.cameras.main.centerX;
-    const centerY = this.scene.cameras.main.centerY;
-
-    this.scene.add
-      .text(
-        this.scene.cameras.main.centerX,
-        this.scene.cameras.main.centerY,
-        "CAMPFIRE DESTROYED\nGAME OVER",
-        {
-          fontSize: "28px",
-          color: "#ff0000",
-          align: "center",
-          stroke: "#000000",
-          strokeThickness: 3,
-        },
-      )
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(10001);
-
-    const restartButton = this.scene.add
-      .text(centerX, centerY + 40, "RESTART", {
-        fontSize: "24px",
-        backgroundColor: "#333333",
-        padding: { x: 12, y: 8 },
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setInteractive({ useHandCursor: true })
-      .setDepth(10001);
-
-    restartButton.on("pointerdown", () => {
-      this.scene.scene.restart();
-    });
-
-    // dark overlay
-    this.scene.add
-      .rectangle(
-        0,
-        0,
-        this.scene.cameras.main.width,
-        this.scene.cameras.main.height,
-        0x000000,
-        0.7,
-      )
-      .setOrigin(0)
-      .setScrollFactor(0)
-      .setDepth(10000);
+    const message = "CAMPFIRE DESTROYED\nGAME OVER";
+    this.scene.gameOverUI.showGameOverScreen(message);
   }
 
   update() {

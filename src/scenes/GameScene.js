@@ -25,6 +25,8 @@ import TreeManager from "../systems/TreeManager.js";
 import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
 import WaveUISystem from "../systems/WaveUISystem.js";
+import GameStateManager from "../systems/GameStateManager.js";
+import GameOverUI from "../ui/GameOverUI.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -53,46 +55,10 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.player = new Player(this, 32, 32);
-    this.player.moveToGrid(20, 25);
-    this.inventorySystem = new InventorySystem(this);
-    this.inputController = new InputController(this);
-    this.actionSystem = new ActionSystem(
-      this,
-      this.player,
-      this.inputController,
-    );
-    this.buildingManager = new BuildingManager(this);
-    this.ghostPreview = new GhostPreviewSystem(this);
-    this.lightingSystem = new LightingSystem(this);
-    this.combatSystem = new CombatSystem(this);
-    this.healthUI = new HealthUI(this);
-    this.damageTextSystem = new DamageTextSystem(this);
-    this.equipmentSystem = new EquipmentSystem(this);
-    this.hotbarSystem = new HotbarSystem(this);
-    this.hotbarUI = new HotbarUI(this);
-    this.dayNightSystem = new DayNightSystem(this);
-    this.resourceSystem = new ResourceSystem(this);
-    this.objectiveSystem = new ObjectiveSystem(this);
-    this.treeManager = new TreeManager(this);
-    this.rockManager = new RockManager(this);
-    this.resourceManager = new ResourceManager(this);
-    this.waveManager = new WaveManager(this);
-    this.waveUISystem = new WaveUISystem(this);
+    this.createEntities();
+    this.createSystems();
+    this.createUI();
 
-    // Campfire
-    this.campfire = new Campfire(this, 32, 32);
-    this.campfire.moveToGrid(25, 25);
-
-    // Projectile group
-    this.projectiles = this.add.group({
-      runChildUpdate: true,
-    });
-    this.enemyProjectiles = this.add.group({
-      runChildUpdate: true,
-    });
-
-    this.isGameOver = false;
     this.input.addPointer(4);
 
     // 3. Create the tilemap data object
@@ -110,21 +76,6 @@ export default class GameScene extends Phaser.Scene {
       // this.lightingSystem.darkness.setSize(gameSize.width, gameSize.height);
     });
 
-    this.trees = this.physics.add.staticGroup();
-    this.rocks = this.physics.add.staticGroup();
-    this.spawnResources();
-
-    // this.ghostPreview.setBuilding("wall");
-    this.input.keyboard.on("keydown-T", () => {
-      console.log(this.hotbarSystem.getSelectedItem());
-    });
-    this.input.keyboard.on("keydown-O", () => {
-      this.dayNightSystem.startDay();
-    });
-    this.input.keyboard.on("keydown-P", () => {
-      this.dayNightSystem.startNight();
-    });
-
     // Set boundry ----------------------------------------------------------------------------------------------------------
     this.physics.world.setBounds(0, 0, 1600, 1200);
     this.cameras.main.setBounds(0, 0, 1600, 1200);
@@ -132,6 +83,18 @@ export default class GameScene extends Phaser.Scene {
 
     // Camera ----------------------------------------------------------------------------------------------------------
     this.cameras.main.startFollow(this.player, false);
+
+    // Projectile group
+    this.projectiles = this.add.group({
+      runChildUpdate: true,
+    });
+    this.enemyProjectiles = this.add.group({
+      runChildUpdate: true,
+    });
+
+    this.trees = this.physics.add.staticGroup();
+    this.rocks = this.physics.add.staticGroup();
+    this.spawnResources();
 
     // collider
     this.physics.add.collider(this.player, this.combatSystem.enemies);
@@ -150,6 +113,41 @@ export default class GameScene extends Phaser.Scene {
         projectile.hit(enemy);
       },
     );
+  }
+
+  createEntities() {
+    this.player = new Player(this, 32, 32);
+    this.player.moveToGrid(20, 25);
+    this.campfire = new Campfire(this, 32, 32);
+    this.campfire.moveToGrid(25, 25);
+  }
+
+  createSystems() {
+    this.inventorySystem = new InventorySystem(this);
+    this.inputController = new InputController(this);
+    this.actionSystem = new ActionSystem(this, this.player, this.inputController); // prettier-ignore
+    this.buildingManager = new BuildingManager(this);
+    this.ghostPreview = new GhostPreviewSystem(this);
+    this.lightingSystem = new LightingSystem(this);
+    this.combatSystem = new CombatSystem(this);
+    this.damageTextSystem = new DamageTextSystem(this);
+    this.equipmentSystem = new EquipmentSystem(this);
+    this.hotbarSystem = new HotbarSystem(this);
+    this.dayNightSystem = new DayNightSystem(this);
+    this.resourceSystem = new ResourceSystem(this);
+    this.objectiveSystem = new ObjectiveSystem(this);
+    this.treeManager = new TreeManager(this);
+    this.rockManager = new RockManager(this);
+    this.resourceManager = new ResourceManager(this);
+    this.waveManager = new WaveManager(this);
+    this.gameStateManager = new GameStateManager(this);
+    this.waveUISystem = new WaveUISystem(this);
+  }
+
+  createUI() {
+    this.healthUI = new HealthUI(this);
+    this.hotbarUI = new HotbarUI(this);
+    this.gameOverUI = new GameOverUI(this);
   }
 
   getScreenWidth() {
@@ -178,9 +176,16 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    if (this.isGameOver) {
+    if (this.gameStateManager.isPaused()) {
+      this.player.body.stop();
       return;
     }
+
+    if (this.gameStateManager.isGameOver()) {
+      this.scene.physics.pause();
+      return;
+    }
+
     this.actionSystem.update();
     this.inputController.update();
     this.player.update();

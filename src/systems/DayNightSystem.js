@@ -1,3 +1,5 @@
+import { GAME_STATE } from "../data/GameState.js";
+
 export default class DayNightSystem {
   constructor(scene) {
     this.scene = scene;
@@ -8,7 +10,7 @@ export default class DayNightSystem {
 
     // this.dayDuration = 20000;
     this.dayDuration = 10000;
-    this.nightDuration = 20000;
+    this.nightDuration = 30000;
 
     this.timer = this.dayDuration;
     const count = 3 + this.day;
@@ -36,9 +38,10 @@ export default class DayNightSystem {
       ease: "Sine.easeInOut",
     });
 
+    this.scene.gameStateManager.setState(GAME_STATE.PAUSED);
     const wave = this.scene.waveManager.getWaveData();
-    console.log(wave.message);
     this.scene.waveUISystem.show(this.day, wave.message, () => {
+      this.scene.gameStateManager.setState(GAME_STATE.RUNNING);
       this.scene.waveManager.startWave();
     });
 
