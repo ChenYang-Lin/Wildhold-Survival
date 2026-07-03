@@ -36,7 +36,11 @@ export default class DayNightSystem {
       ease: "Sine.easeInOut",
     });
 
-    this.scene.waveManager.startWave();
+    const wave = this.scene.waveManager.getWaveData();
+    console.log(wave.message);
+    this.scene.waveUISystem.show(this.day, wave.message, () => {
+      this.scene.waveManager.startWave();
+    });
 
     this.scene.resourceManager.advanceDay();
     console.log("Night started");

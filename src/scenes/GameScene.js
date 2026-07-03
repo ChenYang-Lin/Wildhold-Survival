@@ -24,6 +24,7 @@ import RockManager from "../systems/RockManager.js";
 import TreeManager from "../systems/TreeManager.js";
 import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
+import WaveUISystem from "../systems/WaveUISystem.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -77,6 +78,7 @@ export default class GameScene extends Phaser.Scene {
     this.rockManager = new RockManager(this);
     this.resourceManager = new ResourceManager(this);
     this.waveManager = new WaveManager(this);
+    this.waveUISystem = new WaveUISystem(this);
 
     // Campfire
     this.campfire = new Campfire(this, 32, 32);

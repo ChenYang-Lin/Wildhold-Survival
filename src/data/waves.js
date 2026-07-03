@@ -1,21 +1,18 @@
 export const WAVES = [
   {
-    enemies: [
-      { type: "goblin", count: 3 },
-      { type: "archer", count: 0 },
-    ],
+    enemies: [{ type: "goblin", count: 3 }],
+    message: "The goblins are marching...",
   },
   {
-    enemies: [
-      { type: "goblin", count: 8 },
-      { type: "archer", count: 0 },
-    ],
+    enemies: [{ type: "goblin", count: 8 }],
+    message: "More goblins have arrived...",
   },
   {
     enemies: [
       { type: "goblin", count: 10 },
       { type: "archer", count: 2 },
     ],
+    message: "Archers have joined the raid.",
   },
   {
     enemies: [
