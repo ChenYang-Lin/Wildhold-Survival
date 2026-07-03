@@ -12,10 +12,6 @@ export default class WaveManager {
     ];
   }
 
-  getWaveData() {
-    return WAVES[Math.min(this.scene.dayNightSystem.day - 1, WAVES.length - 1)];
-  }
-
   startWave() {
     const wave = this.getWaveData();
 
@@ -25,11 +21,23 @@ export default class WaveManager {
   spawnEnemies(wave) {
     wave.enemies.forEach((enemy) => {
       for (let i = 0; i < enemy.count; i++) {
-        const point = Phaser.Utils.Array.GetRandom(this.spawnPoints);
-        const x = point.x + Phaser.Math.Between(-80, 80);
-        const y = point.y + Phaser.Math.Between(-80, 80);
-        this.scene.combatSystem.spawnEnemy(x, y, enemy.stats, enemy.type); // prettier-ignore
+        const spawn = this.getRandomSpawnPosition();
+
+        this.scene.combatSystem.spawnEnemy(spawn.x, spawn.y, enemy.stats, enemy.type); // prettier-ignore
       }
     });
+  }
+
+  getWaveData() {
+    return WAVES[Math.min(this.scene.dayNightSystem.day - 1, WAVES.length - 1)];
+  }
+
+  getRandomSpawnPosition() {
+    const point = Phaser.Utils.Array.GetRandom(this.spawnPoints);
+
+    return {
+      x: point.x + Phaser.Math.Between(-80, 80),
+      y: point.y + Phaser.Math.Between(-80, 80),
+    };
   }
 }
