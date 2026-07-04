@@ -39,8 +39,15 @@ export default class DayNightSystem {
     });
 
     this.scene.gameStateManager.setState(GAME_STATE.PAUSED);
+
     const wave = this.scene.waveManager.getWaveData();
-    this.scene.waveUISystem.show(this.day, wave.message, () => {
+    this.scene.overlayMessageUI.show(
+      `Night ${this.day}`,
+      "Protect your tent.\nSurvive the night.",
+    );
+
+    this.scene.time.delayedCall(2500, () => {
+      this.scene.overlayMessageUI.hide();
       this.scene.gameStateManager.setState(GAME_STATE.RUNNING);
       this.scene.waveManager.startWave();
     });

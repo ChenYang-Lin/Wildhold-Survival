@@ -26,12 +26,12 @@ import ResourceSystem from "../systems/ResourceSystem.js";
 import RockManager from "../systems/RockManager.js";
 import TreeManager from "../systems/TreeManager.js";
 import GameStateManager from "../systems/GameStateManager.js";
-import WaveUISystem from "../systems/WaveUISystem.js";
 
 // UI
 import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
 import GameOverUI from "../ui/GameOverUI.js";
+import OverlayMessageUI from "../ui/OverlayMessageUI.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -107,13 +107,13 @@ export default class GameScene extends Phaser.Scene {
     this.resourceManager = new ResourceManager(this);
     this.waveManager = new WaveManager(this);
     this.gameStateManager = new GameStateManager(this);
-    this.waveUISystem = new WaveUISystem(this);
   }
 
   createUI() {
     this.healthUI = new HealthUI(this);
     this.hotbarUI = new HotbarUI(this);
     this.gameOverUI = new GameOverUI(this);
+    this.overlayMessageUI = new OverlayMessageUI(this);
   }
 
   setupCollisions() {
