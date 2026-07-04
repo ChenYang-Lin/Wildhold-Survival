@@ -7,8 +7,16 @@ export default class GameStateManager {
     this.state = GAME_STATE.RUNNING;
   }
 
-  setState(state) {
-    this.state = state;
+  pause() {
+    this.state = GAME_STATE.PAUSED;
+  }
+
+  resume() {
+    this.state = GAME_STATE.RUNNING;
+  }
+
+  gameOver() {
+    this.state = GAME_STATE.GAME_OVER;
   }
 
   isGameOver() {
@@ -16,6 +24,6 @@ export default class GameStateManager {
   }
 
   isPaused() {
-    return this.state !== GAME_STATE.RUNNING;
+    return this.state === GAME_STATE.PAUSED;
   }
 }

@@ -1,5 +1,3 @@
-import { GAME_STATE } from "../data/GameState.js";
-
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "survivor", "survivor_idle_down");
@@ -200,7 +198,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   die() {
     if (this.scene.gameStateManager.isGameOver()) return;
 
-    this.scene.gameStateManager.setState(GAME_STATE.GAME_OVER);
+    this.scene.gameStateManager.gameOver();
 
     const message = "YOU DIED\n";
     this.scene.gameOverUI.showGameOverScreen(message);

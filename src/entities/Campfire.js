@@ -1,5 +1,3 @@
-import { GAME_STATE } from "../data/GameState.js";
-
 export default class Campfire extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "campfire", "campfire_idle");
@@ -63,7 +61,7 @@ export default class Campfire extends Phaser.Physics.Arcade.Sprite {
   die() {
     if (this.scene.gameStateManager.isGameOver()) return;
 
-    this.scene.gameStateManager.setState(GAME_STATE.GAME_OVER);
+    this.scene.gameStateManager.gameOver();
 
     const message = "CAMPFIRE DESTROYED\nGAME OVER";
     this.scene.gameOverUI.showGameOverScreen(message);

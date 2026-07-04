@@ -1,5 +1,3 @@
-import { GAME_STATE } from "../data/GameState.js";
-
 export default class DayNightSystem {
   constructor(scene) {
     this.scene = scene;
@@ -15,14 +13,7 @@ export default class DayNightSystem {
     this.timer = this.dayDuration;
     const count = 3 + this.day;
 
-    this.dayText = scene.add.text(250, 20, "", { fontSize: "18px", color: "#ffffff" }).setScrollFactor(0).setDepth(10000); // prettier-ignore
-
-    this.spawnPoints = [
-      { x: 50, y: 50 },
-      { x: 1550, y: 50 },
-      { x: 50, y: 1150 },
-      { x: 1550, y: 1150 },
-    ];
+    this.dayNightText = scene.add.text(250, 20, "", { fontSize: "18px", color: "#ffffff" }).setScrollFactor(0).setDepth(10000); // prettier-ignore
   }
 
   startNight() {
@@ -38,17 +29,16 @@ export default class DayNightSystem {
       ease: "Sine.easeInOut",
     });
 
-    this.scene.gameStateManager.setState(GAME_STATE.PAUSED);
+    this.scene.gameStateManager.pause();
 
-    const wave = this.scene.waveManager.getWaveData();
     this.scene.overlayMessageUI.show(
       `Night ${this.day}`,
       "Protect your tent.\nSurvive the night.",
     );
 
-    this.scene.time.delayedCall(2500, () => {
+    this.scene.time.delayedCall(3000, () => {
       this.scene.overlayMessageUI.hide();
-      this.scene.gameStateManager.setState(GAME_STATE.RUNNING);
+      this.scene.gameStateManager.resume();
       this.scene.waveManager.startWave();
     });
 
@@ -89,7 +79,7 @@ export default class DayNightSystem {
     this.timer -= delta;
     const seconds = Math.floor(this.timer / 1000);
 
-    this.dayText.setText(
+    this.dayNightText.setText(
       `${this.isNight ? "Night" : "Day"} ${this.day}\nEnds in ${seconds}s`,
     );
     if (this.timer <= 0) {
