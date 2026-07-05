@@ -193,3 +193,19 @@ Never:
 - Blueprint unlocks
 - Weapon unlocks
 - Required progression
+
+Day/Night presentation
+End of night:
+
+- Freeze player input.
+- Enemies retreat to their camps.
+- Fade the screen out.
+- Show "Night X Survived".
+- If available, show a CrazyGames interstitial ad.
+
+Transition:
+
+- Player sleeps inside the tent for 1–2 seconds.
+- Fade back in.
+- Player walks out of the tent.
+- New day begins.
