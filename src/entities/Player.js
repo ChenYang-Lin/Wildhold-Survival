@@ -8,8 +8,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.scene.physics.add.existing(this);
 
     this.setOrigin(0.5, 0.5);
-    this.body.setSize(32, 32);
-    this.body.setOffset(80, 96); // 192 x 192, 32 + 32 + 16, 32 + 32 + 16 + 16
+    this.body.setSize(16, 16);
+    const bodyOffsetY = 16;
+    // 192 x 192, 32 + 32 + 16 + 8, 32 + 32 + 16 + 16
+    // image offset = 64, body offset = 24
+    this.body.setOffset(88, 96);
 
     this.setCollideWorldBounds(true);
 

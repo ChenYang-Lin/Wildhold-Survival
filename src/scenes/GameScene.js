@@ -201,7 +201,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     if (this.gameStateManager.isGameOver()) {
-      this.scene.physics.pause();
+      this.physics.pause();
       return;
     }
 
