@@ -37,8 +37,8 @@ export default class BuildingManager {
         const checkX = gridX + x + (b.footprintOffsetX || 0);
         const checkY = gridY + y + (b.footprintOffsetY || 0);
 
-        const mapWidthTiles = 1600 / 32;
-        const mapHeightTiles = 1200 / 32;
+        const mapWidthTiles = this.scene.worldWidth / 32;
+        const mapHeightTiles = this.scene.worldHeight / 32;
         if (checkX < 0 || checkY < 0) return false;
 
         if (checkX >= mapWidthTiles || checkY >= mapHeightTiles) return false;

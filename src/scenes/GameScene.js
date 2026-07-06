@@ -53,14 +53,21 @@ export default class GameScene extends Phaser.Scene {
     this.load.image("arrow", "assets/arrow.png");
 
     // 1. Load the tileset image asset
-    this.load.image("tileset_objects", "assets/map/tileset_objects.png");
+    this.load.image("Tileset & Objects", "assets/map/Tileset & Objects.png");
+    this.load.image("goblin_camp", "assets/map/goblin_camp.png");
 
     // 2. Load the exported Tiled JSON file
-    this.load.tilemapTiledJSON("test_map", "assets/map/test1.json");
+    this.load.tilemapTiledJSON(
+      "world_map",
+      "assets/map/wildhold_survival_map.json",
+    );
   }
 
   create() {
     this.input.addPointer(4);
+
+    this.worldWidth = 100 * 32;
+    this.worldHeight = 100 * 32;
 
     this.createEntities();
     this.createSystems();
@@ -71,8 +78,8 @@ export default class GameScene extends Phaser.Scene {
     this.createWorld();
 
     // Set boundry ----------------------------------------------------------------------------------------------------------
-    this.physics.world.setBounds(0, 0, 1600, 1200);
-    this.cameras.main.setBounds(0, 0, 1600, 1200);
+    this.physics.world.setBounds(0, 0, this.worldWidth, this.worldHeight);
+    this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
     this.player.setCollideWorldBounds(true);
 
     // Camera ----------------------------------------------------------------------------------------------------------
@@ -83,9 +90,9 @@ export default class GameScene extends Phaser.Scene {
 
   createEntities() {
     this.player = new Player(this, 32, 32);
-    this.player.moveToGrid(20, 25);
+    this.player.moveToGrid(45, 46);
     this.campfire = new Campfire(this, 32, 32);
-    this.campfire.moveToGrid(25, 25);
+    this.campfire.moveToGrid(45, 47);
   }
 
   createSystems() {
@@ -137,15 +144,33 @@ export default class GameScene extends Phaser.Scene {
 
   createMap() {
     // 3. Create the tilemap data object
-    const map = this.make.tilemap({ key: "test_map" });
+    const map = this.make.tilemap({ key: "world_map" });
 
     // 4. Link the Tiled Tileset Name to the Phaser Image Texture
     // WARNING: 'Name_In_Tiled' must exactly match the name of the tileset inside the Tiled software!
-    const tileset = map.addTilesetImage("tileset_objects", "tileset_objects");
+    const tileset = map.addTilesetImage(
+      "Tileset & Objects",
+      "Tileset & Objects",
+    );
+    const tileset2 = map.addTilesetImage("goblin_camp", "goblin_camp");
 
     // 5. Create your visual layers
     // 'Layer_Name_In_Tiled' must match your layer names on the right panel in Tiled
-    const groundLayer = map.createLayer("Tile Layer 1", tileset, 0, 0);
+    const groundLayer = map.createLayer("Ground", tileset, 0, 0);
+    const terrainDecorLayer = map.createLayer("TerrainDecor", tileset, 0, 0);
+    const objectLayer = map.createLayer("Object", [tileset2, tileset], 0, 0);
+
+    this.collisionLayer = map.createLayer("Collision", tileset);
+    this.collisionLayer.setVisible(false);
+    this.collisionLayer.setCollisionByProperty({
+      collides: true,
+    });
+
+    this.physics.add.collider(this.player, this.collisionLayer);
+    this.physics.add.collider(
+      this.combatSystem.getEnemies(),
+      this.collisionLayer,
+    );
   }
 
   createWorld() {
