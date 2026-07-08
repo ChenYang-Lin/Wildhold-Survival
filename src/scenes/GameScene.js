@@ -32,6 +32,7 @@ import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
 import GameOverUI from "../ui/GameOverUI.js";
 import OverlayMessageUI from "../ui/OverlayMessageUI.js";
+import MapManager from "../systems/MapManager.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -66,14 +67,14 @@ export default class GameScene extends Phaser.Scene {
   create() {
     this.input.addPointer(4);
 
-    this.worldWidth = 100 * 32;
-    this.worldHeight = 100 * 32;
-
     this.createEntities();
     this.createSystems();
     this.createUI();
 
-    this.createMap();
+    this.mapManager = new MapManager(this);
+    this.mapManager.load();
+    this.worldWidth = this.mapManager.map.widthInPixels;
+    this.worldHeight = this.mapManager.map.heightInPixels;
 
     this.createWorld();
 
@@ -140,36 +141,11 @@ export default class GameScene extends Phaser.Scene {
         projectile.hit(enemy);
       },
     );
-  }
 
-  createMap() {
-    // 3. Create the tilemap data object
-    const map = this.make.tilemap({ key: "world_map" });
-
-    // 4. Link the Tiled Tileset Name to the Phaser Image Texture
-    // WARNING: 'Name_In_Tiled' must exactly match the name of the tileset inside the Tiled software!
-    const tileset = map.addTilesetImage(
-      "Tileset & Objects",
-      "Tileset & Objects",
-    );
-    const tileset2 = map.addTilesetImage("goblin_camp", "goblin_camp");
-
-    // 5. Create your visual layers
-    // 'Layer_Name_In_Tiled' must match your layer names on the right panel in Tiled
-    const groundLayer = map.createLayer("Ground", tileset, 0, 0);
-    const terrainDecorLayer = map.createLayer("TerrainDecor", tileset, 0, 0);
-    const objectLayer = map.createLayer("Object", [tileset2, tileset], 0, 0);
-
-    this.collisionLayer = map.createLayer("Collision", tileset);
-    this.collisionLayer.setVisible(false);
-    this.collisionLayer.setCollisionByProperty({
-      collides: true,
-    });
-
-    this.physics.add.collider(this.player, this.collisionLayer);
+    this.physics.add.collider(this.player, this.mapManager.collisionLayer);
     this.physics.add.collider(
       this.combatSystem.getEnemies(),
-      this.collisionLayer,
+      this.mapManager.collisionLayer,
     );
   }
 
