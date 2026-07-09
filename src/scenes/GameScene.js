@@ -73,14 +73,13 @@ export default class GameScene extends Phaser.Scene {
 
     this.mapManager = new MapManager(this);
     this.mapManager.load();
-    this.worldWidth = this.mapManager.map.widthInPixels;
-    this.worldHeight = this.mapManager.map.heightInPixels;
 
     this.createWorld();
 
     // Set boundry ----------------------------------------------------------------------------------------------------------
-    this.physics.world.setBounds(0, 0, this.worldWidth, this.worldHeight);
-    this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
+    const bounds = this.mapManager.getWorldBounds();
+    this.physics.world.setBounds(0, 0, bounds.width, bounds.height);
+    this.cameras.main.setBounds(0, 0, bounds.width, bounds.height);
     this.player.setCollideWorldBounds(true);
 
     // Camera ----------------------------------------------------------------------------------------------------------
@@ -142,7 +141,7 @@ export default class GameScene extends Phaser.Scene {
       },
     );
 
-    this.physics.add.collider(this.player, this.mapManager.collisionLayer);
+    this.physics.add.collider(this.player, this.mapManager.layers.collision);
     this.physics.add.collider(
       this.combatSystem.getEnemies(),
       this.mapManager.collisionLayer,

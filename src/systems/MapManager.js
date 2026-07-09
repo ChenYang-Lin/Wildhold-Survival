@@ -11,6 +11,13 @@ export default class MapManager {
     this.resourceZones = [];
   }
 
+  getWorldBounds() {
+    return {
+      width: this.map.widthInPixels,
+      height: this.map.heightInPixels,
+    };
+  }
+
   getCamp(id) {
     return this.camps.find((camp) => camp.campId === id);
   }
@@ -26,12 +33,13 @@ export default class MapManager {
 
     this.layers.ground = this.map.createLayer("Ground", tileset, 0, 0);
     this.layers.terrainDecor = this.map.createLayer("TerrainDecor", tileset, 0, 0); // prettier-ignore
-    this.layers.object = this.map.createLayer("Object", [tileset2, tileset], 0, 0); // prettier-ignore
+    this.layers.objects = this.map.createLayer("Object", [tileset2, tileset], 0, 0); // prettier-ignore
 
-    this.layers.collisionLayer = this.map.getLayer("Collision", tileset);
-    //   .setCollisionByProperty({
-    //     collides: true,
-    //   });
+    this.layers.collision = this.map.createLayer("Collision", tileset);
+    this.layers.collision.setVisible(false);
+    this.layers.collision.setCollisionByProperty({
+      collides: true,
+    });
 
     this.loadCamps();
   }
@@ -39,16 +47,17 @@ export default class MapManager {
   loadCamps() {
     const layer = this.map.getObjectLayer("Camps");
     layer.objects.forEach((camp) => {
-      if (camp.properties && camp.properties[0]) {
-        let newCamp = {
-          campId: camp.properties[0].value,
-          x: camp.x,
-          y: camp.y,
-        };
-        this.camps.push(newCamp);
-      }
-    });
+      const campId = camp.properties?.find((p) => p.name === "campId")?.value;
 
-    console.log(this.camps);
+      if (campId == null) {
+        return;
+      }
+
+      this.camps.push({
+        campId,
+        x: camp.x,
+        y: camp.y,
+      });
+    });
   }
 }
