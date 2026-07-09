@@ -22,6 +22,10 @@ export default class MapManager {
     return this.camps.find((camp) => camp.campId === id);
   }
 
+  getResourceZones(type) {
+    return this.resourceZones.filter((zone) => zone.type === type);
+  }
+
   load() {
     this.map = this.scene.make.tilemap({ key: "world_map" });
 
@@ -42,6 +46,7 @@ export default class MapManager {
     });
 
     this.loadCamps();
+    this.loadResourceZones();
   }
 
   loadCamps() {
@@ -57,6 +62,21 @@ export default class MapManager {
         campId,
         x: camp.x,
         y: camp.y,
+      });
+    });
+  }
+
+  loadResourceZones() {
+    const layer = this.map.getObjectLayer("ResourceZones");
+
+    layer.objects.forEach((zone) => {
+      const type = zone.properties?.find((p) => p.name === "type")?.value;
+      this.resourceZones.push({
+        id: zone.name,
+        type,
+        x: zone.x,
+        y: zone.y,
+        polygon: zone.polygon,
       });
     });
   }

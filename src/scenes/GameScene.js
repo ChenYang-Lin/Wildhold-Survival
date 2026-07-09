@@ -73,6 +73,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.mapManager = new MapManager(this);
     this.mapManager.load();
+    console.log(this.mapManager.getResourceZones("tree"));
 
     this.createWorld();
 
