@@ -23,8 +23,6 @@ import LightingSystem from "../systems/LightingSystem.js";
 import ObjectiveSystem from "../systems/ObjectiveSystem.js";
 import ResourceManager from "../systems/ResourceManger.js";
 import ResourceSystem from "../systems/ResourceSystem.js";
-import RockManager from "../systems/RockManager.js";
-import TreeManager from "../systems/TreeManager.js";
 import GameStateManager from "../systems/GameStateManager.js";
 
 // UI
@@ -58,22 +56,19 @@ export default class GameScene extends Phaser.Scene {
     this.load.image("goblin_camp", "assets/map/goblin_camp.png");
 
     // 2. Load the exported Tiled JSON file
-    this.load.tilemapTiledJSON(
-      "world_map",
-      "assets/map/wildhold_survival_map.json",
-    );
+    this.load.tilemapTiledJSON("world_map", "assets/map/wildhold_survival_map.json");
   }
 
   create() {
     this.input.addPointer(4);
 
-    this.createEntities();
-    this.createSystems();
-    this.createUI();
-
     this.mapManager = new MapManager(this);
     this.mapManager.load();
     console.log(this.mapManager.getResourceZones("tree"));
+
+    this.createEntities();
+    this.createSystems();
+    this.createUI();
 
     this.createWorld();
 
@@ -110,8 +105,6 @@ export default class GameScene extends Phaser.Scene {
     this.dayNightSystem = new DayNightSystem(this);
     this.resourceSystem = new ResourceSystem(this);
     this.objectiveSystem = new ObjectiveSystem(this);
-    this.treeManager = new TreeManager(this);
-    this.rockManager = new RockManager(this);
     this.resourceManager = new ResourceManager(this);
     this.waveManager = new WaveManager(this);
     this.gameStateManager = new GameStateManager(this);
@@ -134,19 +127,12 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.combatSystem.enemies, this.campfire);
 
     this.physics.add.collider(this.combatSystem.enemies, this.trees);
-    this.physics.add.overlap(
-      this.projectiles,
-      this.combatSystem.getEnemies(),
-      (projectile, enemy) => {
-        projectile.hit(enemy);
-      },
-    );
+    this.physics.add.overlap(this.projectiles, this.combatSystem.getEnemies(), (projectile, enemy) => {
+      projectile.hit(enemy);
+    });
 
     this.physics.add.collider(this.player, this.mapManager.layers.collision);
-    this.physics.add.collider(
-      this.combatSystem.getEnemies(),
-      this.mapManager.collisionLayer,
-    );
+    this.physics.add.collider(this.combatSystem.getEnemies(), this.mapManager.collisionLayer);
   }
 
   createWorld() {

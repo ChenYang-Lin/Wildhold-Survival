@@ -9,21 +9,8 @@ export default class MapManager {
     this.camps = [];
 
     this.resourceZones = [];
-  }
 
-  getWorldBounds() {
-    return {
-      width: this.map.widthInPixels,
-      height: this.map.heightInPixels,
-    };
-  }
-
-  getCamp(id) {
-    return this.camps.find((camp) => camp.campId === id);
-  }
-
-  getResourceZones(type) {
-    return this.resourceZones.filter((zone) => zone.type === type);
+    this.occupiedGrid = new Set();
   }
 
   load() {
@@ -71,13 +58,75 @@ export default class MapManager {
 
     layer.objects.forEach((zone) => {
       const type = zone.properties?.find((p) => p.name === "type")?.value;
+      const capacity = zone.properties?.find((p) => p.name === "capacity")?.value; // prettier-ignore
+      const growthRate = zone.properties?.find((p) => p.name === "growthRate")?.value; // prettier-ignore
       this.resourceZones.push({
         id: zone.name,
         type,
-        x: zone.x,
-        y: zone.y,
-        polygon: zone.polygon,
+        capacity,
+        growthRate,
+
+        gridX: Math.floor(zone.x / this.map.tileWidth),
+        gridY: Math.floor(zone.y / this.map.tileHeight),
+
+        gridWidth: Math.floor(zone.width / this.map.tileWidth),
+        gridHeight: Math.floor(zone.height / this.map.tileHeight),
       });
     });
+  }
+
+  getWorldBounds() {
+    return {
+      width: this.map.widthInPixels,
+      height: this.map.heightInPixels,
+    };
+  }
+
+  getCamp(id) {
+    return this.camps.find((camp) => camp.campId === id);
+  }
+
+  getResourceZones(type) {
+    return this.resourceZones.filter((zone) => zone.type === type);
+  }
+
+  getRandomTileInZone(zone) {
+    return {
+      gridX: Phaser.Math.Between(zone.gridX, zone.gridX + zone.gridWidth - 1),
+      gridY: Phaser.Math.Between(zone.gridY, zone.gridY + zone.gridHeight - 1),
+    };
+  }
+
+  gridToWorld(gridX, gridY) {
+    return {
+      x: gridX * this.map.tileWidth,
+      y: gridY * this.map.tileHeight,
+    };
+  }
+
+  worldToGrid(worldX, worldY) {
+    return {
+      x: Math.floor(worldX / this.map.tileWidth),
+      y: Math.floor(worldY / this.map.tileHeight),
+    };
+  }
+
+  isTileOccupied(gridX, gridY) {
+    return this.occupiedGrid.has(`${gridX},${gridY}`);
+  }
+
+  occupyTile(gridX, gridY) {
+    this.occupiedGrid.add(`${gridX},${gridY}`);
+  }
+
+  freeTile(gridX, gridY) {
+    this.occupiedGrid.delete(`${gridX},${gridY}`);
+  }
+
+  isTileBlocked(gridX, gridY) {
+    return (
+      this.layers.collision.getTileAt(gridX, gridY) ||
+      this.isTileOccupied(gridX, gridY)
+    );
   }
 }

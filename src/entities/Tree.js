@@ -17,6 +17,11 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(this.body.center.y);
   }
 
+  setGridPosition(gridX, gridY) {
+    this.gridX = gridX;
+    this.gridY = gridY;
+  }
+
   setStage(stage) {
     this.stage = stage;
 
@@ -72,13 +77,15 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
-    this.scene.treeManager.onTreeDestroyed(this);
+    this.scene.resourceManager.onTreeDestroyed(this);
 
     let numOfDrops = 0;
 
     if (this.stage === TREE_STAGE.SAPLING) numOfDrops = 1;
     else if (this.stage === TREE_STAGE.YOUNG) numOfDrops = 3;
     else if (this.stage === TREE_STAGE.MATURE) numOfDrops = 5;
+
+    this.scene.mapManager.freeTile(this.gridX, this.gridY);
 
     // Spawn drops
     for (let i = 0; i < numOfDrops; i++) {

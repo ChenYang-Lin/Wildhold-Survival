@@ -11,6 +11,11 @@ export default class Rock extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(32, 32);
   }
 
+  setGridPosition(gridX, gridY) {
+    this.gridX = gridX;
+    this.gridY = gridY;
+  }
+
   takeDamage(amount) {
     this.hp -= amount;
 
@@ -22,15 +27,10 @@ export default class Rock extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
-    this.scene.rockManager.onRockDestroyed(this);
+    this.scene.mapManager.freeTile(this.gridX, this.gridY);
 
     for (let i = 0; i < 3; i++) {
-      this.scene.resourceSystem.spawnDrop(
-        "stone",
-        this.x + Phaser.Math.Between(-10, 10),
-        this.y + Phaser.Math.Between(-10, 10),
-        1,
-      );
+      this.scene.resourceSystem.spawnDrop("stone", this.x + Phaser.Math.Between(-10, 10), this.y + Phaser.Math.Between(-10, 10), 1);
     }
 
     this.destroy();
