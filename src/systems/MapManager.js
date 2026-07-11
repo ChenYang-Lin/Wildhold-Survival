@@ -16,10 +16,7 @@ export default class MapManager {
   load() {
     this.map = this.scene.make.tilemap({ key: "world_map" });
 
-    const tileset = this.map.addTilesetImage(
-      "Tileset & Objects",
-      "Tileset & Objects",
-    );
+    const tileset = this.map.addTilesetImage("Tileset & Objects", "Tileset & Objects");
     const tileset2 = this.map.addTilesetImage("goblin_camp", "goblin_camp");
 
     this.layers.ground = this.map.createLayer("Ground", tileset, 0, 0);
@@ -82,7 +79,7 @@ export default class MapManager {
     };
   }
 
-  getCamp(id) {
+  getEnemyCamp(id) {
     return this.camps.find((camp) => camp.campId === id);
   }
 
@@ -124,9 +121,6 @@ export default class MapManager {
   }
 
   isTileBlocked(gridX, gridY) {
-    return (
-      this.layers.collision.getTileAt(gridX, gridY) ||
-      this.isTileOccupied(gridX, gridY)
-    );
+    return this.layers.collision.getTileAt(gridX, gridY) || this.isTileOccupied(gridX, gridY);
   }
 }

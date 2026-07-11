@@ -1,29 +1,95 @@
 export const WAVES = [
+  // Night 1
   {
-    enemies: [{ type: "goblin", count: 3 }],
-    message: "The goblins are marching...",
-  },
-  {
-    enemies: [{ type: "goblin", count: 8 }],
-    message: "More goblins have arrived...",
-  },
-  {
-    enemies: [
-      { type: "goblin", count: 10 },
-      { type: "archer", count: 2 },
+    camps: [
+      {
+        campId: 1,
+        enemies: [{ type: "goblin", count: 3, stats: {} }],
+      },
+      {
+        campId: 2,
+        enemies: [],
+      },
+      {
+        campId: 3,
+        enemies: [],
+      },
+      {
+        campId: 4,
+        enemies: [],
+      },
     ],
-    message: "Archers have joined the raid.",
   },
+  // Night 2
   {
-    enemies: [
-      { type: "goblin", count: 12 },
-      { type: "archer", count: 4 },
+    camps: [
+      {
+        campId: 1,
+        enemies: [
+          { type: "goblin", count: 5, stats: {} },
+          { type: "archer", count: 1, stats: {} },
+        ],
+      },
+      {
+        campId: 2,
+        enemies: [],
+      },
+      {
+        campId: 3,
+        enemies: [],
+      },
+      {
+        campId: 4,
+        enemies: [],
+      },
     ],
   },
+  // Night 3
   {
-    enemies: [
-      { type: "goblin", count: 15 },
-      { type: "archer", count: 5 },
+    camps: [
+      {
+        campId: 1,
+        enemies: [
+          { type: "goblin", count: 7, stats: {} },
+          { type: "archer", count: 3, stats: {} },
+        ],
+      },
+      {
+        campId: 2,
+        enemies: [],
+      },
+      {
+        campId: 3,
+        enemies: [],
+      },
+      {
+        campId: 4,
+        enemies: [],
+      },
+    ],
+  },
+  // Night 4
+  {
+    camps: [
+      {
+        campId: 1,
+        enemies: [
+          { type: "goblin", count: 7, stats: {} },
+          { type: "archer", count: 3, stats: {} },
+        ],
+      },
+      {
+        campId: 2,
+        enemies: [{ type: "goblin", count: 7, stats: {} }],
+      },
+      {
+        campId: 3,
+        enemies: [],
+      },
+      {
+        campId: 4,
+        enemies: [],
+      },
     ],
   },
 ];
