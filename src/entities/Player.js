@@ -15,7 +15,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.playerState = "idle";
     this.facing = "down";
-    this.speed = 100;
+    this.speed = 300;
 
     this.maxHP = 10;
     this.hp = this.maxHP;
@@ -25,11 +25,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   static preload(scene) {
-    scene.load.atlas(
-      "survivor",
-      "assets/player/survivor.png",
-      "assets/player/survivor_atlas.json",
-    );
+    scene.load.atlas("survivor", "assets/player/survivor.png", "assets/player/survivor_atlas.json");
 
     scene.load.animation("survivor_anim", "assets/player/survivor_anim.json");
   }
@@ -137,17 +133,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     // Enemy
     const hitEnemies = new Set();
-    this.scene.physics.add.overlap(
-      hitbox,
-      this.scene.combatSystem.enemies,
-      (_, enemy) => {
-        if (hitEnemies.has(enemy)) return;
+    this.scene.physics.add.overlap(hitbox, this.scene.combatSystem.enemies, (_, enemy) => {
+      if (hitEnemies.has(enemy)) return;
 
-        hitEnemies.add(enemy);
+      hitEnemies.add(enemy);
 
-        enemy.takeDamage(1);
-      },
-    );
+      enemy.takeDamage(1);
+    });
 
     // Tree
     const hitTrees = new Set();
