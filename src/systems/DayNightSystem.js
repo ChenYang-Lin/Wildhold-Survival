@@ -7,7 +7,7 @@ export default class DayNightSystem {
     this.isNight = false;
 
     this.dayDuration = 20000;
-    this.nightDuration = 600000;
+    this.nightDuration = 60000;
 
     this.timer = this.dayDuration;
     const count = 3 + this.day;
