@@ -5,10 +5,6 @@ export default class NavigationManager {
     this.nodes = new Map();
 
     this.loadNavigation();
-
-    console.log(this.getCampNode(1));
-    console.log(this.getBaseNode());
-    console.log(this.getNode("WP_04"));
   }
 
   loadNavigation() {
@@ -56,8 +52,6 @@ export default class NavigationManager {
       }
       delete node.nextNames;
     }
-
-    console.log(this.nodes);
   }
 
   getNode(name) {
@@ -76,5 +70,19 @@ export default class NavigationManager {
 
   getCampNode(id) {
     return this.nodes.get(`Camp_${id}`);
+  }
+
+  chooseNextNode(currentNode) {
+    if (currentNode.next.length === 0) {
+      return null;
+    }
+
+    return Phaser.Utils.Array.GetRandom(currentNode.next);
+  }
+
+  isAtNode(enemy, node) {
+    const distance = Phaser.Math.Distance.Between(enemy.body.center.x, enemy.body.center.y, node.x, node.y);
+
+    return distance < 32;
   }
 }

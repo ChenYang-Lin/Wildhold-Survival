@@ -12,12 +12,12 @@ export default class CombatSystem {
     return this.enemies;
   }
 
-  spawnEnemy(x, y, stats = {}, type) {
+  spawnEnemy(x, y, stats = {}, type, campNode = this.scene.navigationManager.getNode("Camp_1")) {
     let enemy;
     if (type === "goblin") {
-      enemy = new Enemy(this.scene, x, y, stats);
+      enemy = new Enemy(this.scene, x, y, stats, campNode);
     } else if (type === "archer") {
-      enemy = new Archer(this.scene, x, y, stats);
+      enemy = new Archer(this.scene, x, y, stats, campNode);
     }
 
     this.enemies.add(enemy);

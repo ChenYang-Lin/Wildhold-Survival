@@ -6,9 +6,8 @@ export default class DayNightSystem {
 
     this.isNight = false;
 
-    // this.dayDuration = 20000;
-    this.dayDuration = 10000;
-    this.nightDuration = 30000;
+    this.dayDuration = 20000;
+    this.nightDuration = 600000;
 
     this.timer = this.dayDuration;
     const count = 3 + this.day;
@@ -31,10 +30,7 @@ export default class DayNightSystem {
 
     this.scene.gameStateManager.pause();
 
-    this.scene.overlayMessageUI.show(
-      `Night ${this.day}`,
-      "Protect your tent.\nSurvive the night.",
-    );
+    this.scene.overlayMessageUI.show(`Night ${this.day}`, "Protect your tent.\nSurvive the night.");
 
     this.scene.time.delayedCall(3000, () => {
       this.scene.overlayMessageUI.hide();
@@ -79,9 +75,7 @@ export default class DayNightSystem {
     this.timer -= delta;
     const seconds = Math.floor(this.timer / 1000);
 
-    this.dayNightText.setText(
-      `${this.isNight ? "Night" : "Day"} ${this.day}\nEnds in ${seconds}s`,
-    );
+    this.dayNightText.setText(`${this.isNight ? "Night" : "Day"} ${this.day}\nEnds in ${seconds}s`);
     if (this.timer <= 0) {
       this.isNight ? this.startDay() : this.startNight();
     }

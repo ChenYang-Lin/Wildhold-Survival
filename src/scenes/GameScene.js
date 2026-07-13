@@ -133,7 +133,7 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.physics.add.collider(this.player, this.mapManager.layers.collision);
-    this.physics.add.collider(this.combatSystem.getEnemies(), this.mapManager.collisionLayer);
+    this.physics.add.collider(this.combatSystem.getEnemies(), this.mapManager.layers.collision);
   }
 
   createWorld() {
