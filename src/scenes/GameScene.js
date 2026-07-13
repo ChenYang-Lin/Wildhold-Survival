@@ -31,6 +31,7 @@ import HotbarUI from "../ui/HotbarUI.js";
 import GameOverUI from "../ui/GameOverUI.js";
 import OverlayMessageUI from "../ui/OverlayMessageUI.js";
 import MapManager from "../systems/MapManager.js";
+import NavigationManager from "../systems/NavigationManager.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -64,7 +65,6 @@ export default class GameScene extends Phaser.Scene {
 
     this.mapManager = new MapManager(this);
     this.mapManager.load();
-    console.log(this.mapManager.getResourceZones("tree"));
 
     this.createEntities();
     this.createSystems();
@@ -108,6 +108,7 @@ export default class GameScene extends Phaser.Scene {
     this.resourceManager = new ResourceManager(this);
     this.waveManager = new WaveManager(this);
     this.gameStateManager = new GameStateManager(this);
+    this.navigationManager = new NavigationManager(this);
   }
 
   createUI() {

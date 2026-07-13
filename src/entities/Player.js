@@ -15,7 +15,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.playerState = "idle";
     this.facing = "down";
-    this.speed = 300;
+    this.speed = 100;
 
     this.maxHP = 10;
     this.hp = this.maxHP;

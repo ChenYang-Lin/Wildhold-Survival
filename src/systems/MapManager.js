@@ -103,8 +103,8 @@ export default class MapManager {
 
   worldToGrid(worldX, worldY) {
     return {
-      x: Math.floor(worldX / this.map.tileWidth),
-      y: Math.floor(worldY / this.map.tileHeight),
+      gridX: Math.floor(worldX / this.map.tileWidth),
+      gridY: Math.floor(worldY / this.map.tileHeight),
     };
   }
 
