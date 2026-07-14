@@ -32,6 +32,7 @@ import GameOverUI from "../ui/GameOverUI.js";
 import OverlayMessageUI from "../ui/OverlayMessageUI.js";
 import MapManager from "../systems/MapManager.js";
 import NavigationManager from "../systems/NavigationManager.js";
+import PathfindingManager from "../systems/PathfindingManager.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -109,6 +110,7 @@ export default class GameScene extends Phaser.Scene {
     this.waveManager = new WaveManager(this);
     this.gameStateManager = new GameStateManager(this);
     this.navigationManager = new NavigationManager(this);
+    this.pathfindingManager = new PathfindingManager(this);
   }
 
   createUI() {

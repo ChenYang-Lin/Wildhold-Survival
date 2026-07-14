@@ -26,6 +26,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.targetNode = this.scene.navigationManager.chooseNextNode(this.currentNode);
     this.drawDebugTargetNode();
 
+    this.path = [];
+    this.pathIndex = 0;
+
     // Spawn location
     this.spawnX = x;
     this.spawnY = y;
@@ -394,10 +397,18 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     // Choose next node when the enemy arrived the current target node.
     if (this.targetNode && this.scene.navigationManager.isAtNode(this, this.targetNode)) {
+      // update node
       this.currentNode = this.targetNode;
 
       this.targetNode = this.scene.navigationManager.chooseNextNode(this.currentNode);
       this.drawDebugTargetNode();
+
+      // update path
+      const start = this.scene.mapManager.worldToGrid(this.body.center.x, this.body.center.y);
+
+      this.path = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, this.targetNode.gridX, this.targetNode.gridY);
+
+      this.pathIndex = 0;
     }
 
     this.updateTarget();

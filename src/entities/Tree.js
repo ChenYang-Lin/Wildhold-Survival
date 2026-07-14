@@ -1,6 +1,9 @@
 import { TREE_STAGE } from "../data/treeStages.js";
 
 export default class Tree extends Phaser.Physics.Arcade.Sprite {
+  // The collider center is 80 pixels below the sprite origin.
+  static FOOT_OFFSET_Y = -80; // distance from middle of the sprite to the middle of the tree trunk (middle of the collider), 32 + 32 -> top edge of the tree collider, +16 -> center of the collider
+
   constructor(scene, x, y) {
     super(scene, x, y, "tree", "tree_mature");
 
@@ -9,7 +12,8 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
 
     this.setOrigin(0.5, 0.5);
     this.body.setSize(32, 32);
-    this.body.setOffset(48, 160); // 128 x 192, 32 + 16, 160 + 0
+    // Place the collider's top-left corner 48 pixels from the sprite's left edge and 160 pixels from the sprite's top edge.
+    this.body.setOffset(48, 160); // 128 x 192, 32 + 16, distance from left edge to the left edge of tree trunk;  5 * 32;  distance from top edge to the top edge of tree trunk;
 
     this.stage = TREE_STAGE.MATURE;
     this.setStage(TREE_STAGE.MATURE);
@@ -89,12 +93,7 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
 
     // Spawn drops
     for (let i = 0; i < numOfDrops; i++) {
-      this.scene.resourceSystem.spawnDrop(
-        "wood",
-        this.x + Phaser.Math.Between(-10, 10),
-        this.y + Phaser.Math.Between(-10, 10),
-        1,
-      );
+      this.scene.resourceSystem.spawnDrop("wood", this.x + Phaser.Math.Between(-10, 10), this.y + Phaser.Math.Between(-10, 10), 1);
     }
 
     this.destroy();

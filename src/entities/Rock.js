@@ -1,4 +1,6 @@
 export default class Rock extends Phaser.Physics.Arcade.Sprite {
+  static FOOT_OFFSET_Y = 0;
+
   constructor(scene, x, y) {
     super(scene, x, y, "rock");
 

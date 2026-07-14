@@ -53,7 +53,7 @@
          "name":"Collision",
          "opacity":0.87,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":100,
          "x":0,
          "y":0
@@ -751,7 +751,7 @@
                  "visible":true,
                  "width":154.303,
                  "x":1376,
-                 "y":1152
+                 "y":1184
                 }, 
                 {
                  "height":67.9997,
@@ -783,7 +783,7 @@
                  "visible":true,
                  "width":140.303,
                  "x":1216,
-                 "y":1504
+                 "y":1568
                 }, 
                 {
                  "height":107.999,
@@ -814,8 +814,8 @@
                  "type":"",
                  "visible":true,
                  "width":121.636,
-                 "x":1632,
-                 "y":1504
+                 "x":1600,
+                 "y":1568
                 }],
          "opacity":1,
          "type":"objectgroup",

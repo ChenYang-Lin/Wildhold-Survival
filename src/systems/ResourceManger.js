@@ -19,8 +19,6 @@ export default class ResourceManager {
       (tree) => tree.setStage(TREE_STAGE.SPROUT),
       (tree) =>
         this.treeGrowthQueue.push({
-          x: tree.x,
-          y: tree.y,
           tree: tree,
         }),
     );
@@ -69,7 +67,7 @@ export default class ResourceManager {
   spawnResource(ResourceClass, group, gridX, gridY, onSpawn = null, registerGrowth = null) {
     const { x, y } = this.scene.mapManager.gridToWorld(gridX, gridY);
 
-    const resource = new ResourceClass(this.scene, x + 16, y + 16);
+    const resource = new ResourceClass(this.scene, x + 16, y + 16 + (ResourceClass.FOOT_OFFSET_Y ?? 0));
 
     resource.setGridPosition(gridX, gridY);
 
@@ -105,7 +103,7 @@ export default class ResourceManager {
 
   onTreeDestroyed(tree) {
     this.treeGrowthQueue = this.treeGrowthQueue.filter((record) => {
-      return !(record.x === tree.x && record.y === tree.y);
+      return record.tree !== tree;
     });
   }
 
