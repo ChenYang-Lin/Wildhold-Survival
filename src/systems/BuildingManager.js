@@ -6,7 +6,6 @@ export default class BuildingManager {
   constructor(scene) {
     this.scene = scene;
 
-    this.grid = new Map();
     this.buildings = this.scene.physics.add.staticGroup();
 
     this.tileSize = 32;
@@ -54,16 +53,11 @@ export default class BuildingManager {
   }
 
   tileBlocked(gridX, gridY) {
-    if (this.isOccupied(gridX, gridY)) return true; // building (wall, tower, etc)
+    if (this.scene.mapManager.isTileBlocked(gridX, gridY)) return true;
     if (this.hasEnemy(gridX, gridY)) return true;
     if (this.hasPlayer(gridX, gridY)) return true;
-    if (this.hasTree(gridX, gridY)) return true;
 
     return false;
-  }
-
-  isOccupied(x, y) {
-    return this.grid.has(`${x},${y}`);
   }
 
   hasEnemy(gridX, gridY) {
@@ -84,10 +78,6 @@ export default class BuildingManager {
     return playerGridX === gridX && playerGridY === gridY;
   }
 
-  hasTree() {
-    return false;
-  }
-
   getWalls() {
     return this.buildings.getChildren().filter((b) => b instanceof Wall);
   }
@@ -98,14 +88,8 @@ export default class BuildingManager {
 
   getBuildingWorldPosition(building, gridX, gridY) {
     return {
-      x:
-        gridX * this.tileSize +
-        building.footprintWidth / 2 +
-        (building.spriteWidth - building.footprintWidth) / 2,
-      y:
-        gridY * this.tileSize +
-        building.footprintHeight / 2 +
-        (building.spriteHeight - building.footprintHeight) / 2,
+      x: gridX * this.tileSize + building.footprintWidth / 2 + (building.spriteWidth - building.footprintWidth) / 2,
+      y: gridY * this.tileSize + building.footprintHeight / 2 + (building.spriteHeight - building.footprintHeight) / 2,
     };
   }
 
@@ -127,12 +111,16 @@ export default class BuildingManager {
       this.buildings.add(obj);
     }
 
+    obj.occupiedTiles = [];
     // mark occupied tiles
     for (let x = 0; x < building.width; x++) {
       for (let y = 0; y < building.height; y++) {
         const occupiedX = gridX + x + (building.footprintOffsetX || 0);
         const occupiedY = gridY + y + (building.footprintOffsetY || 0);
-        this.grid.set(`${occupiedX},${occupiedY}`, obj);
+
+        this.scene.mapManager.occupyTile(occupiedX, occupiedY);
+
+        obj.occupiedTiles.push({ gridX: occupiedX, gridY: occupiedY });
       }
     }
 
@@ -142,11 +130,9 @@ export default class BuildingManager {
   }
 
   removeBuilding(building) {
-    for (const [key, value] of this.grid.entries()) {
-      if (value === building) {
-        this.grid.delete(key);
-      }
-    }
+    building.occupiedTiles.forEach((occupiedTile) => {
+      this.scene.mapManager.freeTile(occupiedTile.gridX, occupiedTile.gridY);
+    });
 
     building.destroy();
   }

@@ -1,6 +1,23 @@
 export default class PathfindingManager {
   constructor(scene) {
     this.scene = scene;
+
+    // DEBUG
+    this.debugGraphics = null;
+    this.debugTileBlockOn = false;
+  }
+
+  createNode(gridX, gridY) {
+    return {
+      gridX,
+      gridY,
+
+      g: Infinity,
+      h: 0,
+      f: Infinity,
+
+      parent: null,
+    };
   }
 
   findPath(startGridX, startGridY, endGridX, endGridY) {
@@ -8,18 +25,15 @@ export default class PathfindingManager {
 
     const grid = this.buildGrid();
 
-    console.log(grid);
+    const startNode = this.createNode(startGridX, startGridY);
 
-    const node = {
-      gridX: startGridX,
-      gridY: startGridY,
+    startNode.g = 0;
+    startNode.h = this.heuristic(startGridX, startGridY, endGridX, endGridY);
+    startNode.f = startNode.g + startNode.h;
 
-      g: 0,
-      h: 0,
-      f: 0,
+    const openList = [startNode];
 
-      parent: null,
-    };
+    const closedSet = new Set();
 
     return [];
   }
@@ -31,12 +45,6 @@ export default class PathfindingManager {
 
     const grid = [];
 
-    // // Remove previous debug graphics
-    // this.debugGraphics?.destroy();
-
-    // this.debugGraphics = this.scene.add.graphics();
-    // this.debugGraphics.setDepth(100000); // draw on top of everything
-
     for (let y = 0; y < height; y++) {
       grid[y] = [];
 
@@ -44,17 +52,6 @@ export default class PathfindingManager {
         const walkable = !this.scene.mapManager.isTileBlocked(x, y);
 
         grid[y][x] = walkable;
-
-        const worldX = x * map.tileWidth;
-        const worldY = y * map.tileHeight;
-
-        // // DEBUG:
-        // this.debugGraphics.fillStyle(walkable ? 0x00ff00 : 0xff0000, 0.35);
-        // this.debugGraphics.fillRect(worldX, worldY, map.tileWidth, map.tileHeight);
-
-        // // Optional: draw tile border
-        // this.debugGraphics.lineStyle(1, 0x000000, 0.3);
-        // this.debugGraphics.strokeRect(worldX, worldY, map.tileWidth, map.tileHeight);
       }
     }
 
@@ -85,12 +82,44 @@ export default class PathfindingManager {
 
       if (!grid[y][x]) continue;
 
-      neighbors.push({
-        gridX: x,
-        gridY: y,
-      });
+      neighbors.push(this.createNode(x, y));
     }
 
     return neighbors;
+  }
+
+  toggleDebugTileBlock() {
+    console.log("start toggleDebugTileBlcok()");
+    if (this.debugTileBlockOn) {
+      this.debugTileBlockOn = false;
+
+      // Remove previous debug graphics
+      this.debugGraphics?.destroy();
+    } else {
+      this.debugTileBlockOn = true;
+
+      const map = this.scene.mapManager.map;
+      const width = map.width;
+      const height = map.height;
+
+      this.debugGraphics = this.scene.add.graphics();
+      this.debugGraphics.setDepth(100000); // draw on top of everything
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const walkable = !this.scene.mapManager.isTileBlocked(x, y);
+
+          const worldX = x * map.tileWidth;
+          const worldY = y * map.tileHeight;
+
+          this.debugGraphics.fillStyle(walkable ? 0x00ff00 : 0xff0000, 0.35);
+          this.debugGraphics.fillRect(worldX, worldY, map.tileWidth, map.tileHeight);
+
+          // Optional: draw tile border
+          this.debugGraphics.lineStyle(1, 0x000000, 0.3);
+          this.debugGraphics.strokeRect(worldX, worldY, map.tileWidth, map.tileHeight);
+        }
+      }
+    }
   }
 }

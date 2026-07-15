@@ -83,6 +83,10 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, false);
 
     this.setupCollisions();
+
+    this.input.keyboard.on("keydown-P", (e) => {
+      this.pathfindingManager.toggleDebugTileBlock();
+    });
   }
 
   createEntities() {
