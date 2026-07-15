@@ -84,6 +84,8 @@ export default class GameScene extends Phaser.Scene {
 
     this.setupCollisions();
 
+    const path = this.pathfindingManager.findPath(37, 29, 37, 36);
+
     this.input.keyboard.on("keydown-P", (e) => {
       this.pathfindingManager.toggleDebugTileBlock();
     });

@@ -25,7 +25,7 @@ export default class PathfindingManager {
 
     const grid = this.buildGrid();
 
-    const startNode = this.createNode(startGridX, startGridY);
+    const startNode = grid[startGridY][startGridX].node;
 
     startNode.g = 0;
     startNode.h = this.heuristic(startGridX, startGridY, endGridX, endGridY);
@@ -34,6 +34,57 @@ export default class PathfindingManager {
     const openList = [startNode];
 
     const closedSet = new Set();
+
+    while (openList.length > 0) {
+      // Find the node with the smallest F score
+      let current = openList[0];
+
+      for (const node of openList) {
+        if (node.f < current.f) {
+          current = node;
+        }
+      }
+
+      // Remove the node from the open list
+      openList.splice(openList.indexOf(current), 1);
+
+      // Add the node to the closed Set.
+      closedSet.add(`${current.gridX},${current.gridY}`);
+
+      // Check if we've reached the destination
+      if (current.gridX === endGridX && current.gridY === endGridY) {
+        console.log("Path Found");
+
+        const path = this.reconstructPath(current);
+
+        console.log(path);
+
+        return path;
+      }
+
+      // Check every reachable tile around the current tile
+      const neighbors = this.getNeighbors(current, grid);
+      for (const neighbor of neighbors) {
+        // Ignore the nodes already visited.
+        const key = `${neighbor.gridX},${neighbor.gridY}`;
+        if (closedSet.has(key)) continue;
+
+        const tentativeG = current.g + 1;
+
+        const inOpenList = openList.includes(neighbor);
+
+        if (!inOpenList) {
+          neighbor.h = this.heuristic(neighbor.gridX, neighbor.gridY, endGridX, endGridY);
+          openList.push(neighbor);
+        }
+
+        if (tentativeG < neighbor.g) {
+          neighbor.g = tentativeG;
+          neighbor.f = neighbor.g + neighbor.h;
+          neighbor.parent = current;
+        }
+      }
+    }
 
     return [];
   }
@@ -49,9 +100,10 @@ export default class PathfindingManager {
       grid[y] = [];
 
       for (let x = 0; x < width; x++) {
-        const walkable = !this.scene.mapManager.isTileBlocked(x, y);
-
-        grid[y][x] = walkable;
+        grid[y][x] = {
+          walkable: !this.scene.mapManager.isTileBlocked(x, y),
+          node: this.createNode(x, y),
+        };
       }
     }
 
@@ -80,12 +132,31 @@ export default class PathfindingManager {
         continue;
       }
 
-      if (!grid[y][x]) continue;
+      if (!grid[y][x].walkable) continue;
 
-      neighbors.push(this.createNode(x, y));
+      neighbors.push(grid[y][x].node);
     }
 
     return neighbors;
+  }
+
+  reconstructPath(node) {
+    const path = [];
+
+    let current = node;
+
+    while (current) {
+      path.push({
+        gridX: current.gridX,
+        gridY: current.gridY,
+      });
+
+      current = current.parent;
+    }
+
+    path.reverse();
+
+    return path;
   }
 
   toggleDebugTileBlock() {
