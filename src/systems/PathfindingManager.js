@@ -23,8 +23,6 @@ export default class PathfindingManager {
   }
 
   findPath(startGridX, startGridY, endGridX, endGridY, type) {
-    console.log("Finding Path: ", startGridX, startGridY, " ->", endGridX, endGridY);
-
     const grid = this.buildGrid(type);
 
     const startNode = grid[startGridY][startGridX].node;
@@ -55,8 +53,6 @@ export default class PathfindingManager {
 
       // Check if we've reached the destination
       if (current.gridX === endGridX && current.gridY === endGridY) {
-        console.log("Path Found");
-
         const path = this.reconstructPath(current);
 
         this.drawDebugPath(path);
@@ -106,8 +102,14 @@ export default class PathfindingManager {
       for (let gridX = 0; gridX < width; gridX++) {
         let walkable = !this.scene.mapManager.isTileBlocked(gridX, gridY);
 
-        if (type === "enemy") {
-          walkable = !this.scene.mapManager.isTileCollidable(gridX, gridY);
+        switch (type) {
+          case "enemy":
+            walkable = !this.scene.mapManager.isTileBlocked(gridX, gridY);
+            break;
+
+          case "ignoreBuildings":
+            walkable = !this.scene.mapManager.isTileCollidable(gridX, gridY);
+            break;
         }
         grid[gridY][gridX] = {
           walkable: walkable,
@@ -166,11 +168,14 @@ export default class PathfindingManager {
 
     path.reverse();
 
-    console.log(path);
     return path;
   }
 
   toggleDebugTileBlock() {
+    if (!this.scene.DEBUG_MODE) {
+      return;
+    }
+
     console.log("start toggleDebugTileBlcok()");
     if (this.debugBlockGraphicsOn) {
       this.debugBlockGraphicsOn = false;
@@ -207,6 +212,9 @@ export default class PathfindingManager {
   }
 
   drawDebugPath(path) {
+    if (!this.scene.DEBUG_MODE) {
+      return;
+    }
     this.debugPathGraphics?.destroy();
 
     this.debugPathGraphics = this.scene.add.graphics();

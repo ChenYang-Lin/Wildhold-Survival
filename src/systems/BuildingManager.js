@@ -136,4 +136,20 @@ export default class BuildingManager {
 
     building.destroy();
   }
+
+  getBuildingAtGrid(gridX, gridY) {
+    let result = null;
+
+    this.buildings.children.iterate((building) => {
+      if (!building || !building.active) return;
+
+      const occupiesTile = building.occupiedTiles.some((tile) => tile.gridX === gridX && tile.gridY === gridY);
+
+      if (occupiesTile) {
+        result = building;
+      }
+    });
+
+    return result;
+  }
 }

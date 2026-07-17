@@ -13,23 +13,29 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.facing = "down";
     this.hp = stats.hp ?? 3;
     this.maxHP = this.hp;
-    this.speed = stats.speed ?? 100;
+    this.speed = stats.speed ?? 50;
 
     // Attack
-    this.attackRange = 46;
+    this.attackRange = 32;
     this.aggroRange = 200;
     this.attackDamage = stats.damage ?? 1;
     this.attackCooldown = 1000;
     this.canAttack = true;
 
+    this.windupDuration = 500;
+    this.hitboxLifetime = 80;
+    this.attackDelay = 500;
+    this.attackHold = 800;
+
     this.target = null;
     this.currentNode = campNode;
     this.targetNode = this.scene.navigationManager.chooseNextNode(this.currentNode);
+    this.idealPathLength = 0;
+    this.maxDetour = 10;
     this.drawDebugTargetNode();
 
     this.path = [];
     this.currentWaypoint = 0;
-    this.pathRecalculateCooldown = 0;
 
     this.pathCooldown = 0;
     this.pathInterval = 500; // ms
@@ -44,6 +50,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     // AI
     this.STATE_NAVIGATE = "navigate";
+    this.STATE_BREAK_OBSTACLE = "break_obstacle";
     this.STATE_CHASE = "chase";
     this.STATE_WINDUP = "windup";
     this.STATE_ATTACK = "attack";
@@ -101,7 +108,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   // check if target in attack range
   isTargetInAttackRange() {
-    return this.target && this.distanceTo(this.target) <= this.attackRange;
+    return this.target && this.distanceTo(this.target) - this.target.body.width / 2 <= this.attackRange;
+  }
+
+  // get the position of the obstacle(building) that is blocking the enemy path.
+  getObstaclePosition() {
+    const world = this.scene.mapManager.gridToWorld(this.obstacleTile.gridX, this.obstacleTile.gridY);
+
+    return {
+      x: world.x + this.scene.mapManager.map.tileWidth / 2,
+      y: world.y + this.scene.mapManager.map.tileHeight / 2,
+    };
   }
 
   distanceTo(target) {
@@ -124,24 +141,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   stopMoving() {
     this.setVelocity(0, 0);
-  }
-
-  findNearbyBuilding() {
-    let nearest = null;
-    let nearestDist = Infinity;
-
-    this.scene.buildingManager.buildings.children.iterate((building) => {
-      if (!building || !building.active) return;
-
-      const dist = Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, building.body.center.x, building.body.center.y);
-
-      if (dist < 80 && dist < nearestDist) {
-        nearest = building;
-        nearestDist = dist;
-      }
-    });
-
-    return nearest;
   }
 
   startAttackCooldown() {
@@ -222,9 +221,25 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     });
 
     // Destroy hitbox
-    this.scene.time.delayedCall(80, () => {
+    this.scene.time.delayedCall(this.hitboxLifetime, () => {
       hitbox.destroy();
     });
+  }
+
+  chooseObstacleToAttack(normalPath) {
+    console.log("choosing obstacle to attack!");
+    for (const tile of normalPath) {
+      if (this.scene.mapManager.isTileOccupied(tile.gridX, tile.gridY)) {
+        const building = this.scene.buildingManager.getBuildingAtGrid(tile.gridX, tile.gridY);
+        console.log(building);
+        if (building) {
+          this.target = building;
+          this.obstacleTile = tile;
+          this.enterBreakObstacle();
+          return;
+        }
+      }
+    }
   }
 
   lookForTargets() {
@@ -244,6 +259,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.target = player;
       this.enterChase();
       return;
+    }
+
+    if (!this.targetNode) {
+      this.target = this.scene.campfire;
+      this.enterChase();
     }
   }
 
@@ -283,6 +303,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (!waypoint) {
       this.arriveAtNode();
 
+      return;
+    }
+
+    if (this.scene.mapManager.isTileBlocked(waypoint.gridX, waypoint.gridY)) {
+      this.path.length = 0;
       return;
     }
 
@@ -333,12 +358,22 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     const end = this.scene.mapManager.worldToGrid(this.targetNode.x, this.targetNode.y);
 
-    const newPath = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, end.gridX, end.gridY, "enemy");
+    const normalPath = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, end.gridX, end.gridY, "ignoreBuildings");
+    const path = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, end.gridX, end.gridY, "enemy");
 
-    console.log(newPath);
-    if (newPath.length > 0) {
-      this.path = newPath;
+    if (path.length === 0) {
+      this.chooseObstacleToAttack(normalPath);
+      return;
+    }
+
+    this.idealPathLength = normalPath.length;
+    const detour = path.length - this.idealPathLength;
+
+    if (detour <= this.maxDetour) {
+      this.path = path;
       this.currentWaypoint = 0;
+    } else {
+      this.chooseObstacleToAttack(normalPath);
     }
 
     this.pathCooldown = time + this.pathInterval;
@@ -347,18 +382,18 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   performAttack() {
     this.startAttackCooldown();
 
-    this.scene.time.delayedCall(500, () => {
+    this.scene.time.delayedCall(this.attackDelay, () => {
       if (!this.active) return;
       if (this.aiState === this.STATE_DEAD) return;
 
       this.spawnAttackHitbox();
     });
 
-    this.scene.time.delayedCall(800, () => {
+    this.scene.time.delayedCall(this.attackHold, () => {
       if (!this.active) return;
       if (this.aiState === this.STATE_DEAD) return;
 
-      this.enterChase();
+      this.enterNavigate();
     });
   }
 
@@ -368,6 +403,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.aiState = this.STATE_NAVIGATE;
 
     this.target = null;
+    this.obstacleTile = null;
+    this.path.length = 0;
+  }
+
+  enterBreakObstacle() {
+    this.aiState = this.STATE_BREAK_OBSTACLE;
+
     this.path.length = 0;
   }
 
@@ -382,7 +424,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.stopMoving();
 
-    this.scene.time.delayedCall(500, () => {
+    this.scene.time.delayedCall(this.windupDuration, () => {
       if (!this.active) return;
 
       if (this.aiState === this.STATE_DEAD) return;
@@ -399,7 +441,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.stopMoving();
 
     if (!this.canAttack) {
-      this.aiState = this.STATE_CHASE;
       return;
     }
 
@@ -442,6 +483,35 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.lookForTargets();
   }
 
+  updateBreakObstacle(time) {
+    if (!this.target || !this.target.active) {
+      this.enterNavigate();
+      return;
+    }
+
+    if (time > this.pathCooldown) {
+      this.path.length = 0;
+
+      this.updatePath(time);
+
+      if (this.path.length > 0) {
+        this.enterNavigate();
+        return;
+      }
+    }
+
+    const pos = this.getObstaclePosition();
+
+    this.scene.physics.moveTo(this, pos.x, pos.y, this.speed);
+
+    this.updateFacing();
+    this.anims.play(`goblin_walk_${this.facing}`, true);
+
+    if (Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, pos.x, pos.y) <= this.attackRange) {
+      this.enterWindup();
+    }
+  }
+
   updateChase() {
     if (!this.target) return;
 
@@ -456,15 +526,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.updateFacing();
     this.anims.play(`goblin_walk_${this.facing}`, true);
-
-    if (this.body.blocked.left || this.body.blocked.right || this.body.blocked.up || this.body.blocked.down) {
-      const blockingBuilding = this.findNearbyBuilding();
-      if (blockingBuilding) {
-        this.target = blockingBuilding;
-        this.enterWindup();
-        return;
-      }
-    }
 
     if (this.target && this.isTargetInAttackRange()) {
       // if the target is targetNode, then return
@@ -514,6 +575,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     switch (this.aiState) {
       case this.STATE_NAVIGATE:
         this.updateNavigate(time);
+        break;
+
+      case this.STATE_BREAK_OBSTACLE:
+        this.updateBreakObstacle(time);
         break;
 
       case this.STATE_CHASE:

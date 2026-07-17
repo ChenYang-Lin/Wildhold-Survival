@@ -4,7 +4,7 @@ export const WAVES = [
     camps: [
       {
         campId: 1,
-        enemies: [{ type: "goblin", count: 1, stats: {} }],
+        enemies: [{ type: "goblin", count: 3, stats: {} }],
       },
       {
         campId: 2,
@@ -32,7 +32,7 @@ export const WAVES = [
       },
       {
         campId: 2,
-        enemies: [],
+        enemies: [{ type: "goblin", count: 3, stats: {} }],
       },
       {
         campId: 3,
@@ -56,11 +56,11 @@ export const WAVES = [
       },
       {
         campId: 2,
-        enemies: [],
+        enemies: [{ type: "goblin", count: 5, stats: {} }],
       },
       {
         campId: 3,
-        enemies: [],
+        enemies: [{ type: "goblin", count: 3, stats: {} }],
       },
       {
         campId: 4,

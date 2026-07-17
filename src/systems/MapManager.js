@@ -44,6 +44,7 @@ export default class MapManager {
 
       this.camps.push({
         campId,
+        name: camp.name,
         x: camp.x,
         y: camp.y,
       });

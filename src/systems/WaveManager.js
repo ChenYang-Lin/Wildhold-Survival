@@ -30,7 +30,8 @@ export default class WaveManager {
       for (let i = 0; i < enemyData.count; i++) {
         const spawn = this.getRandomSpawnPosition(camp);
 
-        this.scene.combatSystem.spawnEnemy(spawn.x, spawn.y, enemyData.stats, enemyData.type);
+        const campNode = this.scene.navigationManager.getNode(camp.name);
+        this.scene.combatSystem.spawnEnemy(spawn.x, spawn.y, enemyData.stats, enemyData.type, campNode);
       }
     });
   }

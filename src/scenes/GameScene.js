@@ -37,6 +37,8 @@ import PathfindingManager from "../systems/PathfindingManager.js";
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
+
+    this.DEBUG_MODE = false;
   }
 
   preload() {
