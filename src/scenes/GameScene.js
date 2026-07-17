@@ -84,7 +84,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.setupCollisions();
 
-    const path = this.pathfindingManager.findPath(37, 29, 37, 36);
+    const path = this.pathfindingManager.findPath(37, 29, 48, 38);
 
     this.input.keyboard.on("keydown-P", (e) => {
       this.pathfindingManager.toggleDebugTileBlock();
@@ -180,7 +180,7 @@ export default class GameScene extends Phaser.Scene {
     this.inputController.update();
     this.player.update();
     this.ghostPreview.update();
-    this.combatSystem.update();
+    this.combatSystem.update(time);
     this.healthUI.update();
     this.hotbarUI.update();
     this.dayNightSystem.update(delta);

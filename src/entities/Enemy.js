@@ -7,16 +7,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.scene.physics.add.existing(this);
 
     this.setOrigin(0.5, 0.5);
-    this.body.setSize(32, 32);
-    this.body.setOffset(80, 96); // 192 x 192, 32 + 32 + 16, 32 + 32 + 16 + 16
+    this.body.setSize(20, 16);
+    this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
 
     this.facing = "down";
     this.hp = stats.hp ?? 3;
     this.maxHP = this.hp;
-    this.speed = stats.speed ?? 50;
+    this.speed = stats.speed ?? 100;
 
     // Attack
     this.attackRange = 46;
+    this.aggroRange = 200;
     this.attackDamage = stats.damage ?? 1;
     this.attackCooldown = 1000;
     this.canAttack = true;
@@ -27,7 +28,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.drawDebugTargetNode();
 
     this.path = [];
-    this.pathIndex = 0;
+    this.followingPath = false;
+    this.currentWaypoint = 0;
+    this.pathRecalculateCooldown = 0;
+
+    this.pathCooldown = 0;
+    this.pathInterval = 500; // ms
 
     // Spawn location
     this.spawnX = x;
@@ -38,13 +44,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.hpBar.setDepth(5000);
 
     // AI
-    this.aiState = "chase";
-
+    this.STATE_NAVIGATE = "navigate";
     this.STATE_CHASE = "chase";
     this.STATE_WINDUP = "windup";
     this.STATE_ATTACK = "attack";
     this.STATE_RETREAT = "retreat";
     this.STATE_DEAD = "dead";
+
+    this.enterNavigate();
   }
 
   static preload(scene) {
@@ -55,6 +62,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   drawDebugTargetNode() {
     // this.scene.add.circle(this.targetNode.x, this.targetNode.y, 6, 0xff0000);
+  }
+
+  // Similar to setPosition(targetX, targetY). But instead of moving sprite's center to target location, it moves the sprite's body.center to the target location
+  setBodyCenterPosition(targetX, targetY) {
+    const x = targetX - this.body.offset.x + this.width / 2 - this.body.width / 2;
+    const y = targetY - this.body.offset.y + this.height / 2 - this.body.height / 2;
+
+    this.setPosition(x, y);
   }
 
   drawHealthBar() {
@@ -208,6 +223,26 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  lookForTargets() {
+    // Is target nearby
+    const tower = this.scene.buildingManager.getNearestTower(this.body.center.x, this.body.center.y, 150); // prettier-ignore
+
+    if (this.distanceTo(tower) < this.aggroRange) {
+      this.target = tower;
+      this.enterChase();
+      return;
+    }
+
+    // Is player nearby
+    const player = this.scene.player;
+
+    if (this.distanceTo(player) < this.aggroRange) {
+      this.target = player;
+      this.enterChase();
+      return;
+    }
+  }
+
   die() {
     this.hpBar.destroy();
     this.destroy();
@@ -222,32 +257,89 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  updateTarget() {
-    // Keep attacking buildings
-    if (this.target && this.target.active === true && this.target !== this.scene.player && this.target !== this.scene.campfire) {
+  arriveAtNode() {
+    this.currentNode = this.targetNode;
+
+    this.targetNode = this.scene.navigationManager.chooseNextNode(this.currentNode);
+
+    this.path.length = 0;
+    this.followingPath = false;
+    this.currentWaypoint = 0;
+
+    this.pathCooldown = 0;
+  }
+
+  followPath() {
+    if (this.path.length === 0) {
+      this.setVelocity(0);
       return;
     }
 
-    const tower = this.scene.buildingManager.getNearestTower(this.body.center.x, this.body.center.y, 150); // prettier-ignore
-    if (tower) {
-      this.target = tower;
+    const waypoint = this.path[this.currentWaypoint];
+
+    if (!waypoint) {
+      this.arriveAtNode();
+
       return;
     }
 
-    const player = this.scene.player;
+    const world = this.scene.mapManager.gridToWorld(waypoint.gridX, waypoint.gridY);
 
-    const distToPlayer = this.distanceTo(player);
+    const targetX = world.x + this.scene.mapManager.map.tileWidth / 2;
+    const targetY = world.y + this.scene.mapManager.map.tileHeight / 2;
 
-    if (distToPlayer < 200) {
-      this.target = player;
+    const distance = Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, targetX, targetY);
+
+    const arriveDistance = (this.speed * this.scene.game.loop.delta) / 1000 + 2;
+
+    if (distance < arriveDistance) {
+      this.currentWaypoint++;
+      this.setVelocity(0);
+
       return;
     }
 
-    if (this.targetNode) {
-      this.target = this.targetNode;
-    } else {
-      this.target = this.scene.campfire;
+    // Move the enemy
+    let vx = targetX - this.body.center.x;
+    let vy = targetY - this.body.center.y;
+
+    const length = Math.hypot(vx, vy);
+
+    if (length <= 0.001) {
+      this.setVelocity(0);
+      return;
     }
+
+    vx = (vx / length) * this.speed;
+    vy = (vy / length) * this.speed;
+
+    this.setVelocity(vx, vy);
+
+    this.updateFacing();
+    this.anims.play(`goblin_walk_${this.facing}`, true);
+  }
+
+  updatePath(time) {
+    if (!this.targetNode) return;
+
+    if (this.followingPath) return;
+    this.followingPath = true;
+
+    if (time < this.pathCooldown) return;
+
+    const start = this.scene.mapManager.worldToGrid(this.body.center.x, this.body.center.y);
+
+    const end = this.scene.mapManager.worldToGrid(this.targetNode.x, this.targetNode.y);
+
+    const newPath = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, end.gridX, end.gridY);
+
+    console.log(newPath);
+    if (newPath.length > 0) {
+      this.path = newPath;
+      this.currentWaypoint = 0;
+    }
+
+    this.pathCooldown = time + this.pathInterval;
   }
 
   performAttack() {
@@ -268,8 +360,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  enterNavigate() {
+    if (this.aiState === this.STATE_NAVIGATE) return;
+
+    this.aiState = this.STATE_NAVIGATE;
+
+    this.target = null;
+  }
+
   enterChase() {
     this.aiState = this.STATE_CHASE;
+    this.followingPath = false;
   }
 
   enterWindup() {
@@ -331,10 +432,24 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.retreatDirection = Phaser.Math.Angle.Between(this.x, this.y, this.spawnX, this.spawnY);
   }
 
+  updateNavigate(time) {
+    this.updatePath();
+    this.followPath();
+
+    // Target detection
+    this.lookForTargets();
+  }
+
   updateChase() {
     if (!this.target) return;
 
+    if (this.distanceTo(this.target) > this.aggroRange) {
+      this.enterNavigate();
+      return;
+    }
+
     const pos = this.getPosition(this.target);
+
     this.scene.physics.moveTo(this, pos.x, pos.y, this.speed);
 
     this.updateFacing();
@@ -388,32 +503,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.anims.play(`goblin_walk_${this.facing}`, true);
   }
 
-  update() {
+  update(time) {
     if (!this.active) return;
-
     if (this.aiState === this.STATE_DEAD) return;
 
     this.setDepth(this.body.center.y);
 
-    // Choose next node when the enemy arrived the current target node.
-    if (this.targetNode && this.scene.navigationManager.isAtNode(this, this.targetNode)) {
-      // update node
-      this.currentNode = this.targetNode;
-
-      this.targetNode = this.scene.navigationManager.chooseNextNode(this.currentNode);
-      this.drawDebugTargetNode();
-
-      // update path
-      const start = this.scene.mapManager.worldToGrid(this.body.center.x, this.body.center.y);
-
-      this.path = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, this.targetNode.gridX, this.targetNode.gridY);
-
-      this.pathIndex = 0;
-    }
-
-    this.updateTarget();
-
     switch (this.aiState) {
+      case this.STATE_NAVIGATE:
+        this.updateNavigate(time);
+        break;
+
       case this.STATE_CHASE:
         this.updateChase();
         break;
@@ -428,6 +528,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
       case this.STATE_RETREAT:
         this.updateRetreat();
+        break;
+
+      case this.STATE_DEAD:
         break;
     }
 

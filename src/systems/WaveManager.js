@@ -37,8 +37,8 @@ export default class WaveManager {
 
   getRandomSpawnPosition(camp) {
     return {
-      x: camp.x + Phaser.Math.Between(-80, 80),
-      y: camp.y + Phaser.Math.Between(-80, 80),
+      x: camp.x + Phaser.Math.Between(-16, 16),
+      y: camp.y + Phaser.Math.Between(-16, 16),
     };
   }
 }

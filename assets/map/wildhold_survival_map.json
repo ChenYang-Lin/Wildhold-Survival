@@ -53,7 +53,7 @@
          "name":"Collision",
          "opacity":0.87,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":100,
          "x":0,
          "y":0
@@ -466,7 +466,7 @@
                  "y":2144
                 }, 
                 {
-                 "height":861.633,
+                 "height":1026.96633333333,
                  "id":23,
                  "name":"Forest",
                  "properties":[
@@ -530,7 +530,7 @@
                  "y":1312
                 }, 
                 {
-                 "height":227.273,
+                 "height":325.273,
                  "id":29,
                  "name":"Forest",
                  "properties":[
@@ -658,7 +658,7 @@
                  "y":2944
                 }, 
                 {
-                 "height":408.727,
+                 "height":497.727,
                  "id":56,
                  "name":"Forest",
                  "properties":[
@@ -685,12 +685,12 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":222.303,
+                 "width":211.303,
                  "x":2304,
                  "y":768
                 }, 
                 {
-                 "height":251.091,
+                 "height":354.091,
                  "id":57,
                  "name":"Forest",
                  "properties":[
@@ -722,7 +722,7 @@
                  "y":2016
                 }, 
                 {
-                 "height":87.333,
+                 "height":177.833,
                  "id":58,
                  "name":"Forest",
                  "properties":[
@@ -749,9 +749,9 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":154.303,
+                 "width":174.803,
                  "x":1376,
-                 "y":1184
+                 "y":1152
                 }, 
                 {
                  "height":67.9997,

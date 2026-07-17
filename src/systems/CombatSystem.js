@@ -24,11 +24,11 @@ export default class CombatSystem {
     return enemy;
   }
 
-  update() {
+  update(time) {
     this.enemies.children.iterate((enemy) => {
       if (!enemy || !enemy.active) return;
 
-      enemy.update();
+      enemy.update(time);
     });
   }
 }

@@ -3,8 +3,10 @@ export default class PathfindingManager {
     this.scene = scene;
 
     // DEBUG
-    this.debugGraphics = null;
-    this.debugTileBlockOn = false;
+    this.debugBlockGraphics = null; // draw blocked tiles; red -> blocked; green -> walkable
+    this.debugPathGraphics = null; // draw the path
+
+    this.debugBlockGraphicsOn = false;
   }
 
   createNode(gridX, gridY) {
@@ -39,9 +41,9 @@ export default class PathfindingManager {
       // Find the node with the smallest F score
       let current = openList[0];
 
-      for (const node of openList) {
-        if (node.f < current.f) {
-          current = node;
+      for (let i = 1; i < openList.length; i++) {
+        if (openList[i].f < current.f) {
+          current = openList[i];
         }
       }
 
@@ -57,7 +59,7 @@ export default class PathfindingManager {
 
         const path = this.reconstructPath(current);
 
-        console.log(path);
+        this.drawDebugPath(path);
 
         return path;
       }
@@ -85,6 +87,8 @@ export default class PathfindingManager {
         }
       }
     }
+
+    this.debugPathGraphics?.destroy();
 
     return [];
   }
@@ -146,6 +150,7 @@ export default class PathfindingManager {
     let current = node;
 
     while (current) {
+      // const world = this.scene.mapManager.gridToWorld(current.gridX, current.gridY);
       path.push({
         gridX: current.gridX,
         gridY: current.gridY,
@@ -156,25 +161,27 @@ export default class PathfindingManager {
 
     path.reverse();
 
+    console.log(path);
     return path;
   }
 
   toggleDebugTileBlock() {
     console.log("start toggleDebugTileBlcok()");
-    if (this.debugTileBlockOn) {
-      this.debugTileBlockOn = false;
+    if (this.debugBlockGraphicsOn) {
+      this.debugBlockGraphicsOn = false;
 
-      // Remove previous debug graphics
-      this.debugGraphics?.destroy();
+      // Remove debug graphics
+      this.debugBlockGraphics?.destroy();
+      this.debugPathGraphics?.destroy();
     } else {
-      this.debugTileBlockOn = true;
+      this.debugBlockGraphicsOn = true;
 
       const map = this.scene.mapManager.map;
       const width = map.width;
       const height = map.height;
 
-      this.debugGraphics = this.scene.add.graphics();
-      this.debugGraphics.setDepth(100000); // draw on top of everything
+      this.debugBlockGraphics = this.scene.add.graphics();
+      this.debugBlockGraphics.setDepth(100000); // draw on top of everything
 
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
@@ -183,14 +190,29 @@ export default class PathfindingManager {
           const worldX = x * map.tileWidth;
           const worldY = y * map.tileHeight;
 
-          this.debugGraphics.fillStyle(walkable ? 0x00ff00 : 0xff0000, 0.35);
-          this.debugGraphics.fillRect(worldX, worldY, map.tileWidth, map.tileHeight);
+          this.debugBlockGraphics.fillStyle(walkable ? 0x00ff00 : 0xff0000, 0.35);
+          this.debugBlockGraphics.fillRect(worldX, worldY, map.tileWidth, map.tileHeight);
 
           // Optional: draw tile border
-          this.debugGraphics.lineStyle(1, 0x000000, 0.3);
-          this.debugGraphics.strokeRect(worldX, worldY, map.tileWidth, map.tileHeight);
+          this.debugBlockGraphics.lineStyle(1, 0x000000, 0.3);
+          this.debugBlockGraphics.strokeRect(worldX, worldY, map.tileWidth, map.tileHeight);
         }
       }
+    }
+  }
+
+  drawDebugPath(path) {
+    this.debugPathGraphics?.destroy();
+
+    this.debugPathGraphics = this.scene.add.graphics();
+    this.debugPathGraphics.setDepth(100001);
+
+    const tileSize = this.scene.mapManager.map.tileWidth;
+
+    this.debugPathGraphics.fillStyle(0x0000ff, 0.4);
+
+    for (const point of path) {
+      this.debugPathGraphics.fillRect(point.gridX * tileSize, point.gridY * tileSize, tileSize, tileSize);
     }
   }
 }

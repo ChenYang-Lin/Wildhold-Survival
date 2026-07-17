@@ -8,14 +8,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.scene.physics.add.existing(this);
 
     this.setOrigin(0.5, 0.5);
-    this.body.setSize(32, 32);
-    this.body.setOffset(80, 96); // 192 x 192, 32 + 32 + 16, 32 + 32 + 16 + 16
+    this.body.setSize(20, 16);
+    this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
 
     this.setCollideWorldBounds(true);
 
     this.playerState = "idle";
     this.facing = "down";
-    this.speed = 100;
+    this.speed = 200;
 
     this.maxHP = 10;
     this.hp = this.maxHP;
