@@ -108,10 +108,6 @@ export default class MapManager {
     };
   }
 
-  isTileOccupied(gridX, gridY) {
-    return this.occupiedGrid.has(`${gridX},${gridY}`);
-  }
-
   occupyTile(gridX, gridY) {
     this.occupiedGrid.add(`${gridX},${gridY}`);
   }
@@ -120,7 +116,15 @@ export default class MapManager {
     this.occupiedGrid.delete(`${gridX},${gridY}`);
   }
 
+  isTileCollidable(gridX, gridY) {
+    return this.layers.collision.getTileAt(gridX, gridY);
+  }
+
+  isTileOccupied(gridX, gridY) {
+    return this.occupiedGrid.has(`${gridX},${gridY}`);
+  }
+
   isTileBlocked(gridX, gridY) {
-    return this.layers.collision.getTileAt(gridX, gridY) || this.isTileOccupied(gridX, gridY);
+    return this.isTileCollidable(gridX, gridY) || this.isTileOccupied(gridX, gridY);
   }
 }

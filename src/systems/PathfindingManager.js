@@ -22,10 +22,10 @@ export default class PathfindingManager {
     };
   }
 
-  findPath(startGridX, startGridY, endGridX, endGridY) {
+  findPath(startGridX, startGridY, endGridX, endGridY, type) {
     console.log("Finding Path: ", startGridX, startGridY, " ->", endGridX, endGridY);
 
-    const grid = this.buildGrid();
+    const grid = this.buildGrid(type);
 
     const startNode = grid[startGridY][startGridX].node;
 
@@ -93,20 +93,25 @@ export default class PathfindingManager {
     return [];
   }
 
-  buildGrid() {
+  buildGrid(type) {
     const map = this.scene.mapManager.map;
     const width = map.width;
     const height = map.height;
 
     const grid = [];
 
-    for (let y = 0; y < height; y++) {
-      grid[y] = [];
+    for (let gridY = 0; gridY < height; gridY++) {
+      grid[gridY] = [];
 
-      for (let x = 0; x < width; x++) {
-        grid[y][x] = {
-          walkable: !this.scene.mapManager.isTileBlocked(x, y),
-          node: this.createNode(x, y),
+      for (let gridX = 0; gridX < width; gridX++) {
+        let walkable = !this.scene.mapManager.isTileBlocked(gridX, gridY);
+
+        if (type === "enemy") {
+          walkable = !this.scene.mapManager.isTileCollidable(gridX, gridY);
+        }
+        grid[gridY][gridX] = {
+          walkable: walkable,
+          node: this.createNode(gridX, gridY),
         };
       }
     }

@@ -28,7 +28,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.drawDebugTargetNode();
 
     this.path = [];
-    this.followingPath = false;
     this.currentWaypoint = 0;
     this.pathRecalculateCooldown = 0;
 
@@ -51,6 +50,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.STATE_RETREAT = "retreat";
     this.STATE_DEAD = "dead";
 
+    this.aiState = null;
     this.enterNavigate();
   }
 
@@ -120,6 +120,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     return target;
+  }
+
+  stopMoving() {
+    this.setVelocity(0, 0);
   }
 
   findNearbyBuilding() {
@@ -227,7 +231,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     // Is target nearby
     const tower = this.scene.buildingManager.getNearestTower(this.body.center.x, this.body.center.y, 150); // prettier-ignore
 
-    if (this.distanceTo(tower) < this.aggroRange) {
+    if (tower && this.distanceTo(tower) < this.aggroRange) {
       this.target = tower;
       this.enterChase();
       return;
@@ -263,7 +267,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.targetNode = this.scene.navigationManager.chooseNextNode(this.currentNode);
 
     this.path.length = 0;
-    this.followingPath = false;
     this.currentWaypoint = 0;
 
     this.pathCooldown = 0;
@@ -271,7 +274,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   followPath() {
     if (this.path.length === 0) {
-      this.setVelocity(0);
+      this.stopMoving();
       return;
     }
 
@@ -294,7 +297,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     if (distance < arriveDistance) {
       this.currentWaypoint++;
-      this.setVelocity(0);
+      this.stopMoving();
 
       return;
     }
@@ -306,7 +309,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     const length = Math.hypot(vx, vy);
 
     if (length <= 0.001) {
-      this.setVelocity(0);
+      this.stopMoving();
       return;
     }
 
@@ -322,8 +325,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   updatePath(time) {
     if (!this.targetNode) return;
 
-    if (this.followingPath) return;
-    this.followingPath = true;
+    if (this.path.length > 0) return;
 
     if (time < this.pathCooldown) return;
 
@@ -331,7 +333,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     const end = this.scene.mapManager.worldToGrid(this.targetNode.x, this.targetNode.y);
 
-    const newPath = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, end.gridX, end.gridY);
+    const newPath = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, end.gridX, end.gridY, "enemy");
 
     console.log(newPath);
     if (newPath.length > 0) {
@@ -366,11 +368,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.aiState = this.STATE_NAVIGATE;
 
     this.target = null;
+    this.path.length = 0;
   }
 
   enterChase() {
     this.aiState = this.STATE_CHASE;
-    this.followingPath = false;
   }
 
   enterWindup() {
@@ -378,7 +380,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.aiState = this.STATE_WINDUP;
 
-    this.setVelocity(0, 0);
+    this.stopMoving();
 
     this.scene.time.delayedCall(500, () => {
       if (!this.active) return;
@@ -394,7 +396,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   enterAttack() {
     this.aiState = this.STATE_ATTACK;
 
-    this.setVelocity(0, 0);
+    this.stopMoving();
 
     if (!this.canAttack) {
       this.aiState = this.STATE_CHASE;
@@ -413,7 +415,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.aiState = this.STATE_DEAD;
 
-    this.setVelocity(0, 0);
+    this.stopMoving();
 
     this.hpBar.destroy();
 
@@ -433,7 +435,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateNavigate(time) {
-    this.updatePath();
+    this.updatePath(time);
     this.followPath();
 
     // Target detection
@@ -443,7 +445,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   updateChase() {
     if (!this.target) return;
 
-    if (this.distanceTo(this.target) > this.aggroRange) {
+    if (this.target && this.distanceTo(this.target) > this.aggroRange) {
       this.enterNavigate();
       return;
     }
@@ -474,13 +476,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateWindup() {
-    this.setVelocity(0, 0);
+    this.stopMoving();
 
     this.anims.play(`goblin_idle_${this.facing}`, true);
   }
 
   updateAttack() {
-    this.setVelocity(0, 0);
+    this.stopMoving();
   }
 
   updateRetreat() {
@@ -528,9 +530,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
       case this.STATE_RETREAT:
         this.updateRetreat();
-        break;
-
-      case this.STATE_DEAD:
         break;
     }
 
