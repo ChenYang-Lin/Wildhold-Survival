@@ -1,3 +1,6 @@
+import HealthBarComponent from "../components/HealthBarComponent.js";
+import HealthComponent from "../components/HealthComponent.js";
+
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, stats = {}, campNode) {
     super(scene, x, y, "goblin", "goblin_idle_down");
@@ -11,8 +14,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
 
     this.facing = "down";
-    this.hp = stats.hp ?? 3;
-    this.maxHP = this.hp;
+
+    this.health = new HealthComponent(this, stats.hp ?? 3);
+    this.healthBar = new HealthBarComponent(this);
+
     this.speed = stats.speed ?? 50;
 
     // Attack
@@ -44,10 +49,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.spawnX = x;
     this.spawnY = y;
 
-    // HP UI
-    this.hpBar = this.scene.add.graphics();
-    this.hpBar.setDepth(5000);
-
     // AI
     this.STATE_NAVIGATE = "navigate";
     this.STATE_BREAK_OBSTACLE = "break_obstacle";
@@ -77,22 +78,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     const y = targetY - this.body.offset.y + this.height / 2 - this.body.height / 2;
 
     this.setPosition(x, y);
-  }
-
-  drawHealthBar() {
-    if (!this.active) return;
-    this.hpBar.clear();
-
-    const percent = this.hp / this.maxHP;
-
-    const x = this.body.center.x - 16;
-    const y = this.body.center.y - 40;
-
-    this.hpBar.fillStyle(0x222222);
-    this.hpBar.fillRect(x, y, 32, 4);
-
-    this.hpBar.fillStyle(0xff0000);
-    this.hpBar.fillRect(x, y, 32 * percent, 4);
   }
 
   updateFacing() {
@@ -154,13 +139,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   takeDamage(amount) {
-    this.hp -= amount;
-
     this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff4444"); // prettier-ignore
 
-    if (this.hp <= 0) {
-      this.enterDead();
-    }
+    this.health.takeDamage(amount);
+    this.healthBar.update();
   }
 
   spawnAttackHitbox() {
@@ -272,7 +254,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
-    this.hpBar.destroy();
+    this.healthBar.destroy();
     this.destroy();
   }
 
@@ -464,8 +446,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.stopMoving();
 
-    this.hpBar.destroy();
-
     this.anims.play(`goblin_death`);
 
     this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
@@ -600,7 +580,5 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.updateRetreat();
         break;
     }
-
-    this.drawHealthBar();
   }
 }
