@@ -118,4 +118,10 @@ export default class CombatComponent {
       hitbox.destroy();
     });
   }
+
+  startAttackSequence(options) {
+    this.scene.time.delayedCall(this.windupDuration, () => {
+      options?.onWindupComplete?.();
+    });
+  }
 }

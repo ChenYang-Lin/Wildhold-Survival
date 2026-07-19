@@ -149,14 +149,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.stopMoving();
 
-    this.scene.time.delayedCall(this.combat.windupDuration, () => {
-      if (!this.active) return;
+    this.combat.startAttackSequence({
+      onWindupComplete: () => {
+        if (!this.active) return;
 
-      if (this.aiState === this.STATE_DEAD) return;
+        if (this.aiState === this.STATE_DEAD) return;
 
-      if (this.aiState !== this.STATE_WINDUP) return;
+        if (this.aiState !== this.STATE_WINDUP) return;
 
-      this.enterAttack();
+        this.enterAttack();
+      },
     });
   }
 
