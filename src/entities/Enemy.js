@@ -1,3 +1,4 @@
+import CombatComponent from "../components/CombatComponent.js";
 import HealthBarComponent from "../components/HealthBarComponent.js";
 import HealthComponent from "../components/HealthComponent.js";
 
@@ -18,19 +19,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.health = new HealthComponent(this, stats.hp ?? 3);
     this.healthBar = new HealthBarComponent(this);
 
-    this.speed = stats.speed ?? 50;
+    this.combat = new CombatComponent(this);
 
-    // Attack
-    this.attackRange = 32;
     this.aggroRange = 200;
-    this.attackDamage = stats.damage ?? 1;
-    this.attackCooldown = 1000;
-    this.canAttack = true;
 
-    this.windupDuration = 500;
-    this.hitboxLifetime = 80;
-    this.attackDelay = 500;
-    this.attackRecoverDuration = 800;
+    this.speed = stats.speed ?? 50;
 
     this.target = null;
     this.currentNode = campNode;
@@ -91,11 +84,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  // check if target in attack range
-  isTargetInAttackRange() {
-    return this.target && this.distanceTo(this.target) - this.target.body.width / 2 <= this.attackRange;
-  }
-
   // get the position of the obstacle(building) that is blocking the enemy path.
   getObstaclePosition() {
     const world = this.scene.mapManager.gridToWorld(this.obstacleTile.gridX, this.obstacleTile.gridY);
@@ -128,84 +116,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(0, 0);
   }
 
-  startAttackCooldown() {
-    this.canAttack = false;
-
-    this.scene.time.delayedCall(this.attackCooldown, () => {
-      if (this.active) {
-        this.canAttack = true;
-      }
-    });
-  }
-
   takeDamage(amount) {
     this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff4444"); // prettier-ignore
 
     this.health.takeDamage(amount);
     this.healthBar.update();
-  }
-
-  spawnAttackHitbox() {
-    let hitX = this.body.center.x;
-    let hitY = this.body.center.y;
-
-    let hitWidth = 32;
-    let hitHeight = 32;
-
-    switch (this.facing) {
-      case "up":
-        hitY -= 24;
-        hitWidth = 32;
-        break;
-      case "down":
-        hitY += 24;
-        hitWidth = 32;
-        break;
-      case "left":
-        hitX -= 24;
-        hitHeight = 32;
-        break;
-      case "right":
-        hitX += 24;
-        hitHeight = 32;
-        break;
-    }
-
-    const hitbox = this.scene.add.zone(hitX, hitY, hitWidth, hitHeight);
-
-    this.scene.physics.add.existing(hitbox);
-    hitbox.body.setAllowGravity(false);
-
-    const hitTargets = new Set();
-
-    // Player
-    this.scene.physics.add.overlap(hitbox, this.scene.player, (_, player) => {
-      if (hitTargets.has(player)) return;
-
-      hitTargets.add(player);
-      player.takeDamage(this.attackDamage, this);
-    });
-
-    // Buildings
-    this.scene.physics.add.overlap(hitbox, this.scene.buildingManager.buildings, (_, building) => {
-      if (hitTargets.has(building)) return;
-
-      hitTargets.add(building);
-      building.takeDamage(this.attackDamage, this);
-    });
-
-    // Campfire
-    this.scene.physics.add.overlap(hitbox, this.scene.campfire, (_, campfire) => {
-      if (hitTargets.has(campfire)) return;
-
-      hitTargets.add(campfire);
-      campfire.takeDamage(this.attackDamage, this);
-    });
-
-    // Destroy hitbox
-    this.scene.time.delayedCall(this.hitboxLifetime, () => {
-      hitbox.destroy();
-    });
   }
 
   moveTowards(position) {
@@ -365,24 +280,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.pathCooldown = time + this.pathInterval;
   }
 
-  performAttack() {
-    this.startAttackCooldown();
-
-    this.scene.time.delayedCall(this.attackDelay, () => {
-      if (!this.active) return;
-      if (this.aiState === this.STATE_DEAD) return;
-
-      this.spawnAttackHitbox();
-    });
-
-    this.scene.time.delayedCall(this.attackRecoverDuration, () => {
-      if (!this.active) return;
-      if (this.aiState === this.STATE_DEAD) return;
-
-      this.enterChase();
-    });
-  }
-
   enterNavigate() {
     if (this.aiState === this.STATE_NAVIGATE) return;
 
@@ -412,7 +309,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.stopMoving();
 
-    this.scene.time.delayedCall(this.windupDuration, () => {
+    this.scene.time.delayedCall(this.combat.windupDuration, () => {
       if (!this.active) return;
 
       if (this.aiState === this.STATE_DEAD) return;
@@ -428,13 +325,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.stopMoving();
 
-    if (!this.canAttack) {
+    if (!this.combat.canAttack) {
       return;
     }
 
     if (this.active) {
       if (this.aiState === this.STATE_DEAD) return;
-      this.performAttack();
+      this.combat.performAttack({
+        onRecover: () => {
+          this.enterChase();
+        },
+      });
       this.anims.play(`goblin_attack_${this.facing}`);
     }
   }
@@ -495,7 +396,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.moveTowards(obstaclePos);
 
-    if (Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, obstaclePos.x, obstaclePos.y) <= this.attackRange) {
+    if (Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, obstaclePos.x, obstaclePos.y) <= this.combat.attackRange) {
       this.enterWindup();
     }
   }
@@ -510,7 +411,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.moveTowards(this.getPosition(this.target));
 
-    if (this.target && this.isTargetInAttackRange()) {
+    if (this.target && this.combat.isTargetInAttackRange(this.target)) {
       // if the target is targetNode, then return
       if (this.target === this.targetNode) {
         return;
