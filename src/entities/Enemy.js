@@ -1,4 +1,5 @@
 import CombatComponent from "../components/CombatComponent.js";
+import EnemyAIComponent from "../components/EnemyAIComponent.js";
 import HealthBarComponent from "../components/HealthBarComponent.js";
 import HealthComponent from "../components/HealthComponent.js";
 
@@ -25,18 +26,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.speed = stats.speed ?? 50;
 
-    this.target = null;
-    this.currentNode = campNode;
-    this.targetNode = this.scene.navigationManager.chooseNextNode(this.currentNode);
-    this.idealPathLength = 0;
-    this.maxDetour = 10;
-    this.drawDebugTargetNode();
-
-    this.path = [];
-    this.currentWaypoint = 0;
-
-    this.pathCooldown = 0;
-    this.pathInterval = 500; // ms
+    this.ai = new EnemyAIComponent(this, campNode);
 
     // Spawn location
     this.spawnX = x;
@@ -61,10 +51,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     scene.load.animation("goblin_anim", "assets/enemy/goblin_anim.json");
   }
 
-  drawDebugTargetNode() {
-    // this.scene.add.circle(this.targetNode.x, this.targetNode.y, 6, 0xff0000);
-  }
-
   // Similar to setPosition(targetX, targetY). But instead of moving sprite's center to target location, it moves the sprite's body.center to the target location
   setBodyCenterPosition(targetX, targetY) {
     const x = targetX - this.body.offset.x + this.width / 2 - this.body.width / 2;
@@ -82,16 +68,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     } else {
       this.facing = vy > 0 ? "down" : "up";
     }
-  }
-
-  // get the position of the obstacle(building) that is blocking the enemy path.
-  getObstaclePosition() {
-    const world = this.scene.mapManager.gridToWorld(this.obstacleTile.gridX, this.obstacleTile.gridY);
-
-    return {
-      x: world.x + this.scene.mapManager.map.tileWidth / 2,
-      y: world.y + this.scene.mapManager.map.tileHeight / 2,
-    };
   }
 
   distanceTo(target) {
@@ -130,44 +106,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.anims.play(`goblin_walk_${this.facing}`, true);
   }
 
-  chooseObstacleToAttack(normalPath) {
-    console.log("choosing obstacle to attack!");
-    for (const tile of normalPath) {
-      if (this.scene.mapManager.isTileOccupied(tile.gridX, tile.gridY)) {
-        const building = this.scene.buildingManager.getBuildingAtGrid(tile.gridX, tile.gridY);
-        console.log(building);
-        if (building) {
-          this.target = building;
-          this.obstacleTile = tile;
-          this.enterBreakObstacle();
-          return;
-        }
-      }
-    }
-  }
-
-  findHighestPriorityTarget() {
-    // Is target nearby
-    const tower = this.scene.buildingManager.getNearestTower(this.body.center.x, this.body.center.y, 150); // prettier-ignore
-
-    if (tower && this.distanceTo(tower) < this.aggroRange) {
-      return tower;
-    }
-
-    // Is player nearby
-    const player = this.scene.player;
-
-    if (this.distanceTo(player) < this.aggroRange) {
-      return player;
-    }
-
-    if (!this.targetNode) {
-      return this.scene.campfire;
-    }
-
-    return null;
-  }
-
   die() {
     this.healthBar.destroy();
     this.destroy();
@@ -182,112 +120,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  arriveAtNode() {
-    this.currentNode = this.targetNode;
-
-    this.targetNode = this.scene.navigationManager.chooseNextNode(this.currentNode);
-
-    this.path.length = 0;
-    this.currentWaypoint = 0;
-
-    this.pathCooldown = 0;
-  }
-
-  followPath() {
-    if (this.path.length === 0) {
-      this.stopMoving();
-      return;
-    }
-
-    const waypoint = this.path[this.currentWaypoint];
-
-    if (!waypoint) {
-      this.arriveAtNode();
-
-      return;
-    }
-
-    if (this.scene.mapManager.isTileBlocked(waypoint.gridX, waypoint.gridY)) {
-      this.path.length = 0;
-      return;
-    }
-
-    const world = this.scene.mapManager.gridToWorld(waypoint.gridX, waypoint.gridY);
-
-    const targetX = world.x + this.scene.mapManager.map.tileWidth / 2;
-    const targetY = world.y + this.scene.mapManager.map.tileHeight / 2;
-
-    const distance = Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, targetX, targetY);
-
-    const arriveDistance = (this.speed * this.scene.game.loop.delta) / 1000 + 2;
-
-    if (distance < arriveDistance) {
-      this.currentWaypoint++;
-      this.stopMoving();
-
-      return;
-    }
-
-    // Move the enemy
-    let vx = targetX - this.body.center.x;
-    let vy = targetY - this.body.center.y;
-
-    const length = Math.hypot(vx, vy);
-
-    if (length <= 0.001) {
-      this.stopMoving();
-      return;
-    }
-
-    vx = (vx / length) * this.speed;
-    vy = (vy / length) * this.speed;
-
-    this.setVelocity(vx, vy);
-
-    this.updateFacing();
-    this.anims.play(`goblin_walk_${this.facing}`, true);
-  }
-
-  updatePath(time) {
-    if (!this.targetNode) return;
-
-    if (this.path.length > 0) return;
-
-    if (time < this.pathCooldown) return;
-
-    const start = this.scene.mapManager.worldToGrid(this.body.center.x, this.body.center.y);
-
-    const end = this.scene.mapManager.worldToGrid(this.targetNode.x, this.targetNode.y);
-
-    const normalPath = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, end.gridX, end.gridY, "ignoreBuildings");
-    const path = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, end.gridX, end.gridY, "enemy");
-
-    if (path.length === 0) {
-      this.chooseObstacleToAttack(normalPath);
-      return;
-    }
-
-    this.idealPathLength = normalPath.length;
-    const detour = path.length - this.idealPathLength;
-
-    if (detour <= this.maxDetour) {
-      this.path = path;
-      this.currentWaypoint = 0;
-    } else {
-      this.chooseObstacleToAttack(normalPath);
-    }
-
-    this.pathCooldown = time + this.pathInterval;
-  }
-
   enterNavigate() {
     if (this.aiState === this.STATE_NAVIGATE) return;
 
     this.aiState = this.STATE_NAVIGATE;
 
-    this.target = null;
-    this.obstacleTile = null;
-    this.path.length = 0;
+    this.ai.currentTarget = null;
+    this.ai.obstacleTile = null;
+    this.ai.path.length = 0;
   }
 
   enterBreakObstacle() {
@@ -295,7 +135,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.aiState = this.STATE_BREAK_OBSTACLE;
 
-    this.path.length = 0;
+    this.ai.path.length = 0;
   }
 
   enterChase() {
@@ -363,61 +203,21 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateNavigate(time) {
-    this.updatePath(time);
-    this.followPath();
+    this.ai.updatePath(time);
+    this.ai.followPath();
 
     // Target detection
-    const target = this.findHighestPriorityTarget();
-
-    if (target) {
-      this.target = target;
+    if (this.ai.tryAcquireTarget()) {
       this.enterChase();
     }
   }
 
   updateBreakObstacle(time) {
-    if (!this.target || !this.target.active) {
-      this.enterNavigate();
-      return;
-    }
-
-    if (time > this.pathCooldown) {
-      this.path.length = 0;
-
-      this.updatePath(time);
-
-      if (this.path.length > 0) {
-        this.enterNavigate();
-        return;
-      }
-    }
-
-    const obstaclePos = this.getObstaclePosition();
-
-    this.moveTowards(obstaclePos);
-
-    if (Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, obstaclePos.x, obstaclePos.y) <= this.combat.attackRange) {
-      this.enterWindup();
-    }
+    this.ai.updateBreakObstacle(time);
   }
 
   updateChase() {
-    if (!this.target) return;
-
-    if (this.target && this.distanceTo(this.target) > this.aggroRange) {
-      this.enterNavigate();
-      return;
-    }
-
-    this.moveTowards(this.getPosition(this.target));
-
-    if (this.target && this.combat.isTargetInAttackRange(this.target)) {
-      // if the target is targetNode, then return
-      if (this.target === this.targetNode) {
-        return;
-      }
-      this.enterWindup();
-    }
+    this.ai.updateChase();
   }
 
   updateWindup() {
