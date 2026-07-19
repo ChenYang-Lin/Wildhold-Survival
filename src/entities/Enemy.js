@@ -25,7 +25,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.windupDuration = 500;
     this.hitboxLifetime = 80;
     this.attackDelay = 500;
-    this.attackHold = 800;
+    this.attackRecoverDuration = 800;
 
     this.target = null;
     this.currentNode = campNode;
@@ -226,6 +226,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  moveTowards(position) {
+    this.scene.physics.moveTo(this, position.x, position.y, this.speed);
+
+    this.updateFacing();
+    this.anims.play(`goblin_walk_${this.facing}`, true);
+  }
+
   chooseObstacleToAttack(normalPath) {
     console.log("choosing obstacle to attack!");
     for (const tile of normalPath) {
@@ -242,29 +249,26 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  lookForTargets() {
+  findHighestPriorityTarget() {
     // Is target nearby
     const tower = this.scene.buildingManager.getNearestTower(this.body.center.x, this.body.center.y, 150); // prettier-ignore
 
     if (tower && this.distanceTo(tower) < this.aggroRange) {
-      this.target = tower;
-      this.enterChase();
-      return;
+      return tower;
     }
 
     // Is player nearby
     const player = this.scene.player;
 
     if (this.distanceTo(player) < this.aggroRange) {
-      this.target = player;
-      this.enterChase();
-      return;
+      return player;
     }
 
     if (!this.targetNode) {
-      this.target = this.scene.campfire;
-      this.enterChase();
+      return this.scene.campfire;
     }
+
+    return null;
   }
 
   die() {
@@ -389,11 +393,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.spawnAttackHitbox();
     });
 
-    this.scene.time.delayedCall(this.attackHold, () => {
+    this.scene.time.delayedCall(this.attackRecoverDuration, () => {
       if (!this.active) return;
       if (this.aiState === this.STATE_DEAD) return;
 
-      this.enterNavigate();
+      this.enterChase();
     });
   }
 
@@ -408,6 +412,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   enterBreakObstacle() {
+    if (this.aiState === this.STATE_BREAK_OBSTACLE) return;
+
     this.aiState = this.STATE_BREAK_OBSTACLE;
 
     this.path.length = 0;
@@ -480,7 +486,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.followPath();
 
     // Target detection
-    this.lookForTargets();
+    const target = this.findHighestPriorityTarget();
+
+    if (target) {
+      this.target = target;
+      this.enterChase();
+    }
   }
 
   updateBreakObstacle(time) {
@@ -500,14 +511,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
-    const pos = this.getObstaclePosition();
+    const obstaclePos = this.getObstaclePosition();
 
-    this.scene.physics.moveTo(this, pos.x, pos.y, this.speed);
+    this.moveTowards(obstaclePos);
 
-    this.updateFacing();
-    this.anims.play(`goblin_walk_${this.facing}`, true);
-
-    if (Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, pos.x, pos.y) <= this.attackRange) {
+    if (Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, obstaclePos.x, obstaclePos.y) <= this.attackRange) {
       this.enterWindup();
     }
   }
@@ -520,12 +528,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
-    const pos = this.getPosition(this.target);
-
-    this.scene.physics.moveTo(this, pos.x, pos.y, this.speed);
-
-    this.updateFacing();
-    this.anims.play(`goblin_walk_${this.facing}`, true);
+    this.moveTowards(this.getPosition(this.target));
 
     if (this.target && this.isTargetInAttackRange()) {
       // if the target is targetNode, then return
