@@ -4,28 +4,20 @@ import HealthBarComponent from "../components/HealthBarComponent.js";
 import HealthComponent from "../components/HealthComponent.js";
 
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, stats = {}, campNode) {
-    super(scene, x, y, "goblin", "goblin_idle_down");
+  constructor(scene, x, y, texture, frame, stats = {}, campNode) {
+    super(scene, x, y, texture, frame);
     this.scene = scene;
 
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
 
-    this.setOrigin(0.5, 0.5);
-    this.body.setSize(20, 16);
-    this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
-
     this.facing = "down";
+    this.aggroRange = 200;
+    this.speed = stats.speed ?? 50;
 
     this.health = new HealthComponent(this, stats.hp ?? 3);
     this.healthBar = new HealthBarComponent(this);
-
-    this.combat = new CombatComponent(this);
-
-    this.aggroRange = 200;
-
-    this.speed = stats.speed ?? 50;
-
+    this.combat = new CombatComponent(this, stats);
     this.ai = new EnemyAIComponent(this, campNode);
 
     // Spawn location
@@ -103,7 +95,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.scene.physics.moveTo(this, position.x, position.y, this.speed);
 
     this.updateFacing();
-    this.anims.play(`goblin_walk_${this.facing}`, true);
+    this.anims.play(`${this.type}_walk_${this.facing}`, true);
+  }
+
+  attack(damage) {
+    // Override in subclasses.
   }
 
   die() {
@@ -112,12 +108,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   // Enemy die instantly on retreat (temporary function, might change retreat function)
-  retreatEnemies() {
-    const enemies = this.scene.combatSystem.getEnemies().getChildren();
-
-    enemies.forEach((enemy) => {
-      enemy.enterDead();
-    });
+  retreat() {
+    this.enterDead();
   }
 
   enterNavigate() {
@@ -147,6 +139,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.aiState = this.STATE_WINDUP;
 
+    if (!this.combat.canAttack) {
+      this.enterChase();
+      return;
+    }
+
     this.stopMoving();
 
     this.combat.startAttackSequence({
@@ -167,10 +164,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.stopMoving();
 
-    if (!this.combat.canAttack) {
-      return;
-    }
-
     if (this.active) {
       if (this.aiState === this.STATE_DEAD) return;
       this.combat.performAttack({
@@ -178,7 +171,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
           this.enterChase();
         },
       });
-      this.anims.play(`goblin_attack_${this.facing}`);
+      this.anims.play(`${this.type}_attack_${this.facing}`);
     }
   }
 
@@ -189,7 +182,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.stopMoving();
 
-    this.anims.play(`goblin_death`);
+    this.anims.play(`${this.type}_death`);
 
     this.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
       this.die();
@@ -197,7 +190,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   enterRetreat() {
-    this.retreatEnemies(); // temperary solution, might change the way enemy retreat;
+    this.retreat(); // temperary solution, might change the way enemy retreat;
     return;
     this.aiState = this.STATE_RETREAT;
 
@@ -225,7 +218,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   updateWindup() {
     this.stopMoving();
 
-    this.anims.play(`goblin_idle_${this.facing}`, true);
+    this.anims.play(`${this.type}_idle_${this.facing}`, true);
   }
 
   updateAttack() {
@@ -249,14 +242,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.scene.physics.velocityFromRotation(this.retreatDirection, this.speed * 1.5, this.body.velocity);
 
     this.updateFacing();
-    this.anims.play(`goblin_walk_${this.facing}`, true);
+    this.anims.play(`${this.type}_walk_${this.facing}`, true);
   }
 
   update(time) {
     if (!this.active) return;
     if (this.aiState === this.STATE_DEAD) return;
-
-    this.setDepth(this.body.center.y);
 
     switch (this.aiState) {
       case this.STATE_NAVIGATE:
@@ -283,5 +274,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.updateRetreat();
         break;
     }
+
+    this.setDepth(this.body.center.y);
+    this.healthBar.update();
   }
 }

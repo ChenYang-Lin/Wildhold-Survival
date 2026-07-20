@@ -1,4 +1,4 @@
-export default class EnemyProjetile extends Phaser.Physics.Arcade.Sprite {
+export default class EnemyProjectile extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, angle, damage) {
     super(scene, x, y, "arrow");
 
@@ -31,14 +31,10 @@ export default class EnemyProjetile extends Phaser.Physics.Arcade.Sprite {
       this.die();
     });
 
-    this.scene.physics.add.overlap(
-      this,
-      this.scene.buildingManager.buildings,
-      (_, building) => {
-        building.takeDamage(this.damage, this);
-        this.die();
-      },
-    );
+    this.scene.physics.add.overlap(this, this.scene.buildingManager.buildings, (_, building) => {
+      building.takeDamage(this.damage, this);
+      this.die();
+    });
 
     this.scene.physics.add.overlap(this, this.scene.campfire, (_, campfire) => {
       campfire.takeDamage(this.damage, this);

@@ -4,7 +4,10 @@ export const WAVES = [
     camps: [
       {
         campId: 1,
-        enemies: [{ type: "goblin", count: 3, stats: {} }],
+        enemies: [
+          { type: "goblin", count: 3, stats: {} },
+          { type: "archer", count: 1, stats: {} },
+        ],
       },
       {
         campId: 2,

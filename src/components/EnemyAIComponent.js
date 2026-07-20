@@ -24,10 +24,14 @@ export default class EnemyAIComponent {
     return this.currentTarget && this.currentTarget.active;
   }
 
+  getAttackTarget() {
+    return this.currentTarget;
+  }
+
   findHighestPriorityTarget() {
     const owner = this.owner;
 
-    const tower = this.scene.buildingManager.getNearestTower(owner.body.center.x, owner.body.center.y, 150);
+    const tower = this.scene.buildingManager.getNearestTower(owner.body.center.x, owner.body.center.y, owner.aggroRange);
 
     if (tower && owner.distanceTo(tower) < owner.aggroRange) {
       return tower;
@@ -168,7 +172,7 @@ export default class EnemyAIComponent {
     this.owner.setVelocity(vx, vy);
 
     this.owner.updateFacing();
-    this.owner.anims.play(`goblin_walk_${this.owner.facing}`, true);
+    this.owner.anims.play(`${this.owner.type}_walk_${this.owner.facing}`, true);
   }
 
   tryAcquireTarget() {
@@ -193,12 +197,12 @@ export default class EnemyAIComponent {
       return;
     }
 
-    this.owner.moveTowards(this.owner.getPosition(this.currentTarget));
-
     if (this.currentTarget !== this.targetNode && this.owner.combat.isTargetInAttackRange(this.currentTarget)) {
       this.owner.enterWindup();
       return;
     }
+
+    this.owner.moveTowards(this.owner.getPosition(this.currentTarget));
   }
 
   updateBreakObstacle(time) {
