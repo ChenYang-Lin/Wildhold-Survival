@@ -34,6 +34,7 @@ import MapManager from "../systems/MapManager.js";
 import NavigationManager from "../systems/NavigationManager.js";
 import PathfindingManager from "../systems/PathfindingManager.js";
 import Goblin from "../entities/Goblin.js";
+import GoblinTank from "../entities/GoblinTank.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -45,6 +46,7 @@ export default class GameScene extends Phaser.Scene {
   preload() {
     Player.preload(this);
     Goblin.preload(this);
+    GoblinTank.preload(this);
     Archer.preload(this);
     Campfire.preload(this);
     Tower.preload(this);

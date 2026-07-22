@@ -7,6 +7,7 @@ export const WAVES = [
         enemies: [
           { type: "goblin", count: 3, stats: {} },
           { type: "archer", count: 1, stats: {} },
+          { type: "goblin_tank", count: 1, stats: {} },
         ],
       },
       {

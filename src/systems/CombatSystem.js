@@ -1,6 +1,7 @@
 import Archer from "../entities/Archer.js";
 import Enemy from "../entities/Enemy.js";
 import Goblin from "../entities/Goblin.js";
+import GoblinTank from "../entities/GoblinTank.js";
 
 export default class CombatSystem {
   constructor(scene) {
@@ -19,6 +20,8 @@ export default class CombatSystem {
       enemy = new Goblin(this.scene, x, y, stats, campNode);
     } else if (type === "archer") {
       enemy = new Archer(this.scene, x, y, stats, campNode);
+    } else if (type === "goblin_tank") {
+      enemy = new GoblinTank(this.scene, x, y, stats, campNode);
     }
 
     this.enemies.add(enemy);
