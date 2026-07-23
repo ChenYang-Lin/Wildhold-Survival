@@ -1,0 +1,548 @@
+{
+    "anims": [
+        {
+            "key": "goblin_shaman_spellcast_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_down_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_down_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_down_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_down_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_down_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_down_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_down_6"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_spellcast_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_up_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_up_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_up_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_up_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_up_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_up_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_up_6"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_spellcast_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_right_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_right_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_right_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_right_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_right_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_right_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_right_6"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_spellcast_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_left_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_left_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_left_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_left_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_left_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_left_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_spellcast_left_6"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_attack_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_down_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_down_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_down_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_down_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_down_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_down_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_down_6"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_down_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_attack_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_up_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_up_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_up_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_up_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_up_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_up_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_up_6"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_up_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_attack_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_right_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_right_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_right_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_right_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_right_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_right_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_right_6"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_right_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_attack_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_left_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_left_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_left_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_left_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_left_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_left_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_left_6"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_attack_left_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_walk_down",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_down_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_down_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_down_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_down_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_down_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_down_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_down_6"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_down_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_walk_up",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_up_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_up_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_up_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_up_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_up_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_up_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_up_6"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_up_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_walk_right",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_right_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_right_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_right_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_right_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_right_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_right_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_right_6"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_right_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_walk_left",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_left_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_left_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_left_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_left_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_left_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_left_5"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_left_6"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_walk_left_7"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_death",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_death_0"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_death_1"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_death_2"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_death_3"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_death_4"
+                },
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_death_5"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_idle_down",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_idle_down"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_idle_up",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_idle_up"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_idle_right",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_idle_right"
+                }
+            ]
+        },
+        {
+            "key": "goblin_shaman_idle_left",
+            "type": "frames",
+            "repeat": -1,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "goblin_shaman",
+                    "frame": "goblin_shaman_idle_left"
+                }
+            ]
+        }
+    ]
+}
