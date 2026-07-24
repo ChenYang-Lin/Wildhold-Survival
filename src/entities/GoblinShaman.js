@@ -3,7 +3,7 @@ import Enemy from "./Enemy.js";
 export default class GoblinShaman extends Enemy {
   constructor(scene, x, y, stats = {}, campNode) {
     const goblinStats = {
-      attackRange: stats.attackRange ?? 32,
+      attackRange: stats.attackRange ?? 20,
       attackDamage: stats.damage ?? 1,
       attackCooldown: stats.attackCooldown ?? 1000,
 

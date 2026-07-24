@@ -15,7 +15,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.aggroRange = 200;
     this.speed = stats.speed ?? 50;
 
-    this.health = new HealthComponent(this, stats.hp ?? 3);
+    this.health = new HealthComponent(this, stats.maxHP ?? 3);
     this.healthBar = new HealthBarComponent(this);
     this.combat = new CombatComponent(this, stats);
     this.ai = new EnemyAIComponent(this, campNode);
@@ -51,14 +51,50 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setPosition(x, y);
   }
 
+  moveBodyCenterTowards(targetX, targetY) {
+    let vx = targetX - this.body.center.x;
+    let vy = targetY - this.body.center.y;
+
+    const length = Math.hypot(vx, vy);
+
+    if (length <= 0.001) {
+      this.stopMoving();
+      return;
+    }
+
+    vx = (vx / length) * this.speed;
+    vy = (vy / length) * this.speed;
+
+    this.setVelocity(vx, vy);
+
+    this.updateFacing();
+    this.anims.play(`${this.type}_walk_${this.facing}`, true);
+  }
+
   updateFacing() {
     const vx = this.body.velocity.x;
     const vy = this.body.velocity.y;
+
+    // ignore tiny velocities
+    if (Math.abs(vx) < 0.1 && Math.abs(vy) < 0.1) return;
 
     if (Math.abs(vx) > Math.abs(vy)) {
       this.facing = vx > 0 ? "right" : "left";
     } else {
       this.facing = vy > 0 ? "down" : "up";
+    }
+  }
+
+  faceTarget(target) {
+    if (!target) return;
+
+    const dx = target.body.center.x - this.body.center.x;
+    const dy = target.body.center.y - this.body.center.y;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      this.facing = dx > 0 ? "right" : "left";
+    } else {
+      this.facing = dy > 0 ? "down" : "up";
     }
   }
 
@@ -89,13 +125,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.health.takeDamage(amount);
     this.healthBar.update();
-  }
-
-  moveTowards(position) {
-    this.scene.physics.moveTo(this, position.x, position.y, this.speed);
-
-    this.updateFacing();
-    this.anims.play(`${this.type}_walk_${this.facing}`, true);
   }
 
   attack(damage) {
@@ -134,10 +163,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.aiState = this.STATE_CHASE;
   }
 
-  enterWindup() {
+  enterWindup(target) {
     if (this.aiState === this.STATE_WINDUP) return;
 
     this.aiState = this.STATE_WINDUP;
+    this.faceTarget(target);
 
     if (!this.combat.canAttack) {
       this.enterChase();
@@ -145,6 +175,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     this.stopMoving();
+
+    this.anims.play(`${this.type}_idle_${this.facing}`);
 
     this.combat.startAttackSequence({
       onWindupComplete: () => {
@@ -217,8 +249,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   updateWindup() {
     this.stopMoving();
-
-    this.anims.play(`${this.type}_idle_${this.facing}`, true);
   }
 
   updateAttack() {

@@ -198,11 +198,13 @@ export default class EnemyAIComponent {
     }
 
     if (this.currentTarget !== this.targetNode && this.owner.combat.isTargetInAttackRange(this.currentTarget)) {
-      this.owner.enterWindup();
+      this.owner.enterWindup(this.currentTarget);
       return;
     }
 
-    this.owner.moveTowards(this.owner.getPosition(this.currentTarget));
+    const pos = this.owner.getPosition(this.currentTarget);
+
+    this.owner.moveBodyCenterTowards(pos.x, pos.y);
   }
 
   updateBreakObstacle(time) {
@@ -224,7 +226,7 @@ export default class EnemyAIComponent {
 
     const obstaclePos = this.getObstaclePosition();
 
-    this.owner.moveTowards(obstaclePos);
+    this.owner.moveBodyCenterTowards(obstaclePos.x, obstaclePos.y);
 
     if (Phaser.Math.Distance.Between(this.owner.body.center.x, this.owner.body.center.y, obstaclePos.x, obstaclePos.y) <= this.owner.combat.attackRange) {
       this.owner.enterWindup();

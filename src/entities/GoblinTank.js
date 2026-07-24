@@ -11,15 +11,18 @@ export default class GoblinTank extends Enemy {
       attackDelay: stats.attackDelay ?? 150,
       attackRecoverDuration: stats.attackRecoverDuration ?? 800,
       hitboxLifetime: stats.hitboxLifetime ?? 80,
+
+      maxHP: 10,
     };
 
     super(scene, x, y, "goblin_tank", "goblin_tank_idle_down", goblinStats, campNode);
 
     this.type = "goblin_tank";
 
+    this.setScale(1.5);
     this.setOrigin(0.5, 0.5);
-    this.body.setSize(20, 16);
-    this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
+    this.body.setSize(20, 16, true);
+    this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 32 + 16
   }
 
   static preload(scene) {
@@ -37,29 +40,25 @@ export default class GoblinTank extends Enemy {
     let hitX = this.body.center.x;
     let hitY = this.body.center.y;
 
-    let hitWidth = 32;
-    let hitHeight = 32;
+    let attackWidth = 48;
+    let attackHeight = 48;
 
     switch (this.facing) {
       case "up":
         hitY -= 24;
-        hitWidth = 32;
         break;
       case "down":
         hitY += 24;
-        hitWidth = 32;
         break;
       case "left":
         hitX -= 24;
-        hitHeight = 32;
         break;
       case "right":
         hitX += 24;
-        hitHeight = 32;
         break;
     }
 
-    const hitbox = this.scene.add.zone(hitX, hitY, hitWidth, hitHeight);
+    const hitbox = this.scene.add.zone(hitX, hitY, attackWidth, attackHeight);
 
     this.scene.physics.add.existing(hitbox);
     hitbox.body.setAllowGravity(false);
