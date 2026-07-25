@@ -20,11 +20,31 @@ export default class GoblinShaman extends Enemy {
     this.setOrigin(0.5, 0.5);
     this.body.setSize(20, 16);
     this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
+
+    this.spellRange = stats.spellRange ?? 120;
+    this.spellCooldown = stats.spellCooldown ?? 5000;
+    this.isCastingSpell = false;
+
+    this.spellCastEvent = this.scene.time.addEvent({
+      delay: this.spellCooldown,
+      loop: true,
+      callback: () => {
+        if (!this.active) return;
+        if (this.isActionLocked()) return;
+
+        this.tryCastBuff();
+      },
+    });
   }
 
   static preload(scene) {
     scene.load.atlas("goblin_shaman", "assets/enemy/goblin_shaman.png", "assets/enemy/goblin_shaman_atlas.json");
     scene.load.animation("goblin_shaman_anim", "assets/enemy/goblin_shaman_anim.json");
+  }
+
+  die() {
+    this.spellCastEvent.remove();
+    super.die();
   }
 
   attack(damage) {
@@ -94,6 +114,61 @@ export default class GoblinShaman extends Enemy {
     this.scene.time.delayedCall(this.hitboxLifetime, () => {
       hitbox.destroy();
     });
+  }
+
+  findAlliesInRange() {
+    const allies = [];
+
+    this.scene.combatSystem.enemies.children.iterate((enemy) => {
+      if (!enemy || enemy === this || !enemy.active) return;
+
+      if (this.distanceTo(enemy) <= this.spellRange) {
+        allies.push(enemy);
+      }
+    });
+
+    return allies;
+  }
+
+  tryCastBuff() {
+    const allies = this.findAlliesInRange();
+
+    if (allies.length === 0) return false;
+
+    this.castBuff(allies);
+
+    return true;
+  }
+
+  castBuff(allies) {
+    this.isCastingSpell = true;
+
+    this.stopMoving();
+
+    const buff = {
+      id: Phaser.Math.RND.uuid(),
+      type: "speed",
+      duration: 5000,
+      multiplier: 1.5,
+    };
+
+    this.anims.play(`${this.type}_spellcast_${this.facing}`);
+
+    this.once(Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + `${this.type}_spellcast_${this.facing}`, () => {
+      if (!this.active) return;
+
+      for (const ally of allies) {
+        if (!ally.active) continue;
+
+        ally.stats.applyBuff(buff);
+      }
+
+      this.isCastingSpell = false;
+    });
+  }
+
+  isActionLocked() {
+    return this.isCastingSpell;
   }
 
   update(time) {

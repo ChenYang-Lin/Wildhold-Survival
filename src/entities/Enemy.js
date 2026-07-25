@@ -2,6 +2,7 @@ import CombatComponent from "../components/CombatComponent.js";
 import EnemyAIComponent from "../components/EnemyAIComponent.js";
 import HealthBarComponent from "../components/HealthBarComponent.js";
 import HealthComponent from "../components/HealthComponent.js";
+import StatsComponent from "../components/StatsComponent.js";
 
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, texture, frame, stats = {}, campNode) {
@@ -13,12 +14,17 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.facing = "down";
     this.aggroRange = 200;
-    this.speed = stats.speed ?? 50;
 
+    // Components
     this.health = new HealthComponent(this, stats.maxHP ?? 3);
     this.healthBar = new HealthBarComponent(this);
     this.combat = new CombatComponent(this, stats);
     this.ai = new EnemyAIComponent(this, campNode);
+    this.stats = new StatsComponent(this, {
+      speed: stats.speed,
+      damage: stats.attackDamage,
+      attackCooldown: stats.attackCooldown,
+    });
 
     // Spawn location
     this.spawnX = x;
@@ -62,8 +68,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
-    vx = (vx / length) * this.speed;
-    vy = (vy / length) * this.speed;
+    vx = (vx / length) * this.stats.speed;
+    vy = (vy / length) * this.stats.speed;
 
     this.setVelocity(vx, vy);
 
@@ -96,6 +102,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     } else {
       this.facing = dy > 0 ? "down" : "up";
     }
+  }
+
+  isActionLocked() {
+    return false;
   }
 
   distanceTo(target) {
@@ -263,13 +273,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
-    this.scene.physics.moveTo(this, this.spawnX, this.spawnY, this.speed * 1.5);
+    this.scene.physics.moveTo(this, this.spawnX, this.spawnY, this.stats.speed * 1.5);
 
     if (this.body.blocked.left || this.body.blocked.right || this.body.blocked.up || this.body.blocked.down) {
       this.retreatDirection += Phaser.Math.FloatBetween(-1, 1);
     }
 
-    this.scene.physics.velocityFromRotation(this.retreatDirection, this.speed * 1.5, this.body.velocity);
+    this.scene.physics.velocityFromRotation(this.retreatDirection, this.stats.speed * 1.5, this.body.velocity);
 
     this.updateFacing();
     this.anims.play(`${this.type}_walk_${this.facing}`, true);
@@ -278,6 +288,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   update(time) {
     if (!this.active) return;
     if (this.aiState === this.STATE_DEAD) return;
+
+    if (this.isActionLocked?.()) {
+      return;
+    }
 
     switch (this.aiState) {
       case this.STATE_NAVIGATE:

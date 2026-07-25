@@ -146,7 +146,7 @@ export default class EnemyAIComponent {
 
     const distance = Phaser.Math.Distance.Between(this.owner.body.center.x, this.owner.body.center.y, targetX, targetY);
 
-    const arriveDistance = (this.owner.speed * this.scene.game.loop.delta) / 1000 + 2;
+    const arriveDistance = (this.owner.stats.speed * this.scene.game.loop.delta) / 1000 + 2;
 
     if (distance < arriveDistance) {
       this.currentWaypoint++;
@@ -166,8 +166,8 @@ export default class EnemyAIComponent {
       return;
     }
 
-    vx = (vx / length) * this.owner.speed;
-    vy = (vy / length) * this.owner.speed;
+    vx = (vx / length) * this.owner.stats.speed;
+    vy = (vy / length) * this.owner.stats.speed;
 
     this.owner.setVelocity(vx, vy);
 
