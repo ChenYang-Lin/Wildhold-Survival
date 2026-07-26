@@ -285,7 +285,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.anims.play(`${this.type}_walk_${this.facing}`, true);
   }
 
-  update(time) {
+  update(time, delta) {
     if (!this.active) return;
     if (this.aiState === this.STATE_DEAD) return;
 
@@ -321,5 +321,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.setDepth(this.body.center.y);
     this.healthBar.update();
+    this.castBar?.update(delta);
   }
 }

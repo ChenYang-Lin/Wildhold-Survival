@@ -31,11 +31,11 @@ export default class CombatSystem {
     return enemy;
   }
 
-  update(time) {
+  update(time, delta) {
     this.enemies.children.iterate((enemy) => {
       if (!enemy || !enemy.active) return;
 
-      enemy.update(time);
+      enemy.update(time, delta);
     });
   }
 }

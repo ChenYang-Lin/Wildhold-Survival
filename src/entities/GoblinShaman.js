@@ -1,3 +1,4 @@
+import CastBarComponent from "../components/CastBarComponent.js";
 import Enemy from "./Enemy.js";
 
 export default class GoblinShaman extends Enemy {
@@ -21,8 +22,11 @@ export default class GoblinShaman extends Enemy {
     this.body.setSize(20, 16);
     this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
 
+    this.castBar = new CastBarComponent(this);
+
     this.spellRange = stats.spellRange ?? 120;
     this.spellCooldown = stats.spellCooldown ?? 5000;
+    this.castingTime = 2000;
     this.isCastingSpell = false;
 
     this.spellCastEvent = this.scene.time.addEvent({
@@ -155,15 +159,24 @@ export default class GoblinShaman extends Enemy {
     this.anims.play(`${this.type}_spellcast_${this.facing}`);
 
     this.once(Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + `${this.type}_spellcast_${this.facing}`, () => {
-      if (!this.active) return;
+      this.anims.pause();
 
-      for (const ally of allies) {
-        if (!ally.active) continue;
+      this.castBar.show(this.castingTime);
 
-        ally.stats.applyBuff(buff);
-      }
+      this.scene.time.delayedCall(this.castingTime, () => {
+        if (!this.active) return;
 
-      this.isCastingSpell = false;
+        for (const ally of allies) {
+          if (!ally.active) continue;
+
+          ally.stats.applyBuff(buff);
+        }
+
+        this.anims.resume();
+        this.anims.play(`${this.type}_idle_${this.facing}`);
+
+        this.isCastingSpell = false;
+      });
     });
   }
 
@@ -171,7 +184,7 @@ export default class GoblinShaman extends Enemy {
     return this.isCastingSpell;
   }
 
-  update(time) {
+  update(time, delta) {
     super.update(time);
   }
 }

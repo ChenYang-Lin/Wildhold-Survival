@@ -187,7 +187,7 @@ export default class GameScene extends Phaser.Scene {
     this.inputController.update();
     this.player.update();
     this.ghostPreview.update();
-    this.combatSystem.update(time);
+    this.combatSystem.update(time, delta);
     this.healthUI.update();
     this.hotbarUI.update();
     this.dayNightSystem.update(delta);
