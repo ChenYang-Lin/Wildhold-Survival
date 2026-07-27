@@ -144,7 +144,7 @@ export default class GoblinShaman extends Enemy {
 
     this.stopMoving();
 
-    const buff = this.createSpeedBuff();
+    const buff = this.scene.buffFactory.createSpeedBuff();
 
     this.anims.play(`${this.type}_spellcast_${this.facing}`);
 
@@ -174,17 +174,6 @@ export default class GoblinShaman extends Enemy {
         this.isCastingSpell = false;
       });
     });
-  }
-
-  createSpeedBuff() {
-    return {
-      id: Phaser.Math.RND.uuid(),
-      type: "speed",
-      duration: 5000,
-      stat: "speed",
-      operation: "multiply",
-      value: 1.5,
-    };
   }
 
   isActionLocked() {

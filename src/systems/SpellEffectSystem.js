@@ -10,16 +10,7 @@ export default class SpellEffectSystem {
   }
 
   attachAura(owner, buff) {
-    switch (buff.type) {
-      case "speed":
-        return new SpeedAura(this.scene, owner);
-
-      case "heal":
-        return new HealAura(this.scene, owner);
-
-      case "shield":
-        return new ShieldAura(this.scene, owner);
-    }
+    return this.scene.auraFactory.createAura(this.scene, owner, buff);
   }
 
   showHeal(target) {}
