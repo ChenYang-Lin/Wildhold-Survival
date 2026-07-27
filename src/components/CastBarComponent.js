@@ -26,6 +26,8 @@ export default class CastBarComponent {
     this.progress = 0;
     this.isCasting = true;
 
+    this.fill.width = 0;
+
     this.background.setVisible(true);
     this.fill.setVisible(true);
   }
@@ -59,9 +61,5 @@ export default class CastBarComponent {
     this.progress = Phaser.Math.Clamp(this.elapsed / this.duration, 0, 1);
 
     this.fill.width = this.width * this.progress;
-
-    if (this.progress >= 1) {
-      this.cancel();
-    }
   }
 }

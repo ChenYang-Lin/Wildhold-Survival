@@ -46,11 +46,6 @@ export default class GoblinShaman extends Enemy {
     scene.load.animation("goblin_shaman_anim", "assets/enemy/goblin_shaman_anim.json");
   }
 
-  die() {
-    this.spellCastEvent.remove();
-    super.die();
-  }
-
   attack(damage) {
     super.attack(damage);
 
@@ -149,12 +144,7 @@ export default class GoblinShaman extends Enemy {
 
     this.stopMoving();
 
-    const buff = {
-      id: Phaser.Math.RND.uuid(),
-      type: "speed",
-      duration: 5000,
-      multiplier: 1.5,
-    };
+    const buff = this.createSpeedBuff();
 
     this.anims.play(`${this.type}_spellcast_${this.facing}`);
 
@@ -163,6 +153,8 @@ export default class GoblinShaman extends Enemy {
 
       this.castBar.show(this.castingTime);
 
+      this.scene.spellEffectSystem.showSpeedCast(this);
+
       this.scene.time.delayedCall(this.castingTime, () => {
         if (!this.active) return;
 
@@ -170,7 +162,11 @@ export default class GoblinShaman extends Enemy {
           if (!ally.active) continue;
 
           ally.stats.applyBuff(buff);
+
+          // this.scene.spellEffectSystem.attachAura(ally, buff);
         }
+
+        this.castBar.hide();
 
         this.anims.resume();
         this.anims.play(`${this.type}_idle_${this.facing}`);
@@ -180,8 +176,24 @@ export default class GoblinShaman extends Enemy {
     });
   }
 
+  createSpeedBuff() {
+    return {
+      id: Phaser.Math.RND.uuid(),
+      type: "speed",
+      duration: 5000,
+      stat: "speed",
+      operation: "multiply",
+      value: 1.5,
+    };
+  }
+
   isActionLocked() {
     return this.isCastingSpell;
+  }
+
+  die() {
+    this.spellCastEvent.remove();
+    super.die();
   }
 
   update(time, delta) {

@@ -6,7 +6,7 @@ export default class DayNightSystem {
 
     this.isNight = false;
 
-    this.dayDuration = 15000;
+    this.dayDuration = 5000;
     this.nightDuration = 60000;
 
     this.timer = this.dayDuration;
@@ -21,7 +21,7 @@ export default class DayNightSystem {
 
     this.scene.tweens.add({
       targets: this.scene.lightingSystem,
-      darknessAlpha: 0.95,
+      darknessAlpha: 0.85,
       visionRadius: 200,
       glowAlpha: 0.3,
       duration: 1000,

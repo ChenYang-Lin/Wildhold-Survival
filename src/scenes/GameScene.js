@@ -6,6 +6,9 @@ import Player from "../entities/Player.js";
 import Rock from "../entities/Rock.js";
 import Tower from "../entities/Tower.js";
 import Tree from "../entities/Tree.js";
+import Goblin from "../entities/Goblin.js";
+import GoblinTank from "../entities/GoblinTank.js";
+import GoblinShaman from "../entities/GoblinShaman.js";
 
 // Systems
 import WaveManager from "../systems/WaveManager.js";
@@ -14,6 +17,7 @@ import ActionSystem from "../systems/ActionSystem.js";
 import BuildingManager from "../systems/BuildingManager.js";
 import CombatSystem from "../systems/CombatSystem.js";
 import DamageTextSystem from "../systems/DamageTextSystem.js";
+import SpellEffectSystem from "../systems/SpellEffectSystem.js";
 import DayNightSystem from "../systems/DayNightSystem.js";
 import EquipmentSystem from "../systems/EquipmentSystem.js";
 import GhostPreviewSystem from "../systems/GhostPreviewSystem.js";
@@ -24,18 +28,15 @@ import ObjectiveSystem from "../systems/ObjectiveSystem.js";
 import ResourceManager from "../systems/ResourceManger.js";
 import ResourceSystem from "../systems/ResourceSystem.js";
 import GameStateManager from "../systems/GameStateManager.js";
+import MapManager from "../systems/MapManager.js";
+import NavigationManager from "../systems/NavigationManager.js";
+import PathfindingManager from "../systems/PathfindingManager.js";
 
 // UI
 import HealthUI from "../ui/HealthUI.js";
 import HotbarUI from "../ui/HotbarUI.js";
 import GameOverUI from "../ui/GameOverUI.js";
 import OverlayMessageUI from "../ui/OverlayMessageUI.js";
-import MapManager from "../systems/MapManager.js";
-import NavigationManager from "../systems/NavigationManager.js";
-import PathfindingManager from "../systems/PathfindingManager.js";
-import Goblin from "../entities/Goblin.js";
-import GoblinTank from "../entities/GoblinTank.js";
-import GoblinShaman from "../entities/GoblinShaman.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -100,7 +101,8 @@ export default class GameScene extends Phaser.Scene {
 
   createEntities() {
     this.player = new Player(this, 32, 32);
-    this.player.moveToGrid(45, 46);
+    // this.player.moveToGrid(45, 46);
+    this.player.moveToGrid(45, 20);
     this.campfire = new Campfire(this, 32, 32);
     this.campfire.moveToGrid(45, 47);
   }
@@ -114,6 +116,7 @@ export default class GameScene extends Phaser.Scene {
     this.lightingSystem = new LightingSystem(this);
     this.combatSystem = new CombatSystem(this);
     this.damageTextSystem = new DamageTextSystem(this);
+    this.spellEffectSystem = new SpellEffectSystem(this);
     this.equipmentSystem = new EquipmentSystem(this);
     this.hotbarSystem = new HotbarSystem(this);
     this.dayNightSystem = new DayNightSystem(this);

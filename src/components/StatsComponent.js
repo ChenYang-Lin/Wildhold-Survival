@@ -24,47 +24,44 @@ export default class StatsComponent {
   }
 
   applyBuff(buff) {
-    this.activeBuffs.set(buff.id, buff);
+    this.activeBuffs.set(buff.id, {
+      buff,
+    });
 
-    this.refresh(buff.type);
+    this.refreshStats();
 
     this.owner.scene.time.delayedCall(buff.duration, () => {
-      if (!this.owner.active) return;
-
-      this.activeBuffs.delete(buff.id);
-      this.refresh(buff.type);
+      this.removeBuff(buff.id);
     });
   }
 
-  refresh(type) {
-    switch (type) {
-      case "speed":
-        this.refreshSpeed();
-        break;
+  removeBuff(id) {
+    const entry = this.activeBuffs.get(id);
 
-      case "damage":
-        this.refreshDamage();
-        break;
-    }
+    if (!entry) return;
+
+    this.activeBuffs.delete(id);
+
+    this.refreshStats();
   }
 
-  refreshSpeed() {
-    this.current.speed = this.base.speed;
+  refreshStats(type) {
+    this.current = {
+      ...this.base,
+    };
 
-    for (const buff of this.activeBuffs.values()) {
-      if (buff.type !== "speed") continue;
+    for (const entry of this.activeBuffs.values()) {
+      const buff = entry.buff;
 
-      this.current.speed *= buff.multiplier;
-    }
-  }
+      switch (buff.operation) {
+        case "multiply":
+          this.current[buff.stat] *= buff.value;
+          break;
 
-  refreshDamage() {
-    this.current.damage = this.base.damage;
-
-    for (const buff of this.activeBuffs.values()) {
-      if (buff.type !== "damage") continue;
-
-      this.current.damage *= buff.multiplier;
+        case "add":
+          this.current[buff.stat] += buff.value;
+          break;
+      }
     }
   }
 }
