@@ -3,7 +3,7 @@ export default class BuffFactory {
     return {
       id: Phaser.Math.RND.uuid(),
 
-      type: "speed",
+      effectType: "speed",
 
       duration: 5000,
 
@@ -19,7 +19,7 @@ export default class BuffFactory {
     return {
       id: Phaser.Math.RND.uuid(),
 
-      type: "damage",
+      effectType: "damage",
 
       duration: 5000,
 
@@ -35,7 +35,7 @@ export default class BuffFactory {
     return {
       id: Phaser.Math.RND.uuid(),
 
-      type: "shield",
+      effectType: "shield",
 
       duration: 4000,
 

@@ -38,8 +38,9 @@ import HotbarUI from "../ui/HotbarUI.js";
 import GameOverUI from "../ui/GameOverUI.js";
 import OverlayMessageUI from "../ui/OverlayMessageUI.js";
 
-// Data
-import BuffFactory from "../data/BuffFactory.js";
+// Factories
+import BuffFactory from "../factories/BuffFactory.js";
+import AuraFactory from "../factories/AuraFactory.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -142,6 +143,7 @@ export default class GameScene extends Phaser.Scene {
 
   createData() {
     this.buffFactory = new BuffFactory();
+    this.auraFactory = new AuraFactory();
   }
 
   setupCollisions() {

@@ -144,8 +144,6 @@ export default class GoblinShaman extends Enemy {
 
     this.stopMoving();
 
-    const buff = this.scene.buffFactory.createSpeedBuff();
-
     this.anims.play(`${this.type}_spellcast_${this.facing}`);
 
     this.once(Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + `${this.type}_spellcast_${this.facing}`, () => {
@@ -161,6 +159,7 @@ export default class GoblinShaman extends Enemy {
         for (const ally of allies) {
           if (!ally.active) continue;
 
+          const buff = this.scene.buffFactory.createSpeedBuff();
           ally.stats.applyBuff(buff);
 
           // this.scene.spellEffectSystem.attachAura(ally, buff);
