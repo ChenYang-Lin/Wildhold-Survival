@@ -27,7 +27,7 @@ export default class StatsComponent {
 
   findBuff(type) {
     for (const entry of this.activeBuffs.values()) {
-      if (entry.buff.type === type) return entry;
+      if (entry.buff.effectType === type) return entry;
     }
 
     return null;
@@ -55,6 +55,8 @@ export default class StatsComponent {
     }
 
     const aura = this.auraFactory.createAura(this.owner.scene, this.owner, buff);
+
+    console.log(aura);
 
     const timer = this.createBuffTimer(buff.id, buff.duration);
 

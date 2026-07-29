@@ -1,18 +1,22 @@
-import SpeedAura from "../auras/SpeedAura.js";
-import HealAura from "../auras/HealAura.js";
-import ShieldAura from "../auras/ShieldAura.js";
+import BuffAura from "../effects/auras/BuffAura.js";
 
 export default class AuraFactory {
   createAura(scene, owner, buff) {
-    switch (buff.type) {
+    switch (buff.effectType) {
       case "speed":
-        return new SpeedAura(scene, owner);
+        return new BuffAura(scene, owner, {
+          color: 0xffffff,
+        });
 
-      case "heal":
-        return new HealAura(scene, owner);
+      case "damage":
+        return new BuffAura(scene, owner, {
+          color: 0xff4444,
+        });
 
-      case "shield":
-        return new ShieldAura(scene, owner);
+      case "defense":
+        return new BuffAura(scene, owner, {
+          color: 0x4488ff,
+        });
 
       default:
         return null;
