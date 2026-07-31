@@ -204,7 +204,7 @@ export default class GoblinShaman extends Enemy {
   }
 
   isActionLocked() {
-    return this.isCastingSpell;
+    return this.isCastingSpell || this.aiState === this.STATE_WINDUP || this.aiState === this.STATE_ATTACK;
   }
 
   die() {
@@ -214,5 +214,14 @@ export default class GoblinShaman extends Enemy {
 
   update(time, delta) {
     super.update(time);
+
+    console.log({
+      state: this.aiState,
+      casting: this.isCastingSpell,
+      canAttack: this.combat.canAttack,
+      velocity: this.body.velocity,
+      currentAnim: this.anims.currentAnim?.key,
+      isPaused: this.anims.paused,
+    });
   }
 }
