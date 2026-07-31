@@ -27,8 +27,10 @@ export default class Goblin extends Enemy {
     scene.load.animation("goblin_anim", "assets/enemy/goblin_anim.json");
   }
 
-  attack(damage) {
-    super.attack(damage);
+  attack() {
+    super.attack();
+
+    const damage = this.stats.damage;
 
     this.spawnAttackHitbox(damage);
   }

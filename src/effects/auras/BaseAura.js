@@ -16,7 +16,7 @@ export default class BaseAura {
     this.container.destroy();
   }
 
-  update(time, delta) {
+  update() {
     if (!this.owner.active) return;
 
     this.container.setPosition(this.owner.body.center.x, this.owner.body.center.y - 4);

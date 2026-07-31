@@ -30,8 +30,10 @@ export default class GoblinTank extends Enemy {
     scene.load.animation("goblin_tank_anim", "assets/enemy/goblin_tank_anim.json");
   }
 
-  attack(damage) {
-    super.attack(damage);
+  attack() {
+    super.attack();
+
+    const damage = this.stats.damage;
 
     this.spawnAttackHitbox(damage);
   }

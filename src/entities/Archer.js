@@ -28,9 +28,10 @@ export default class Archer extends Enemy {
     scene.load.animation("goblin_archer_anim", "assets/enemy/goblin_archer_anim.json");
   }
 
-  attack(damage) {
-    super.attack(damage);
+  attack() {
+    super.attack();
 
+    const damage = this.stats.damage;
     this.shootArrow(damage);
   }
 

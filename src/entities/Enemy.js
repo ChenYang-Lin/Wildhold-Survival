@@ -137,7 +137,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.healthBar.update();
   }
 
-  attack(damage) {
+  attack() {
     // Override in subclasses.
   }
 

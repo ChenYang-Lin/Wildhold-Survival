@@ -38,7 +38,7 @@ export default class StatsComponent {
   }
 
   applyBuff(buff) {
-    const existing = this.findBuff(buff.type);
+    const existing = this.findBuff(buff.effectType);
 
     if (existing) {
       existing.timer.remove();

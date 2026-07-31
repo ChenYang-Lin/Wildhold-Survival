@@ -11,6 +11,8 @@ export default class BuffAura extends BaseAura {
     this.lineHeight = config.lineHeight ?? 14;
     this.riseSpeed = config.riseSpeed ?? 30;
 
+    this.spawnWidth = 10;
+
     this.particles = [];
 
     this.spawnParticles();
@@ -20,7 +22,7 @@ export default class BuffAura extends BaseAura {
     for (let i = 0; i < this.count; i++) {
       const rect = this.scene.add.rectangle(0, 0, this.lineWidth, this.lineHeight, this.color);
 
-      rect.x = Phaser.Math.Between(-10, 10);
+      rect.x = Phaser.Math.Between(-this.spawnWidth, this.spawnWidth);
       rect.y = Phaser.Math.Between(10, 16);
 
       this.container.add(rect);
@@ -30,7 +32,8 @@ export default class BuffAura extends BaseAura {
         life: 0,
         maxLife: 2000,
         speed: Phaser.Math.FloatBetween(this.riseSpeed - 2, this.riseSpeed + 2),
-        delay: i * 150, // 0ms, 150ms, 300ms, 450ms...
+        delay: i * 500, // 0ms, 150ms, 300ms, 450ms...
+        initialDelay: i * 500,
       };
 
       this.particles.push(particle);
@@ -39,8 +42,9 @@ export default class BuffAura extends BaseAura {
 
   respawn(p) {
     p.life = 0;
+    p.delay = p.initialDelay;
 
-    p.rect.x = Phaser.Math.Between(-10, 10);
+    p.rect.x = Phaser.Math.Between(-this.spawnWidth, this.spawnWidth);
     p.rect.y = Phaser.Math.Between(10, 16);
 
     p.rect.alpha = 0.7;
@@ -52,6 +56,7 @@ export default class BuffAura extends BaseAura {
     for (const p of this.particles) {
       if (p.delay > 0) {
         p.delay -= delta;
+        p.rect.alpha = 0;
         continue;
       }
 

@@ -4,7 +4,6 @@ export default class CombatComponent {
     this.scene = owner.scene;
 
     this.attackRange = stats.attackRange ?? 32;
-    this.attackDamage = stats.damage ?? 1;
 
     this.attackCooldown = stats.attackCooldown ?? 1000;
     this.canAttack = true;
@@ -44,7 +43,7 @@ export default class CombatComponent {
 
       if (this.owner.health.isDead) return;
 
-      this.owner.attack(this.attackDamage);
+      this.owner.attack();
     });
 
     this.scene.time.delayedCall(this.attackRecoverDuration, () => {
