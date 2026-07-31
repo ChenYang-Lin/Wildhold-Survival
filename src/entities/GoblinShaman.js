@@ -153,18 +153,40 @@ export default class GoblinShaman extends Enemy {
 
       this.castBar.show(this.castingTime);
 
-      this.scene.spellEffectSystem.showSpeedCast(this);
-
       this.scene.time.delayedCall(this.castingTime, () => {
         if (!this.active) return;
+
+        const spell = this.createRandomSpell();
+
+        switch (spell) {
+          case "speed":
+            this.scene.spellEffectSystem.showSpeedCast(this);
+            break;
+          case "damage":
+            this.scene.spellEffectSystem.showDamageCast(this);
+            break;
+          case "heal":
+            this.scene.spellEffectSystem.showHealCast(this);
+            break;
+        }
 
         for (const ally of allies) {
           if (!ally.active) continue;
 
-          const buff = this.scene.buffFactory.createSpeedBuff();
-          ally.stats.applyBuff(buff);
+          switch (spell) {
+            case "speed":
+              ally.stats.applyBuff(this.scene.buffFactory.createSpeedBuff());
+              break;
 
-          // this.scene.spellEffectSystem.attachAura(ally, buff);
+            case "damage":
+              ally.stats.applyBuff(this.scene.buffFactory.createDamageBuff());
+              break;
+
+            case "heal":
+              ally.health.heal(1);
+              this.scene.spellEffectSystem.showHeal(ally);
+              break;
+          }
         }
 
         this.castBar.hide();
@@ -175,6 +197,10 @@ export default class GoblinShaman extends Enemy {
         this.isCastingSpell = false;
       });
     });
+  }
+
+  createRandomSpell() {
+    return Phaser.Utils.Array.GetRandom(["speed", "damage", "heal"]);
   }
 
   isActionLocked() {

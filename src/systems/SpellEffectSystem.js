@@ -1,9 +1,17 @@
+import HealEffect from "../effects/spellEffects/HealEffect.js";
+
 export default class SpellEffectSystem {
   constructor(scene) {
     this.scene = scene;
   }
 
-  showSpeedCast(caster) {}
+  showSpeedCast(target) {}
 
-  showHeal(target) {}
+  showDamageCast(target) {}
+
+  showHealCast(target) {}
+
+  showHeal(target) {
+    new HealEffect(this.scene, target);
+  }
 }
