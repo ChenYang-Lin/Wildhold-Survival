@@ -1,3 +1,7 @@
+import HealthComponent from "../components/HealthComponent.js";
+import MovementComponent from "../components/MovementComponent.js";
+import StatsComponent from "../components/StatsComponent.js";
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "survivor", "survivor_idle_down");
@@ -11,14 +15,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(20, 16);
     this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
 
+    this.health = new HealthComponent(this, 10);
+    this.movement = new MovementComponent(this);
+    this.stats = new StatsComponent(this, {
+      damage: 1,
+      attackCooldown: 500,
+      stamina: 100,
+      maxStamina: 100,
+    });
+
     this.setCollideWorldBounds(true);
 
     this.playerState = "idle";
-    this.facing = "down";
-    this.speed = 100;
-
-    this.maxHP = 10;
-    this.hp = this.maxHP;
 
     this.attackCooldown = 500;
     this.canAttack = true;
@@ -46,19 +54,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.moveToPosition(worldX, worldY);
   }
 
-  updateFacing() {
-    const vx = this.body.velocity.x;
-    const vy = this.body.velocity.y;
-
-    if (vx === 0 && vy === 0) return;
-
-    if (Math.abs(vx) > Math.abs(vy)) {
-      this.facing = vx > 0 ? "right" : "left";
-    } else {
-      this.facing = vy > 0 ? "down" : "up";
-    }
-  }
-
   attackMelee() {
     if (!this.canAttack) return;
 
@@ -80,7 +75,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   playAttackAnimation() {
-    switch (this.facing) {
+    switch (this.movement.facing) {
       case "up":
         this.play("survivor_attack_up", true);
         break;
@@ -107,7 +102,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     const distance = 32;
 
-    switch (this.facing) {
+    switch (this.movement.facing) {
       case "up":
         hitY -= distance;
         hitWidth = 64;
@@ -166,7 +161,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   takeDamage(amount, source) {
-    this.hp -= amount;
+    this.health.takeDamage(amount);
 
     this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff0000"); // prettier-ignore
 
@@ -177,14 +172,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.scene.time.delayedCall(100, () => {
       if (this.active) this.clearTint();
     });
-
-    if (this.hp <= 0) {
-      this.die();
-    }
   }
 
-  stopMovement() {
-    this.body.stop();
+  enterDead() {
+    this.die();
   }
 
   die() {
@@ -208,19 +199,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
-    const move = this.scene.inputController.state.moveVector.clone();
+    const move = this.scene.inputController.state.moveVector;
 
-    if (move.length() > 1) {
-      move.normalize();
-    }
-
-    this.setVelocity(move.x * this.speed, move.y * this.speed);
-    this.updateFacing();
+    this.movement.move(move);
 
     if (this.body.velocity.x === 0 && this.body.velocity.y === 0) {
-      this.anims.play(`survivor_idle_${this.facing}`, true);
+      this.anims.play(`survivor_idle_${this.movement.facing}`, true);
     } else {
-      this.anims.play(`survivor_walk_${this.facing}`, true);
+      this.anims.play(`survivor_walk_${this.movement.facing}`, true);
     }
   }
 }

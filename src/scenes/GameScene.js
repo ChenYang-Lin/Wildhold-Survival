@@ -187,7 +187,7 @@ export default class GameScene extends Phaser.Scene {
 
   update(time, delta) {
     if (this.gameStateManager.isPaused()) {
-      this.player.stopMovement();
+      this.player.movement.stopMovement();
       return;
     }
 

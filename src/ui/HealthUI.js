@@ -18,7 +18,7 @@ export default class HealthUI {
     const player = this.scene.player;
     const campfire = this.scene.campfire;
 
-    if (player.hp <= player.maxHP * 0.3) {
+    if (player.health.hp <= player.health.maxHP * 0.3) {
       this.playerText.setColor("#ff4444");
     } else {
       this.playerText.setColor("#ffffff");
@@ -30,12 +30,12 @@ export default class HealthUI {
       this.campfireText.setColor("#ffffff");
     }
 
-    this.playerText.setText(`Player HP: ${player.hp}/${player.maxHP}`);
+    this.playerText.setText(`Player HP: ${player.health.hp}/${player.health.maxHP}`);
     this.campfireText.setText(`Campfire HP: ${campfire.hp}/${campfire.maxHP}`);
 
     this.graphics.clear();
 
-    const playerPercent = Phaser.Math.Clamp(player.hp / player.maxHP, 0, 1);
+    const playerPercent = Phaser.Math.Clamp(player.health.hp / player.health.maxHP, 0, 1);
 
     this.graphics.fillStyle(0x222222);
     this.graphics.fillRect(16, 70, 150, 16);
