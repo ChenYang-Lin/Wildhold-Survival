@@ -187,7 +187,7 @@ export default class GameScene extends Phaser.Scene {
 
   update(time, delta) {
     if (this.gameStateManager.isPaused()) {
-      this.player.movement.stopMovement();
+      this.player.movement.stop();
       return;
     }
 
@@ -198,7 +198,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.actionSystem.update();
     this.inputController.update();
-    this.player.update();
+    this.player.update(delta);
     this.ghostPreview.update();
     this.combatSystem.update(time, delta);
     this.healthUI.update();

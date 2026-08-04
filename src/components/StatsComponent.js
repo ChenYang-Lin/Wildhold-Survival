@@ -8,11 +8,15 @@ export default class StatsComponent {
       speed: baseStats.speed ?? 50,
       damage: baseStats.damage ?? 1,
       attackCooldown: baseStats.attackCooldown ?? 1000,
+
+      maxStamina: baseStats.maxStamina ?? 100,
     };
 
     this.current = {
       ...this.base,
     };
+
+    this.currentStamina = baseStats.stamina ?? this.base.maxStamina;
 
     this.activeBuffs = new Map();
   }
@@ -23,6 +27,26 @@ export default class StatsComponent {
 
   get damage() {
     return this.current.damage;
+  }
+
+  get stamina() {
+    return this.currentStamina;
+  }
+
+  get staminaPercent() {
+    return this.stamina / this.current.maxStamina;
+  }
+
+  consumeStamina(amount) {
+    this.stamina = Math.max(0, this.stamina - amount);
+  }
+
+  recoverStamina(amount) {
+    this.stamina = Math.min(this.current.maxStamina, this.stamina + amount);
+  }
+
+  hasStamina(amount) {
+    return this.stamina >= amount;
   }
 
   findBuff(type) {

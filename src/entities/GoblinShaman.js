@@ -215,13 +215,13 @@ export default class GoblinShaman extends Enemy {
   update(time, delta) {
     super.update(time);
 
-    console.log({
-      state: this.aiState,
-      casting: this.isCastingSpell,
-      canAttack: this.combat.canAttack,
-      velocity: this.body.velocity,
-      currentAnim: this.anims.currentAnim?.key,
-      isPaused: this.anims.paused,
-    });
+    // console.log({
+    //   state: this.aiState,
+    //   casting: this.isCastingSpell,
+    //   canAttack: this.combat.canAttack,
+    //   velocity: this.body.velocity,
+    //   currentAnim: this.anims.currentAnim?.key,
+    //   isPaused: this.anims.paused,
+    // });
   }
 }

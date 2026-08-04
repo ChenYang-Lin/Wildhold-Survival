@@ -18,6 +18,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.health = new HealthComponent(this, 10);
     this.movement = new MovementComponent(this);
     this.stats = new StatsComponent(this, {
+      speed: 100,
       damage: 1,
       attackCooldown: 500,
       stamina: 100,
@@ -190,7 +191,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setTint(0x555555);
   }
 
-  update() {
+  update(delta) {
     if (!this.active) return;
     this.setDepth(this.body.center.y);
 
@@ -201,7 +202,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     const move = this.scene.inputController.state.moveVector;
 
-    this.movement.move(move);
+    this.movement.update(move, delta);
 
     if (this.body.velocity.x === 0 && this.body.velocity.y === 0) {
       this.anims.play(`survivor_idle_${this.movement.facing}`, true);

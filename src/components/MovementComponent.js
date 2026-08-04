@@ -4,7 +4,8 @@ export default class MovementComponent {
 
     this.facing = "down";
 
-    this.speed = 100;
+    this.isSprinting = false;
+    this.isDashing = false;
   }
 
   updateFacing() {
@@ -20,18 +21,20 @@ export default class MovementComponent {
     }
   }
 
-  stopMovement() {
+  stop() {
     this.owner.body.stop();
   }
 
-  move(moveVector) {
+  update(moveVector, delta) {
     const move = moveVector.clone();
 
     if (move.length() > 1) {
       move.normalize();
     }
 
-    this.owner.setVelocity(move.x * this.speed, move.y * this.speed);
+    const speed = this.owner.stats.speed;
+    this.owner.setVelocity(move.x * speed, move.y * speed);
+
     this.updateFacing();
   }
 }
