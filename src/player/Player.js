@@ -1,6 +1,7 @@
 import HealthComponent from "../components/HealthComponent.js";
 import MovementComponent from "../components/MovementComponent.js";
 import StatsComponent from "../components/StatsComponent.js";
+import PlayerMovementFSM from "./fsm/PlayerMovementFSM.js";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
@@ -23,11 +24,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       attackCooldown: 500,
       stamina: 100,
       maxStamina: 100,
+      staminaDrainRate: 20,
+      staminaRegenRate: 20,
     });
+    this.movementFSM = new PlayerMovementFSM(this);
 
     this.setCollideWorldBounds(true);
-
-    this.playerState = "idle";
 
     this.attackCooldown = 500;
     this.canAttack = true;
@@ -59,7 +61,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     if (!this.canAttack) return;
 
     this.canAttack = false;
-    this.playerState = "attack";
 
     // Animation
     this.playAttackAnimation();
@@ -71,7 +72,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.scene.time.delayedCall(this.attackCooldown, () => {
       this.canAttack = true;
-      this.playerState = "idle";
     });
   }
 
@@ -191,23 +191,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setTint(0x555555);
   }
 
+  updateAnimation() {
+    // if (this.body.velocity.x === 0 && this.body.velocity.y === 0) {
+    //   this.anims.play(`survivor_idle_${this.movement.facing}`, true);
+    // } else {
+    //   this.anims.play(`survivor_walk_${this.movement.facing}`, true);
+    // }
+  }
+
   update(delta) {
     if (!this.active) return;
     this.setDepth(this.body.center.y);
 
-    if (this.playerState === "attack") {
-      this.setVelocity(0, 0);
-      return;
-    }
+    const input = this.scene.inputController.state;
 
-    const move = this.scene.inputController.state.moveVector;
+    this.movementFSM.update(input, delta);
 
-    this.movement.update(move, delta);
-
-    if (this.body.velocity.x === 0 && this.body.velocity.y === 0) {
-      this.anims.play(`survivor_idle_${this.movement.facing}`, true);
-    } else {
-      this.anims.play(`survivor_walk_${this.movement.facing}`, true);
-    }
+    this.updateAnimation();
   }
 }

@@ -1,11 +1,7 @@
 export default class MovementComponent {
   constructor(owner) {
     this.owner = owner;
-
     this.facing = "down";
-
-    this.isSprinting = false;
-    this.isDashing = false;
   }
 
   updateFacing() {
@@ -21,18 +17,21 @@ export default class MovementComponent {
     }
   }
 
+  dash(direction, speed) {
+    this.owner.setVelocity(direction.x * speed, direction.y * speed);
+  }
+
   stop() {
     this.owner.body.stop();
   }
 
-  update(moveVector, delta) {
+  update(moveVector, speed) {
     const move = moveVector.clone();
 
     if (move.length() > 1) {
       move.normalize();
     }
 
-    const speed = this.owner.stats.speed;
     this.owner.setVelocity(move.x * speed, move.y * speed);
 
     this.updateFacing();

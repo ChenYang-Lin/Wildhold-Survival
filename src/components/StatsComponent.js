@@ -10,6 +10,8 @@ export default class StatsComponent {
       attackCooldown: baseStats.attackCooldown ?? 1000,
 
       maxStamina: baseStats.maxStamina ?? 100,
+      staminaDrainRate: baseStats.staminaDrainRate ?? 20,
+      staminaRegenRate: baseStats.staminaRegenRate ?? 20,
     };
 
     this.current = {
@@ -17,6 +19,9 @@ export default class StatsComponent {
     };
 
     this.currentStamina = baseStats.stamina ?? this.base.maxStamina;
+
+    this.staminaRegenDelay = 1000;
+    this.staminaRegenTimer = 0;
 
     this.activeBuffs = new Map();
   }
@@ -37,12 +42,32 @@ export default class StatsComponent {
     return this.stamina / this.current.maxStamina;
   }
 
+  get staminaDrainRate() {
+    return this.current.staminaDrainRate;
+  }
+
+  get staminaRegenRate() {
+    return this.current.staminaRegenRate;
+  }
+
+  updateStaminaRegen(delta) {
+    if (this.staminaRegenTimer > 0) {
+      this.staminaRegenTimer -= delta;
+      return;
+    }
+
+    const amount = this.staminaRegenRate * (delta / 1000);
+    this.recoverStamina(amount);
+  }
+
   consumeStamina(amount) {
-    this.stamina = Math.max(0, this.stamina - amount);
+    this.currentStamina = Math.max(0, this.currentStamina - amount);
+
+    this.staminaRegenTimer = this.staminaRegenDelay;
   }
 
   recoverStamina(amount) {
-    this.stamina = Math.min(this.current.maxStamina, this.stamina + amount);
+    this.currentStamina = Math.min(this.current.maxStamina, this.currentStamina + amount);
   }
 
   hasStamina(amount) {
@@ -79,8 +104,6 @@ export default class StatsComponent {
     }
 
     const aura = this.auraFactory.createAura(this.owner.scene, this.owner, buff);
-
-    console.log(aura);
 
     const timer = this.createBuffTimer(buff.id, buff.duration);
 

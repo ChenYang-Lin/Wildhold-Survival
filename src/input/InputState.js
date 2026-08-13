@@ -22,5 +22,9 @@ export default class InputState {
     // Combat - Build (hotbar)
     this.toggleBuildModePressed = false;
     this.hotbarScroll = 0;
+
+    // Movement
+    this.dashPressed = false;
+    this.sprintHeld = false;
   }
 }

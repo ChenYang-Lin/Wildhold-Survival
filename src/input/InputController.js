@@ -55,10 +55,7 @@ export default class InputController {
     // POINTER DOWN ON SCREEN
     this.scene.input.on("pointerdown", (pointer) => {
       // Joystick - only left side starts joystick
-      if (
-        pointer.x < this.scene.scale.width * 0.4 &&
-        this.joyPointerId === null
-      ) {
+      if (pointer.x < this.scene.scale.width * 0.4 && this.joyPointerId === null) {
         this.joyPointerId = pointer.id;
         this.joystickActive = true;
 
@@ -87,25 +84,14 @@ export default class InputController {
       const dx = pointer.x - this.joyBase.x;
       const dy = pointer.y - this.joyBase.y;
 
-      const distance = Math.min(
-        Phaser.Math.Distance.Between(
-          this.joyBase.x,
-          this.joyBase.y,
-          pointer.x,
-          pointer.y,
-        ),
-        50,
-      );
+      const distance = Math.min(Phaser.Math.Distance.Between(this.joyBase.x, this.joyBase.y, pointer.x, pointer.y), 50);
 
       const angle = Math.atan2(dy, dx);
 
       const thumbX = Math.cos(angle) * distance;
       const thumbY = Math.sin(angle) * distance;
 
-      this.joyThumb.setPosition(
-        this.joyBase.x + thumbX,
-        this.joyBase.y + thumbY,
-      );
+      this.joyThumb.setPosition(this.joyBase.x + thumbX, this.joyBase.y + thumbY);
 
       // normalized movement vector with dead zone (don't make character move instanly when joystick just move tiny bit)
       const deadzone = 14;
@@ -140,6 +126,8 @@ export default class InputController {
   }
 
   setupPC() {
+    this.scene.input.mouse.disableContextMenu();
+
     this.keys = this.scene.input.keyboard.addKeys({
       up: "W",
       down: "S",
@@ -148,9 +136,7 @@ export default class InputController {
     });
 
     // restart button
-    this.restartKey = this.scene.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.R,
-    );
+    this.restartKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
     // mouse move = aim
     this.scene.input.on("pointermove", (pointer) => {
@@ -162,15 +148,29 @@ export default class InputController {
     this.scene.input.on("pointerdown", (pointer) => {
       if (this.isOverUI(pointer)) return;
 
-      console.log("attack - pointerdown pc");
-      this.state.actionPressed = true;
-      this.state.actionHeld = true;
+      if (pointer.button === 0) {
+        // Left click = attack
+        this.state.actionPressed = true;
+        this.state.actionHeld = true;
+      }
+
+      if (pointer.button === 2) {
+        // Right click = dash + sprint
+        this.state.dashPressed = true;
+        this.state.sprintHeld = true;
+      }
     });
 
     // pointer released
     this.scene.input.on("pointerup", (pointer) => {
-      this.state.actionHeld = false;
-      this.state.actionReleased = true;
+      if (pointer.button === 0) {
+        this.state.actionHeld = false;
+        this.state.actionReleased = true;
+      }
+
+      if (pointer.button === 2) {
+        this.state.sprintHeld = false;
+      }
     });
 
     // toggler for Build mode and Combat mode
@@ -185,11 +185,7 @@ export default class InputController {
   }
 
   isOverUI(pointer) {
-    const objects = this.scene.input.manager.hitTest(
-      pointer,
-      this.scene.input._list,
-      this.scene.cameras.main,
-    );
+    const objects = this.scene.input.manager.hitTest(pointer, this.scene.input._list, this.scene.cameras.main);
 
     return objects.some((obj) => obj.isUI);
   }
@@ -207,7 +203,16 @@ export default class InputController {
     this.scene.hotbarUI?.resetUIPosition();
   }
 
+  endFrame() {
+    this.state.dashPressed = false;
+    this.state.actionPressed = false;
+    this.state.actionReleased = false;
+    this.state.toggleBuildModePressed = false;
+    this.state.hotbarScroll = 0;
+  }
+
   update() {
+    // console.log("dashPressed:", this.state.dashPressed, "sprintHeld:", this.state.sprintHeld);
     if (!this.state.isMobile) {
       this.state.moveVector.set(0, 0);
 
