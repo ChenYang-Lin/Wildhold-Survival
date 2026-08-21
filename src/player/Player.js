@@ -1,6 +1,8 @@
+import AttackComponent from "../components/AttackComponent.js";
 import HealthComponent from "../components/HealthComponent.js";
 import MovementComponent from "../components/MovementComponent.js";
 import StatsComponent from "../components/StatsComponent.js";
+import PlayerCombatFSM from "./fsm/PlayerCombatFSM.js";
 import PlayerMovementFSM from "./fsm/PlayerMovementFSM.js";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
@@ -21,24 +23,25 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.stats = new StatsComponent(this, {
       speed: 100,
       damage: 1,
-      attackCooldown: 500,
+      attackSpeed: 2,
       stamina: 100,
       maxStamina: 100,
       staminaDrainRate: 20,
       staminaRegenRate: 20,
     });
+
+    this.attack = new AttackComponent(this);
+
     this.movementFSM = new PlayerMovementFSM(this);
-
-    this.setCollideWorldBounds(true);
-
-    this.attackCooldown = 500;
-    this.canAttack = true;
+    this.combatFSM = new PlayerCombatFSM(this);
   }
 
   static preload(scene) {
     scene.load.atlas("survivor", "assets/player/survivor.png", "assets/player/survivor_atlas.json");
-
     scene.load.animation("survivor_anim", "assets/player/survivor_anim.json");
+
+    scene.load.atlas("survivor_attack", "assets/player/survivor_attack.png", "assets/player/survivor_attack_atlas.json");
+    scene.load.animation("survivor_attack_anim", "assets/player/survivor_attack_anim.json");
   }
 
   moveToPosition(x, y) {
@@ -55,110 +58,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     const worldY = gridY * 32 + 16;
 
     this.moveToPosition(worldX, worldY);
-  }
-
-  attackMelee() {
-    if (!this.canAttack) return;
-
-    this.canAttack = false;
-
-    // Animation
-    this.playAttackAnimation();
-
-    // Hit
-    this.scene.time.delayedCall(100, () => {
-      this.doMeleeHit();
-    });
-
-    this.scene.time.delayedCall(this.attackCooldown, () => {
-      this.canAttack = true;
-    });
-  }
-
-  playAttackAnimation() {
-    switch (this.movement.facing) {
-      case "up":
-        this.play("survivor_attack_up", true);
-        break;
-
-      case "down":
-        this.play("survivor_attack_down", true);
-        break;
-
-      case "left":
-        this.play("survivor_attack_left", true);
-        break;
-
-      case "right":
-        this.play("survivor_attack_right", true);
-        break;
-    }
-  }
-
-  doMeleeHit() {
-    let hitX = this.body.center.x;
-    let hitY = this.body.center.y;
-    let hitWidth = 48;
-    let hitHeight = 32;
-
-    const distance = 32;
-
-    switch (this.movement.facing) {
-      case "up":
-        hitY -= distance;
-        hitWidth = 64;
-        break;
-      case "down":
-        hitY += distance;
-        hitWidth = 64;
-        break;
-      case "left":
-        hitX -= distance;
-        hitHeight = 64;
-        break;
-      case "right":
-        hitX += distance;
-        hitHeight = 64;
-        break;
-    }
-
-    const hitbox = this.scene.add.zone(hitX, hitY, hitWidth, hitHeight);
-
-    this.scene.physics.add.existing(hitbox);
-    hitbox.body.setAllowGravity(false);
-
-    // Enemy
-    const hitEnemies = new Set();
-    this.scene.physics.add.overlap(hitbox, this.scene.combatSystem.enemies, (_, enemy) => {
-      if (hitEnemies.has(enemy)) return;
-
-      hitEnemies.add(enemy);
-
-      enemy.takeDamage(1);
-    });
-
-    // Tree
-    const hitTrees = new Set();
-    this.scene.physics.add.overlap(hitbox, this.scene.trees, (_, tree) => {
-      if (hitTrees.has(tree)) return;
-
-      hitTrees.add(tree);
-      tree.takeDamage(1);
-    });
-
-    // Rock
-    const hitRocks = new Set();
-    this.scene.physics.add.overlap(hitbox, this.scene.rocks, (_, rock) => {
-      if (hitRocks.has(rock)) return;
-
-      hitRocks.add(rock);
-      rock.takeDamage(1);
-    });
-
-    // Clear hitbox
-    this.scene.time.delayedCall(80, () => {
-      hitbox.destroy();
-    });
   }
 
   takeDamage(amount, source) {
@@ -191,22 +90,32 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.setTint(0x555555);
   }
 
-  updateAnimation() {
-    // if (this.body.velocity.x === 0 && this.body.velocity.y === 0) {
-    //   this.anims.play(`survivor_idle_${this.movement.facing}`, true);
-    // } else {
-    //   this.anims.play(`survivor_walk_${this.movement.facing}`, true);
-    // }
-  }
-
   update(delta) {
     if (!this.active) return;
+
     this.setDepth(this.body.center.y);
 
     const input = this.scene.inputController.state;
 
-    this.movementFSM.update(input, delta);
+    // Dash has highest priority
+    if (input.dashPressed && this.movementFSM.state !== this.movementFSM.STATE_DASH) {
+      this.combatFSM.cancelAttack();
+      this.movementFSM.enterDash(input);
+    }
 
-    this.updateAnimation();
+    // Dash locks everything else. If currently dashing, ONLY update dash
+    if (this.movementFSM.state === this.movementFSM.STATE_DASH) {
+      this.movementFSM.update(input, delta);
+      return;
+    }
+
+    // Otherwise combat has priority over normal movement
+    this.combatFSM.update(input, delta);
+
+    if (!this.combatFSM.locksMovement()) {
+      this.movementFSM.update(input, delta);
+    } else {
+      this.movement.stop();
+    }
   }
 }

@@ -1,0 +1,500 @@
+{
+    "anims": [
+        {
+            "key": "survivor_sprint_attack_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_down_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_down_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_down_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_down_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_down_4"
+                }
+            ]
+        },
+        {
+            "key": "survivor_sprint_attack_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_up_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_up_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_up_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_up_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_up_4"
+                }
+            ]
+        },
+        {
+            "key": "survivor_sprint_attack_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_right_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_right_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_right_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_right_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_right_4"
+                }
+            ]
+        },
+        {
+            "key": "survivor_sprint_attack_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_left_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_left_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_left_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_left_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_sprint_attack_left_4"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_3_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_down_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_down_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_down_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_down_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_down_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_down_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_3_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_up_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_up_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_up_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_up_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_up_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_up_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_3_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_right_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_right_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_right_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_right_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_right_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_right_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_3_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_left_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_left_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_left_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_left_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_left_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_3_left_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_2_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_down_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_down_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_down_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_down_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_down_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_down_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_2_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_up_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_up_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_up_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_up_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_up_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_up_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_2_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_right_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_right_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_right_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_right_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_right_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_right_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_2_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_left_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_left_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_left_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_left_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_left_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_2_left_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_1_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_down_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_down_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_down_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_down_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_down_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_down_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_1_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_up_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_up_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_up_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_up_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_up_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_up_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_1_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_right_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_right_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_right_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_right_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_right_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_right_5"
+                }
+            ]
+        },
+        {
+            "key": "survivor_attack_1_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_left_0"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_left_1"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_left_2"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_left_3"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_left_4"
+                },
+                {
+                    "key": "survivor_attack",
+                    "frame": "survivor_attack_1_left_5"
+                }
+            ]
+        }
+    ]
+}

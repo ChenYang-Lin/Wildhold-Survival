@@ -74,11 +74,6 @@ export default class PlayerMovementFSM {
       return;
     }
 
-    if (input.dashPressed) {
-      this.enterDash(input);
-      return;
-    }
-
     if (input.sprintHeld && this.owner.stats.stamina > 0) {
       this.enterSprint();
       return;
@@ -96,11 +91,6 @@ export default class PlayerMovementFSM {
       return;
     }
 
-    if (input.dashPressed) {
-      this.enterDash(input);
-      return;
-    }
-
     if (!input.sprintHeld || this.owner.stats.stamina <= 0) {
       this.enterWalk();
       return;
@@ -115,11 +105,6 @@ export default class PlayerMovementFSM {
     if (input.moveVector.lengthSq() === 0) {
       this.owner.movement.stop();
       this.owner.stats.updateStaminaRegen(delta);
-      return;
-    }
-
-    if (input.dashPressed) {
-      this.enterDash(input);
       return;
     }
 
@@ -159,7 +144,6 @@ export default class PlayerMovementFSM {
   }
 
   update(input, delta) {
-    // console.log(this.state);
     switch (this.state) {
       case this.STATE_IDLE:
         this.updateIdle(input, delta);

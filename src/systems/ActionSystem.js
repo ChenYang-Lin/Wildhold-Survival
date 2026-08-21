@@ -66,19 +66,18 @@ export default class ActionSystem {
 
     // Handle action pressed
     if (state.actionPressed) {
-      state.actionPressed = false;
-
       const itemId = this.scene.hotbarSystem.getSelectedItem();
       const mode = this.scene.equipmentSystem.getMode();
 
       if (!itemId) return;
 
       if (mode === "combat") {
-        this.handleCombat(itemId);
+        // this.handleCombat(itemId);
       }
 
       if (mode === "build") {
         this.handlePlaceable({ id: itemId });
+        state.actionPressed = false;
       }
     }
 

@@ -8,6 +8,7 @@ export default class StatsComponent {
       speed: baseStats.speed ?? 50,
       damage: baseStats.damage ?? 1,
       attackCooldown: baseStats.attackCooldown ?? 1000,
+      attackSpeed: baseStats.attackSpeed ?? 1,
 
       maxStamina: baseStats.maxStamina ?? 100,
       staminaDrainRate: baseStats.staminaDrainRate ?? 20,
@@ -48,6 +49,10 @@ export default class StatsComponent {
 
   get staminaRegenRate() {
     return this.current.staminaRegenRate;
+  }
+
+  get attackSpeed() {
+    return this.current.attackSpeed;
   }
 
   updateStaminaRegen(delta) {
