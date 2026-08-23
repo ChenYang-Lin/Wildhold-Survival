@@ -41,6 +41,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.aiState = null;
     this.enterNavigate();
+
+    // knockback
+    this.knockbackTimer = 0;
+    this.knockbackVelocity = new Phaser.Math.Vector2();
   }
 
   static preload(scene) {
@@ -130,11 +134,66 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(0, 0);
   }
 
+  applyKnockback(direction, force, duration = 200) {
+    if (!this.active) return;
+    if (this.aiState === this.STATE_DEAD) return;
+
+    console.log("KNOCKBACK APPLIED", "state =", this.aiState, "direction =", direction, "force =", force, "time =", this.scene.time.now);
+
+    this.knockbackTimer = duration;
+
+    switch (direction) {
+      case "up":
+        this.knockbackVelocity.set(0, -force);
+        break;
+
+      case "down":
+        this.knockbackVelocity.set(0, force);
+        break;
+
+      case "left":
+        this.knockbackVelocity.set(-force, 0);
+        break;
+
+      case "right":
+        this.knockbackVelocity.set(force, 0);
+        break;
+
+      default:
+        this.knockbackVelocity.set(0, 0);
+        this.knockbackTimer = 0;
+        return;
+    }
+
+    this.setVelocity(this.knockbackVelocity.x, this.knockbackVelocity.y);
+  }
+
+  updateKnockback(delta) {
+    console.log("KNOCKBACK UPDATE", "timer =", this.knockbackTimer, "velocity =", this.body.velocity.x, this.body.velocity.y, "state =", this.aiState);
+    this.setVelocity(this.knockbackVelocity.x, this.knockbackVelocity.y);
+
+    this.knockbackTimer -= delta;
+
+    if (this.knockbackTimer <= 0) {
+      this.knockbackTimer = 0;
+      this.knockbackVelocity.set(0, 0);
+      this.stopMoving();
+
+      console.log("KNOCKBACK END", "velocity =", this.body.velocity.x, this.body.velocity.y);
+    }
+  }
+
   takeDamage(amount) {
+    if (this.aiState === this.STATE_DEAD) return;
+
     this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff4444"); // prettier-ignore
 
     this.health.takeDamage(amount);
     this.healthBar.update();
+
+    if (this.health.isDead) {
+      this.enterDead();
+    }
   }
 
   attack() {
@@ -142,6 +201,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
+    this.knockbackTimer = 0;
+    this.knockbackVelocity.set(0, 0);
+    this.stopMoving();
+
     this.healthBar.destroy();
     this.destroy();
   }
@@ -202,19 +265,22 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   enterAttack() {
+    if (!this.active) return;
+    if (this.aiState === this.STATE_DEAD) return;
+
     this.aiState = this.STATE_ATTACK;
 
     this.stopMoving();
 
-    if (this.active) {
-      if (this.aiState === this.STATE_DEAD) return;
-      this.combat.performAttack({
-        onRecover: () => {
-          this.enterChase();
-        },
-      });
-      this.anims.play(`${this.type}_attack_${this.facing}`);
-    }
+    this.combat.performAttack({
+      onRecover: () => {
+        if (!this.active) return;
+        if (this.aiState === this.STATE_DEAD) return;
+
+        this.enterChase();
+      },
+    });
+    this.anims.play(`${this.type}_attack_${this.facing}`);
   }
 
   enterDead() {
@@ -222,6 +288,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.aiState = this.STATE_DEAD;
 
+    // Clear knockback immediately
+    this.knockbackTimer = 0;
+    this.knockbackVelocity.set(0, 0);
+
+    // Stop physics movement
     this.stopMoving();
 
     this.anims.play(`${this.type}_death`);
@@ -289,35 +360,37 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (!this.active) return;
     if (this.aiState === this.STATE_DEAD) return;
 
-    if (this.isActionLocked?.()) {
-      return;
+    if (this.knockbackTimer > 0) {
+      this.updateKnockback(delta);
+    } else if (!this.isActionLocked?.()) {
+      // isActionLocked => GoblinShaman casting
+      switch (this.aiState) {
+        case this.STATE_NAVIGATE:
+          this.updateNavigate(time);
+          break;
+
+        case this.STATE_BREAK_OBSTACLE:
+          this.updateBreakObstacle(time);
+          break;
+
+        case this.STATE_CHASE:
+          this.updateChase();
+          break;
+
+        case this.STATE_WINDUP:
+          this.updateWindup();
+          break;
+
+        case this.STATE_ATTACK:
+          this.updateAttack();
+          break;
+
+        case this.STATE_RETREAT:
+          this.updateRetreat();
+          break;
+      }
     }
-
-    switch (this.aiState) {
-      case this.STATE_NAVIGATE:
-        this.updateNavigate(time);
-        break;
-
-      case this.STATE_BREAK_OBSTACLE:
-        this.updateBreakObstacle(time);
-        break;
-
-      case this.STATE_CHASE:
-        this.updateChase();
-        break;
-
-      case this.STATE_WINDUP:
-        this.updateWindup();
-        break;
-
-      case this.STATE_ATTACK:
-        this.updateAttack();
-        break;
-
-      case this.STATE_RETREAT:
-        this.updateRetreat();
-        break;
-    }
+    // console.log("ENEMY FINAL VELOCITY", this.body.velocity.x, this.body.velocity.y, "state =", this.aiState, "knockback =", this.knockbackTimer);
 
     this.setDepth(this.body.center.y);
     this.healthBar.update();

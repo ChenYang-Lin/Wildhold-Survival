@@ -7,6 +7,7 @@ export default class GoblinShaman extends Enemy {
       attackRange: stats.attackRange ?? 20,
       attackDamage: stats.damage ?? 1,
       attackCooldown: stats.attackCooldown ?? 1000,
+      maxHP: stats.maxHP ?? 10,
 
       windupDuration: stats.windupDuration ?? 500,
       attackDelay: stats.attackDelay ?? 150,
@@ -213,7 +214,7 @@ export default class GoblinShaman extends Enemy {
   }
 
   update(time, delta) {
-    super.update(time);
+    super.update(time, delta);
 
     // console.log({
     //   state: this.aiState,

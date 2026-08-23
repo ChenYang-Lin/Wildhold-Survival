@@ -98,7 +98,7 @@ export default class AttackComponent {
   finishCurrentAttack() {
     this.owner.anims.timeScale = 1;
 
-    if (this.comboQueued && this.comboIndex < 2) {
+    if (this.comboQueued && this.comboIndex < meleeCombo.length - 1) {
       this.currentAttack = null;
       this.startNextComboAttack();
 
@@ -182,6 +182,13 @@ export default class AttackComponent {
       const damage = this.owner.stats.damage * attack.damageMultiplier;
 
       enemy.takeDamage(damage);
+
+      console.log("PLAYER HIT ENEMY", "attack =", attack, "enemy state =", enemy.aiState, "time =", this.owner.scene.time.now);
+
+      // knockback
+      if (attack.knockback) {
+        enemy.applyKnockback(this.owner.movement.facing, attack.knockback);
+      }
     });
 
     // Tree
@@ -237,7 +244,6 @@ export default class AttackComponent {
     if (this.attackTimer <= 0) {
       this.comboWindowOpen = false;
       this.finishCurrentAttack();
-      console.log("timer < 0");
     }
   }
 }

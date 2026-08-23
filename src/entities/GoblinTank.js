@@ -97,7 +97,7 @@ export default class GoblinTank extends Enemy {
     });
   }
 
-  update(time) {
-    super.update(time);
+  update(time, delta) {
+    super.update(time, delta);
   }
 }

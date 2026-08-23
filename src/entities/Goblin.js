@@ -6,6 +6,7 @@ export default class Goblin extends Enemy {
       attackRange: stats.attackRange ?? 20,
       attackDamage: stats.damage ?? 1,
       attackCooldown: stats.attackCooldown ?? 1000,
+      maxHP: stats.maxHP ?? 10,
 
       windupDuration: stats.windupDuration ?? 500,
       attackDelay: stats.attackDelay ?? 500,
@@ -94,7 +95,7 @@ export default class Goblin extends Enemy {
     });
   }
 
-  update(time) {
-    super.update(time);
+  update(time, delta) {
+    super.update(time, delta);
   }
 }

@@ -44,7 +44,7 @@ export default class Archer extends Enemy {
     this.scene.enemyProjectiles.add(projectile);
   }
 
-  update(time) {
-    super.update(time);
+  update(time, delta) {
+    super.update(time, delta);
   }
 }

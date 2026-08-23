@@ -38,7 +38,7 @@ const melee3 = {
     left: "survivor_attack_2_left",
     right: "survivor_attack_2_right",
   },
-  knockback: 200,
+  knockback: 100,
 };
 
 export const meleeCombo = [melee1, melee2, melee3];
