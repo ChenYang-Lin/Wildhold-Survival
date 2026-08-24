@@ -26,10 +26,21 @@ export default class PlayerCombatFSM {
     this.state = this.STATE_IDLE;
   }
 
-  enterAttack() {
+  enterAttack(input) {
     if (this.state === this.STATE_ATTACK) return;
 
-    if (!this.owner.attack.startBasicMelee()) {
+    let started;
+
+    const isSprintAttack = this.owner.movementFSM.sprintAttackWindow && input.moveVector.lengthSq() > 0;
+
+    if (isSprintAttack) {
+      started = this.owner.attack.startSprintAttack();
+      this.owner.movementFSM.resetSprintAttackWindow();
+    } else {
+      started = this.owner.attack.startBasicMelee();
+    }
+
+    if (!started) {
       return;
     }
 
@@ -41,7 +52,7 @@ export default class PlayerCombatFSM {
       return;
     }
 
-    this.enterAttack();
+    this.enterAttack(input);
   }
 
   updateAttack(input, delta) {

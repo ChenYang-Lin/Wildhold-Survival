@@ -42,3 +42,23 @@ const melee3 = {
 };
 
 export const meleeCombo = [melee1, melee2, melee3];
+
+export const sprintAttack = {
+  type: "sprint",
+  damageMultiplier: 1.5,
+  hitTimeRatio: 0.25,
+  hitboxDuration: 80,
+  knockback: 150,
+
+  lunge: {
+    speed: 300,
+    duration: 150,
+  },
+
+  animation: {
+    up: "survivor_sprint_attack_up",
+    down: "survivor_sprint_attack_down",
+    left: "survivor_sprint_attack_left",
+    right: "survivor_sprint_attack_right",
+  },
+};

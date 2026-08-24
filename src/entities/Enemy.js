@@ -138,8 +138,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (!this.active) return;
     if (this.aiState === this.STATE_DEAD) return;
 
-    console.log("KNOCKBACK APPLIED", "state =", this.aiState, "direction =", direction, "force =", force, "time =", this.scene.time.now);
-
     this.knockbackTimer = duration;
 
     switch (direction) {
@@ -169,7 +167,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateKnockback(delta) {
-    console.log("KNOCKBACK UPDATE", "timer =", this.knockbackTimer, "velocity =", this.body.velocity.x, this.body.velocity.y, "state =", this.aiState);
     this.setVelocity(this.knockbackVelocity.x, this.knockbackVelocity.y);
 
     this.knockbackTimer -= delta;
@@ -178,8 +175,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.knockbackTimer = 0;
       this.knockbackVelocity.set(0, 0);
       this.stopMoving();
-
-      console.log("KNOCKBACK END", "velocity =", this.body.velocity.x, this.body.velocity.y);
     }
   }
 

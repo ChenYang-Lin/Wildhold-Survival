@@ -15,6 +15,16 @@ export default class PlayerMovementFSM {
 
     this.dashTimer = 0;
     this.dashDirection = new Phaser.Math.Vector2(0, 0);
+
+    // Sprint
+    this.sprintAttackEligible = false;
+    this.sprintAttackGraceDuration = 500;
+    this.sprintAttackWindowTimer = 0;
+  }
+
+  resetSprintAttackWindow() {
+    this.sprintAttackWindowTimer = 0;
+    this.sprintAttackEligible = false;
   }
 
   enterIdle() {
@@ -31,6 +41,9 @@ export default class PlayerMovementFSM {
 
   enterSprint() {
     if (this.state === this.STATE_SPRINT) return;
+
+    this.sprintAttackEligible = true;
+    this.sprintAttackWindowTimer = this.sprintAttackGraceDuration;
 
     this.state = this.STATE_SPRINT;
   }
@@ -144,6 +157,15 @@ export default class PlayerMovementFSM {
   }
 
   update(input, delta) {
+    // Update sprint attack grace period
+    if (this.state !== this.STATE_SPRINT && this.sprintAttackEligible) {
+      this.sprintAttackWindowTimer -= delta;
+
+      if (this.sprintAttackWindowTimer <= 0) {
+        this.resetSprintAttackWindow();
+      }
+    }
+
     switch (this.state) {
       case this.STATE_IDLE:
         this.updateIdle(input, delta);

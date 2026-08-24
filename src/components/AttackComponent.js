@@ -1,4 +1,4 @@
-import { meleeCombo } from "../data/attacks.js";
+import { meleeCombo, sprintAttack } from "../data/attacks.js";
 
 export default class AttackComponent {
   constructor(owner) {
@@ -16,10 +16,21 @@ export default class AttackComponent {
     this.comboIndex = 0;
     this.comboQueued = false;
     this.comboWindowOpen = false;
+
+    // Sprint Attack
+    this.lungeTimer = 0;
+    this.lungeVelocity = new Phaser.Math.Vector2();
   }
 
   isAttacking() {
     return this.currentAttack !== null;
+  }
+
+  startSprintAttack() {
+    this.comboIndex = 0;
+    this.comboQueued = false;
+
+    return this.startAttack(sprintAttack);
   }
 
   startBasicMelee() {
@@ -39,6 +50,13 @@ export default class AttackComponent {
     if (this.currentAttack) return false;
 
     this.currentAttack = attack;
+
+    // Attack takes control of movement.
+    if (attack.lunge) {
+      this.startLunge(attack.lunge);
+    } else {
+      this.owner.movement.stop();
+    }
 
     // Start animation
     const attackSpeed = this.owner.stats.attackSpeed;
@@ -85,6 +103,13 @@ export default class AttackComponent {
       this.hitbox = null;
     }
 
+    // cancel lunge
+    this.lungeTimer = 0;
+    this.lungeVelocity.set(0, 0);
+
+    // Stop attack movement
+    this.owner.setVelocity(0, 0);
+
     // stop attack animation
     this.owner.anims.stop();
 
@@ -98,7 +123,7 @@ export default class AttackComponent {
   finishCurrentAttack() {
     this.owner.anims.timeScale = 1;
 
-    if (this.comboQueued && this.comboIndex < meleeCombo.length - 1) {
+    if (this.currentAttack.type === "melee" && this.comboQueued && this.comboIndex < meleeCombo.length - 1) {
       this.currentAttack = null;
       this.startNextComboAttack();
 
@@ -183,8 +208,6 @@ export default class AttackComponent {
 
       enemy.takeDamage(damage);
 
-      console.log("PLAYER HIT ENEMY", "attack =", attack, "enemy state =", enemy.aiState, "time =", this.owner.scene.time.now);
-
       // knockback
       if (attack.knockback) {
         enemy.applyKnockback(this.owner.movement.facing, attack.knockback);
@@ -223,8 +246,66 @@ export default class AttackComponent {
     });
   }
 
+  startLunge(lunge) {
+    console.log("start lunge");
+    const direction = this.owner.movement.facing;
+
+    let x = 0;
+    let y = 0;
+
+    switch (direction) {
+      case "up":
+        y = -1;
+        break;
+      case "down":
+        y = 1;
+        break;
+      case "left":
+        x = -1;
+        break;
+      case "right":
+        x = 1;
+        break;
+    }
+
+    this.lungeTimer = lunge.duration;
+    this.lungeVelocity.set(x * lunge.speed, y * lunge.speed);
+
+    this.owner.setVelocity(this.lungeVelocity.x, this.lungeVelocity.y);
+  }
+
+  updateLunge(delta) {
+    if (this.lungeTimer <= 0) return;
+
+    const body = this.owner.body;
+
+    // Stop only the axis that is blocked.
+    // Stop only the axis that is blocked.
+    if (body.blocked.left || body.blocked.right) {
+      this.lungeVelocity.x = 0;
+    }
+
+    if (body.blocked.up || body.blocked.down) {
+      this.lungeVelocity.y = 0;
+    }
+
+    this.owner.setVelocity(this.lungeVelocity.x, this.lungeVelocity.y);
+
+    this.lungeTimer -= delta;
+
+    if (this.lungeTimer <= 0) {
+      this.lungeTimer = 0;
+      this.lungeVelocity.set(0, 0);
+
+      this.owner.movement.stop();
+    }
+  }
+
   update(input, delta) {
     if (!this.currentAttack) return;
+
+    // Update lunge
+    this.updateLunge(delta);
 
     this.attackTimer -= delta;
 
