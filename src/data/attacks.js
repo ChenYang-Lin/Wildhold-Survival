@@ -51,7 +51,7 @@ export const sprintAttack = {
   knockback: 150,
 
   lunge: {
-    speed: 300,
+    speed: 200,
     duration: 150,
   },
 

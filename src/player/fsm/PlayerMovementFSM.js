@@ -27,6 +27,14 @@ export default class PlayerMovementFSM {
     this.sprintAttackEligible = false;
   }
 
+  cancelDash() {
+    if (this.state !== this.STATE_DASH) return;
+
+    this.dashTimer = 0;
+    this.owner.movement.stop();
+    this.enterIdle();
+  }
+
   enterIdle() {
     if (this.state === this.STATE_IDLE) return;
 

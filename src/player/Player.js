@@ -106,7 +106,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     if (this.movementFSM.state === this.movementFSM.STATE_DASH) {
-      this.movementFSM.update(input, delta);
+      this.combatFSM.update(input, delta);
+
+      if (this.combatFSM.locksMovement()) {
+        this.movementFSM.cancelDash();
+      } else {
+        this.movementFSM.update(input, delta);
+      }
     } else {
       this.combatFSM.update(input, delta);
 

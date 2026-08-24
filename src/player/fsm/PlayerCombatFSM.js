@@ -31,9 +31,11 @@ export default class PlayerCombatFSM {
 
     let started;
 
+    const isDashing = this.owner.movementFSM.state === this.owner.movementFSM.STATE_DASH;
+
     const isSprintAttack = this.owner.movementFSM.sprintAttackEligible && input.moveVector.lengthSq() > 0;
 
-    if (isSprintAttack) {
+    if (isDashing || isSprintAttack) {
       started = this.owner.attack.startSprintAttack();
       this.owner.movementFSM.resetSprintAttackWindow();
     } else {
