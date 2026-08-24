@@ -10,7 +10,7 @@ export default class PlayerMovementFSM {
     this.state = this.STATE_IDLE;
 
     // Dash
-    this.dashDuration = 150;
+    this.dashDuration = 250;
     this.dashSpeed = 400;
 
     this.dashTimer = 0;

@@ -38,6 +38,8 @@ export default class Archer extends Enemy {
   shootArrow(damage) {
     const target = this.ai.getAttackTarget();
 
+    if (!target) return;
+
     const angle = Phaser.Math.Angle.Between(this.body.center.x, this.body.center.y, target.body.center.x, target.body.center.y);
     const projectile = new EnemyProjectile(this.scene, this.body.center.x, this.body.center.y, angle, damage);
 

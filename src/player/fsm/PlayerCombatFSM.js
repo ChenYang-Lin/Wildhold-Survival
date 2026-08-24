@@ -31,7 +31,7 @@ export default class PlayerCombatFSM {
 
     let started;
 
-    const isSprintAttack = this.owner.movementFSM.sprintAttackWindow && input.moveVector.lengthSq() > 0;
+    const isSprintAttack = this.owner.movementFSM.sprintAttackEligible && input.moveVector.lengthSq() > 0;
 
     if (isSprintAttack) {
       started = this.owner.attack.startSprintAttack();

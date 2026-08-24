@@ -1,3 +1,4 @@
+import AnimationComponent from "../components/AnimationComponent.js";
 import AttackComponent from "../components/AttackComponent.js";
 import HealthComponent from "../components/HealthComponent.js";
 import MovementComponent from "../components/MovementComponent.js";
@@ -34,6 +35,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.movementFSM = new PlayerMovementFSM(this);
     this.combatFSM = new PlayerCombatFSM(this);
+    this.animation = new AnimationComponent(this);
   }
 
   static preload(scene) {
@@ -97,23 +99,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     const input = this.scene.inputController.state;
 
-    // Dash has highest priority
+    // Dash pressed => cancel attack and enter dash state in movementFSM.
     if (input.dashPressed && this.movementFSM.state !== this.movementFSM.STATE_DASH) {
       this.combatFSM.cancelAttack();
       this.movementFSM.enterDash(input);
     }
 
-    // Dash locks everything else. If currently dashing, ONLY update dash
     if (this.movementFSM.state === this.movementFSM.STATE_DASH) {
       this.movementFSM.update(input, delta);
-      return;
+    } else {
+      this.combatFSM.update(input, delta);
+
+      if (!this.combatFSM.locksMovement()) {
+        this.movementFSM.update(input, delta);
+      }
     }
 
-    // Otherwise combat has priority over normal movement
-    this.combatFSM.update(input, delta);
-
-    if (!this.combatFSM.locksMovement()) {
-      this.movementFSM.update(input, delta);
-    }
+    this.animation.update();
   }
 }
