@@ -1,5 +1,6 @@
 import InputState from "./InputState.js";
 import ActionButtonUI from "./../ui/ActionButtonUI.js";
+import MovementButtonUI from "../ui/MovementButtonUI.js";
 
 export default class InputController {
   constructor(scene) {
@@ -22,6 +23,7 @@ export default class InputController {
   setupMobile() {
     // Action button
     this.actionButtonUI = new ActionButtonUI(this.scene);
+    this.movementButtonUI = new MovementButtonUI(this.scene);
 
     // JOYSTICK --------------------------------------------------------------------------------------------------------------------
     this.joystickActive = false;
@@ -39,6 +41,7 @@ export default class InputController {
       .setScrollFactor(0)
       .setDepth(10000);
 
+    // Attack Button
     this.actionButtonUI.button.on("pointerdown", (pointer) => {
       console.log("BUTTON CLICKED");
 
@@ -50,6 +53,21 @@ export default class InputController {
     this.actionButtonUI.button.on("pointerup", () => {
       this.state.actionHeld = false;
       this.state.actionReleased = true;
+    });
+
+    // Dash/Sprint button
+    this.movementButtonUI.button.on("pointerdown", (pointer) => {
+      this.state.movementPointerId = pointer.id;
+
+      this.state.dashPressed = true;
+      this.state.sprintHeld = true;
+    });
+
+    this.movementButtonUI.button.on("pointerup", (pointer) => {
+      if (pointer.id !== this.state.movementPointerId) return;
+
+      this.state.sprintHeld = false;
+      this.state.movementPointerId = null;
     });
 
     // POINTER DOWN ON SCREEN
@@ -197,8 +215,11 @@ export default class InputController {
     this.joyBase.setPosition(120, h - 100);
     this.joyThumb.setPosition(120, h - 100);
 
-    this.actionButtonUI.button.setPosition(w - 100, h - 100);
-    this.actionButtonUI.text.setPosition(w - 100, h - 100);
+    this.actionButtonUI.button.setPosition(w - 200, h - 100);
+    this.actionButtonUI.text.setPosition(w - 200, h - 100);
+
+    this.movementButtonUI.button.setPosition(w - 100, h - 100);
+    this.movementButtonUI.text.setPosition(w - 100, h - 100);
 
     this.scene.hotbarUI?.resetUIPosition();
   }

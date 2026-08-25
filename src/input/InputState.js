@@ -26,5 +26,6 @@ export default class InputState {
     // Movement
     this.dashPressed = false;
     this.sprintHeld = false;
+    this.movementPointerId = null; // For mobile button
   }
 }
