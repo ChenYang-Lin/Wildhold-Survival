@@ -50,9 +50,12 @@ export default class InputController {
       this.state.actionHeld = true;
     });
 
-    this.actionButtonUI.button.on("pointerup", () => {
+    this.actionButtonUI.button.on("pointerup", (pointer) => {
+      if (pointer.id !== this.state.actionPointerId) return;
+
       this.state.actionHeld = false;
       this.state.actionReleased = true;
+      this.state.actionPointerId = null;
     });
 
     // Dash/Sprint button
