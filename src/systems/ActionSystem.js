@@ -7,14 +7,14 @@ export default class ActionSystem {
     this.inputController = inputController;
   }
 
-  handlePlaceable(item) {
+  handlePlaceable(itemId) {
     const state = this.inputController.state;
 
     const gridX = Math.floor(state.aimWorldX / 32);
     const gridY = Math.floor(state.aimWorldY / 32);
 
     // Check if there is enough resource for placing selected building (wall, tower, etc)
-    const recipe = BUILDINGS[item.id];
+    const recipe = BUILDINGS[itemId];
 
     if (!recipe) return;
 
@@ -67,27 +67,15 @@ export default class ActionSystem {
     // Handle action pressed
     if (state.actionPressed) {
       const itemId = this.scene.hotbarSystem.getSelectedItem();
-      const mode = this.scene.equipmentSystem.getMode();
+      const isNight = this.scene.dayNightSystem.isNight;
 
       if (!itemId) return;
 
-      if (mode === "combat") {
+      if (!isNight) {
+        this.handlePlaceable(itemId);
+      } else {
         // this.handleCombat(itemId);
       }
-
-      if (mode === "build") {
-        this.handlePlaceable({ id: itemId });
-        state.actionPressed = false;
-      }
-    }
-
-    // check toggler for Build mode and Combat mode
-    if (state.toggleBuildModePressed) {
-      state.toggleBuildModePressed = false;
-
-      this.scene.equipmentSystem.toggleMode();
-
-      console.log("Mode:", this.scene.equipmentSystem.getMode());
     }
 
     // check mouse wheel scroll for Build/Combat item select in hotbar

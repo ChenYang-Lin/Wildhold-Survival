@@ -9,14 +9,10 @@ export default class ActionButtonUI {
   }
 
   update() {
-    const mode = this.scene.equipmentSystem.getMode();
-
-    if (mode === "combat") {
+    if (this.scene.dayNightSystem.isNight) {
       this.button.setFillStyle(0xaa0000);
       this.text.setText("ATTACK");
-    }
-
-    if (mode === "build") {
+    } else {
       this.button.setFillStyle(0x00aa00);
       this.text.setText("BUILD");
     }

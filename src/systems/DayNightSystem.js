@@ -17,6 +17,7 @@ export default class DayNightSystem {
 
   startNight() {
     this.isNight = true;
+
     this.timer = this.nightDuration;
 
     this.scene.tweens.add({
@@ -44,6 +45,7 @@ export default class DayNightSystem {
 
   startDay() {
     this.isNight = false;
+
     this.day++;
     this.timer = this.dayDuration;
 

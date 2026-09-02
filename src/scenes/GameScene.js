@@ -224,10 +224,9 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Update Ghost preview for placeables (wall, etc)
-    const mode = this.equipmentSystem.getMode();
     const itemId = this.hotbarSystem.getSelectedItem();
 
-    if (mode === "build") {
+    if (!this.dayNightSystem.isNight) {
       this.ghostPreview.setBuilding(itemId);
     } else {
       this.ghostPreview.hide();

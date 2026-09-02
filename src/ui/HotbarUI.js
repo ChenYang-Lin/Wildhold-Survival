@@ -74,9 +74,7 @@ export default class HotbarUI {
   }
 
   update() {
-    const mode = this.scene.equipmentSystem.getMode();
-
-    if (mode === "combat") {
+    if (this.scene.dayNightSystem.isNight) {
       this.combatButton.fillColor = 0xff4444;
       this.buildButton.fillColor = 0x444444;
     } else {

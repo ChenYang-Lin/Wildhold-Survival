@@ -1,7 +1,9 @@
 export const BUILDINGS = {
   wall: {
     id: "wall",
+    name: "Wall",
     texture: "wall",
+    icon: "wallIcon",
 
     width: 1,
     height: 1,
@@ -22,6 +24,7 @@ export const BUILDINGS = {
 
   tower: {
     id: "tower",
+    name: "Tower",
     texture: "tower",
 
     width: 2,

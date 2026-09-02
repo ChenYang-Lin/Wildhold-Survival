@@ -2,14 +2,12 @@ export default class HotbarSystem {
   constructor(scene) {
     this.scene = scene;
 
-    this.combatIndex = 0;
+    this.weaponIndex = 0;
     this.buildIndex = 0;
   }
 
   getItems() {
-    const mode = this.scene.equipmentSystem.getMode();
-
-    if (mode === "combat") {
+    if (this.scene.dayNightSystem.isNight) {
       return this.scene.blueprintSystem ? this.scene.blueprintSystem.getUnlockedWeapons() : ["woodenSword"]; // prettier-ignore
       // return this.scene.blueprintSystem ? this.scene.blueprintSystem.getUnlockedWeapons() : ["woodenSword", "ironSword", "bow"]; // prettier-ignore
     }
@@ -17,16 +15,62 @@ export default class HotbarSystem {
     return this.scene.blueprintSystem ? this.scene.blueprintSystem.getUnlockedBuildings() : ["wall", "tower"]; // prettier-ignore
   }
 
-  getSelectedItem() {
+  getSelectedIndex() {
     const items = this.getItems();
 
-    if (items.length === 0) return null;
+    if (items.length === 0) return -1;
 
-    const mode = this.scene.equipmentSystem.getMode();
+    let index = this.scene.dayNightSystem.isNight ? this.weaponIndex : this.buildIndex;
 
-    const index = mode === "combat" ? this.combatIndex : this.buildIndex;
+    // Keep selection valid if the available items changed.
+    if (index >= items.length) {
+      index = 0;
 
-    return items[index];
+      if (this.scene.dayNightSystem.isNight) {
+        this.weaponIndex = index;
+      } else {
+        this.buildIndex = index;
+      }
+    }
+
+    return index;
+  }
+
+  getSelectedItem() {
+    const index = this.getSelectedIndex();
+
+    if (index === -1) return null;
+
+    return this.getItems()[index];
+  }
+
+  select(index) {
+    const items = this.getItems();
+
+    if (items.length === 0) return;
+
+    if (index < 0 || index >= items.length) return;
+
+    if (this.scene.dayNightSystem.isNight) {
+      this.weaponIndex = index;
+
+      const weaponId = items[index];
+      this.scene.equipmentSystem.equipWeapon(weaponId);
+    } else {
+      this.buildIndex = index;
+    }
+  }
+
+  selectItem(id) {
+    const items = this.getItems();
+
+    const index = items.indexOf(id);
+
+    if (index === -1) return false;
+
+    this.select(index);
+
+    return true;
   }
 
   next() {
@@ -34,13 +78,9 @@ export default class HotbarSystem {
 
     if (items.length === 0) return;
 
-    const mode = this.scene.equipmentSystem.getMode();
+    const index = this.scene.dayNightSystem.isNight ? (this.weaponIndex + 1) % items.length : (this.buildIndex + 1) % items.length;
 
-    if (mode === "combat") {
-      this.combatIndex = (this.combatIndex + 1) % items.length;
-    } else {
-      this.buildIndex = (this.buildIndex + 1) % items.length;
-    }
+    this.select(index);
   }
 
   previous() {
@@ -48,12 +88,10 @@ export default class HotbarSystem {
 
     if (items.length === 0) return;
 
-    const mode = this.scene.equipmentSystem.getMode();
+    const index = this.scene.dayNightSystem.isNight
+      ? (this.weaponIndex - 1 + items.length) % items.length
+      : (this.buildIndex - 1 + items.length) % items.length;
 
-    if (mode === "combat") {
-      this.combatIndex = (this.combatIndex - 1 + items.length) % items.length;
-    } else {
-      this.buildIndex = (this.buildIndex - 1 + items.length) % items.length;
-    }
+    this.select(index);
   }
 }
