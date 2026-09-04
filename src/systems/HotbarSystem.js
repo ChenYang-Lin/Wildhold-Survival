@@ -8,11 +8,10 @@ export default class HotbarSystem {
 
   getItems() {
     if (this.scene.dayNightSystem.isNight) {
-      return this.scene.blueprintSystem ? this.scene.blueprintSystem.getUnlockedWeapons() : ["woodenSword"]; // prettier-ignore
-      // return this.scene.blueprintSystem ? this.scene.blueprintSystem.getUnlockedWeapons() : ["woodenSword", "ironSword", "bow"]; // prettier-ignore
+      return ["woodenSword"];
     }
 
-    return this.scene.blueprintSystem ? this.scene.blueprintSystem.getUnlockedBuildings() : ["wall", "tower"]; // prettier-ignore
+    return ["wall", "tower"];
   }
 
   getSelectedIndex() {

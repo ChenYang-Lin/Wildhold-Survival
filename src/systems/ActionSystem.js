@@ -50,17 +50,6 @@ export default class ActionSystem {
     }
   }
 
-  handleCombat(itemId) {
-    switch (itemId) {
-      case "woodenSword":
-        this.player.attackMelee();
-        break;
-      case "bow":
-        console.log("shoot bow");
-        break;
-    }
-  }
-
   update() {
     const state = this.inputController.state;
 
@@ -73,8 +62,6 @@ export default class ActionSystem {
 
       if (!isNight) {
         this.handlePlaceable(itemId);
-      } else {
-        // this.handleCombat(itemId);
       }
     }
 

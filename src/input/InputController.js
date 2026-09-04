@@ -75,19 +75,15 @@ export default class InputController {
 
     // POINTER DOWN ON SCREEN
     this.scene.input.on("pointerdown", (pointer) => {
-      // Joystick - only left side starts joystick
+      if (this.isOverUI(pointer)) return;
+
+      // Joystick
       if (pointer.x < this.scene.scale.width * 0.4 && this.joyPointerId === null) {
         this.joyPointerId = pointer.id;
         this.joystickActive = true;
 
-        // Make the fixed position joystick to Floating joystick
-        // this.joyBase.setPosition(pointer.x, pointer.y);
-        // this.joyThumb.setPosition(pointer.x, pointer.y);
-
         this.state.moveVector.set(0, 0);
       }
-
-      if (this.isOverUI(pointer)) return;
 
       this.state.aimWorldX = pointer.worldX;
       this.state.aimWorldY = pointer.worldY;

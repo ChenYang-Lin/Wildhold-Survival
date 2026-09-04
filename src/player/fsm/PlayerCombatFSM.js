@@ -50,6 +50,10 @@ export default class PlayerCombatFSM {
   }
 
   updateIdle(input) {
+    if (!this.owner.scene.dayNightSystem.isNight) {
+      return;
+    }
+
     if (!input.actionPressed) {
       return;
     }

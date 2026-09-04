@@ -2,88 +2,214 @@ export default class HotbarUI {
   constructor(scene) {
     this.scene = scene;
 
-    this.container = this.scene.add.container(0, 0);
-    this.container.setScrollFactor(0);
-    this.container.setDepth(10000);
+    this.slotWidth = 60;
+    this.slotHeight = 60;
 
-    this.itemText = this.scene.add.text(445, this.scene.scale.height - 50, "", { fontSize: "24px", color: "#ffff00" }).setOrigin(0.5).setScrollFactor(0).setDepth(10000); // prettier-ignore
+    this.selectedSlotWidth = 100;
+    this.selectedSlotHeight = 90;
 
-    this.container.add(this.itemText);
+    this.slotSpacing = 8;
 
-    // Combat-Building Button
-    this.combatButton = this.scene.add.rectangle(390, this.scene.scale.height - 100, 100, 40, 0xaa3333).setInteractive().setScrollFactor(0).setDepth(10000); //prettier-ignore
-    this.combatText = this.scene.add.text(390, this.scene.scale.height - 100, "Combat", { fontSize: "18px", color: "#ffffff" }).setOrigin(0.5).setScrollFactor(0).setDepth(10000); // prettier-ignore
-    this.combatButton.isUI = true;
+    this.arrowWidth = 45;
+    this.arrowHeight = 45;
 
-    this.buildButton = this.scene.add.rectangle(500, this.scene.scale.height - 100, 100, 40, 0x33aa33).setInteractive().setScrollFactor(0).setDepth(10000); //prettier-ignore
-    this.buildText = this.scene.add.text(500, this.scene.scale.height - 100, "Build", { fontSize: "18px", color: "#ffffff" }).setOrigin(0.5).setScrollFactor(0).setDepth(10000); // prettier-ignore
-    this.buildButton.isUI = true;
+    this.slots = [];
 
-    // Left/Right buttons - for switch items
-    this.leftButton = this.scene.add.rectangle(320, this.scene.scale.height - 50, 50, 50, 0x444444).setInteractive().setScrollFactor(0).setDepth(10000); //prettier-ignore
-    this.leftButtonText = this.scene.add.text(320, this.scene.scale.height - 50, "<", { fontSize: "28px", color: "#ffffff" }).setOrigin(0.5).setScrollFactor(0).setDepth(10000); // prettier-ignore
+    // Left button
+    this.leftButton = this.scene.add.rectangle(0, 0, this.arrowWidth, this.arrowHeight, 0x444444).setScrollFactor(0).setDepth(10000).setInteractive({
+      useHandCursor: true,
+    });
+
     this.leftButton.isUI = true;
 
-    this.rightButton = this.scene.add.rectangle(570, this.scene.scale.height - 50, 50, 50, 0x444444).setInteractive().setScrollFactor(0).setDepth(10000); //prettier-ignore
-    this.rightButtonText = this.scene.add.text(570, this.scene.scale.height - 50, ">", { fontSize: "28px", color: "#ffffff" }).setOrigin(0.5).setScrollFactor(0).setDepth(10000); // prettier-ignore
+    this.leftButtonText = this.scene.add
+      .text(0, 0, "<", {
+        fontSize: "28px",
+        color: "#ffffff",
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(10001);
+
+    // Right button
+    this.rightButton = this.scene.add.rectangle(0, 0, this.arrowWidth, this.arrowHeight, 0x444444).setScrollFactor(0).setDepth(10000).setInteractive({
+      useHandCursor: true,
+    });
+
     this.rightButton.isUI = true;
 
-    this.combatButton.on("pointerdown", () => {
-      this.scene.equipmentSystem.setMode("combat");
-    });
+    this.rightButtonText = this.scene.add
+      .text(0, 0, ">", {
+        fontSize: "28px",
+        color: "#ffffff",
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(10001);
 
-    this.buildButton.on("pointerdown", () => {
-      this.scene.equipmentSystem.setMode("build");
-    });
-
+    // Previous item
     this.leftButton.on("pointerdown", () => {
+      console.log("LEFT BUTTON CLICKED");
+
       this.scene.hotbarSystem.previous();
+      this.update();
     });
 
+    // Next item
     this.rightButton.on("pointerdown", () => {
+      console.log("RIGHT BUTTON CLICKED");
+
       this.scene.hotbarSystem.next();
+      this.update();
+    });
+
+    this.leftButton.on("pointerover", () => {
+      console.log("LEFT BUTTON HOVER");
+    });
+
+    this.leftButton.on("pointerout", () => {
+      console.log("LEFT BUTTON OUT");
     });
 
     this.resetUIPosition();
   }
 
-  resetUIPosition() {
-    const w = Math.min(this.scene.scale.width, window.innerWidth);
+  createSlot(index) {
+    const background = this.scene.add
+      .rectangle(0, 0, this.slotWidth, this.slotHeight, 0x333333)
+      .setScrollFactor(0)
+      .setDepth(10000)
+      .setInteractive({ useHandCursor: true });
 
-    const h = Math.min(this.scene.scale.height, window.innerHeight);
+    background.isUI = true;
 
-    const bottomOffset = 30;
+    const nameText = this.scene.add
+      .text(0, 0, "", {
+        fontSize: "14px",
+        color: "#ffffff",
+        align: "center",
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(10001);
 
-    this.itemText.setPosition(w / 2, h - 30 - bottomOffset);
+    background.on("pointerdown", () => {
+      console.log("HOTBAR SLOT CLICKED:", index);
+      this.scene.hotbarSystem.select(index);
+      this.update();
+    });
 
-    this.combatButton.setPosition(w / 2 - 55, h - 80 - bottomOffset);
-
-    this.combatText.setPosition(w / 2 - 55, h - 80 - bottomOffset);
-
-    this.buildButton.setPosition(w / 2 + 55, h - 80 - bottomOffset);
-
-    this.buildText.setPosition(w / 2 + 55, h - 80 - bottomOffset);
-
-    this.leftButton.setPosition(w / 2 - 125, h - 30 - bottomOffset);
-
-    this.leftButtonText.setPosition(w / 2 - 125, h - 30 - bottomOffset);
-
-    this.rightButton.setPosition(w / 2 + 125, h - 30 - bottomOffset);
-
-    this.rightButtonText.setPosition(w / 2 + 125, h - 30 - bottomOffset);
+    return {
+      background,
+      nameText,
+    };
   }
 
   update() {
-    if (this.scene.dayNightSystem.isNight) {
-      this.combatButton.fillColor = 0xff4444;
-      this.buildButton.fillColor = 0x444444;
-    } else {
-      this.combatButton.fillColor = 0x444444;
-      this.buildButton.fillColor = 0x44ff44;
+    const items = this.scene.hotbarSystem.getItems();
+    const selectedIndex = this.scene.hotbarSystem.getSelectedIndex();
+
+    while (this.slots.length < items.length) {
+      this.slots.push(this.createSlot(this.slots.length));
     }
 
-    const selected = this.scene.hotbarSystem.getSelectedItem();
+    const centerX = this.getCenterX();
+    const y = this.getY();
 
-    this.itemText.setText(selected || "None");
+    // Calculate total width using each slot's current size
+    let totalWidth = 0;
+
+    for (let i = 0; i < items.length; i++) {
+      const isSelected = i === selectedIndex;
+
+      const width = isSelected ? this.selectedSlotWidth : this.slotWidth;
+
+      totalWidth += width;
+
+      if (i < items.length - 1) {
+        totalWidth += this.slotSpacing;
+      }
+    }
+
+    let currentX = centerX - totalWidth / 2;
+
+    for (let i = 0; i < this.slots.length; i++) {
+      const slot = this.slots[i];
+
+      if (i >= items.length) {
+        slot.background.setVisible(false);
+        slot.nameText.setVisible(false);
+        continue;
+      }
+
+      const isSelected = i === selectedIndex;
+
+      const width = isSelected ? this.selectedSlotWidth : this.slotWidth;
+
+      const height = isSelected ? this.selectedSlotHeight : this.slotHeight;
+
+      const x = currentX + width / 2;
+
+      slot.background.setPosition(x, y).setSize(width, height).setVisible(true);
+
+      slot.nameText
+        .setPosition(x, y - height / 2 + 12)
+        .setText(isSelected ? items[i] : "")
+        .setVisible(isSelected);
+
+      if (isSelected) {
+        slot.background.setFillStyle(0x555555);
+        slot.nameText.setColor("#ffffff");
+      } else {
+        slot.background.setFillStyle(0x333333);
+      }
+
+      currentX += width + this.slotSpacing;
+    }
+
+    this.resetUIPosition();
+  }
+
+  getCenterX() {
+    return this.scene.scale.width / 2;
+  }
+
+  getY() {
+    return this.scene.scale.height - 60;
+  }
+
+  getTotalSlotWidth(items) {
+    const selectedIndex = this.scene.hotbarSystem.getSelectedIndex();
+
+    let totalWidth = 0;
+
+    for (let i = 0; i < items.length; i++) {
+      totalWidth += i === selectedIndex ? this.selectedSlotWidth : this.slotWidth;
+
+      if (i < items.length - 1) {
+        totalWidth += this.slotSpacing;
+      }
+    }
+
+    return totalWidth;
+  }
+
+  resetUIPosition() {
+    const centerX = this.getCenterX();
+    const y = this.getY();
+
+    const items = this.scene.hotbarSystem.getItems();
+
+    const totalWidth = this.getTotalSlotWidth(items);
+
+    const leftX = centerX - totalWidth / 2 - this.arrowWidth / 2 - 10;
+
+    const rightX = centerX + totalWidth / 2 + this.arrowWidth / 2 + 10;
+
+    this.leftButton.setPosition(leftX, y);
+    this.leftButtonText.setPosition(leftX, y);
+
+    this.rightButton.setPosition(rightX, y);
+    this.rightButtonText.setPosition(rightX, y);
   }
 }
