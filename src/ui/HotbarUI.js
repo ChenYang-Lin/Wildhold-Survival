@@ -1,3 +1,6 @@
+import { BUILDINGS } from "../data/buildings.js";
+import { WEAPONS } from "../data/weapons.js";
+
 export default class HotbarUI {
   constructor(scene) {
     this.scene = scene;
@@ -85,9 +88,35 @@ export default class HotbarUI {
 
     const nameText = this.scene.add
       .text(0, 0, "", {
-        fontSize: "14px",
+        fontSize: "13px",
         color: "#ffffff",
         align: "center",
+        wordWrap: {
+          width: this.selectedSlotWidth - 12,
+        },
+        maxLines: 2,
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(10002);
+
+    const icon = this.scene.add.image(0, 0, "").setScrollFactor(0).setDepth(10001);
+
+    const costText = this.scene.add
+      .text(0, 0, "", {
+        fontFamily: "Arial",
+        fontSize: "11px",
+        fontStyle: "normal",
+        color: "#ffffff",
+        align: "center",
+        shadow: {
+          offsetX: 1,
+          offsetY: 1,
+          color: "#000000",
+          blur: 0,
+          stroke: true,
+          fill: true,
+        },
       })
       .setOrigin(0.5)
       .setScrollFactor(0)
@@ -102,6 +131,8 @@ export default class HotbarUI {
     return {
       background,
       nameText,
+      icon,
+      costText,
     };
   }
 
@@ -139,9 +170,10 @@ export default class HotbarUI {
       if (i >= items.length) {
         slot.background.setVisible(false);
         slot.nameText.setVisible(false);
+        slot.icon.setVisible(false);
+        slot.costText.setVisible(false);
         continue;
       }
-
       const isSelected = i === selectedIndex;
 
       const width = isSelected ? this.selectedSlotWidth : this.slotWidth;
@@ -152,16 +184,35 @@ export default class HotbarUI {
 
       slot.background.setPosition(x, y).setSize(width, height).setVisible(true);
 
+      const itemId = items[i];
+      const recipe = BUILDINGS[itemId];
+      const weaponIcon = WEAPONS[itemId];
+
+      // Slot content
+      const itemData = recipe || weaponIcon;
+
+      // Item name
       slot.nameText
         .setPosition(x, y - height / 2 + 12)
-        .setText(isSelected ? items[i] : "")
+        .setText(isSelected && itemData ? itemData.name : "")
         .setVisible(isSelected);
 
+      // Item Icon
+      this.setSlotIcon(slot, itemData, isSelected, x, y, width, height);
+
+      // Item cost
+      slot.costText
+        .setPosition(x, y + height / 2 - 17)
+        .setText(isSelected && recipe ? this.getCostText(recipe.cost) : "")
+        .setVisible(isSelected && !!recipe);
+
+      // Slot background
       if (isSelected) {
-        slot.background.setFillStyle(0x555555);
+        slot.background.setFillStyle(0x444444).setStrokeStyle(3, 0xf5c542);
+
         slot.nameText.setColor("#ffffff");
       } else {
-        slot.background.setFillStyle(0x333333);
+        slot.background.setFillStyle(0x333333).setStrokeStyle(1, 0x666666);
       }
 
       currentX += width + this.slotSpacing;
@@ -192,6 +243,27 @@ export default class HotbarUI {
     }
 
     return totalWidth;
+  }
+
+  getCostText(cost) {
+    return Object.entries(cost)
+      .map(([resource, amount]) => `${resource} x ${amount}`)
+      .join("\n");
+  }
+
+  setSlotIcon(slot, itemData, isSelected, x, y, width, height) {
+    if (!itemData) {
+      slot.icon.setVisible(false);
+      return;
+    }
+
+    const maxIconWidth = isSelected ? width - 20 : width - 12;
+
+    const maxIconHeight = isSelected ? height - 45 : height - 12;
+
+    const scale = Math.min(maxIconWidth / itemData.spriteWidth, maxIconHeight / itemData.spriteHeight);
+
+    slot.icon.setTexture(itemData.icon).setPosition(x, y).setScale(scale).setVisible(true);
   }
 
   resetUIPosition() {

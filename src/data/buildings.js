@@ -3,7 +3,7 @@ export const BUILDINGS = {
     id: "wall",
     name: "Wall",
     texture: "wall",
-    icon: "wallIcon",
+    icon: "wall",
 
     width: 1,
     height: 1,
@@ -26,6 +26,7 @@ export const BUILDINGS = {
     id: "tower",
     name: "Tower",
     texture: "tower",
+    icon: "tower",
 
     width: 2,
     height: 2,
@@ -40,7 +41,7 @@ export const BUILDINGS = {
     footprintOffsetY: 2,
 
     cost: {
-      wood: 10,
+      wood: 5,
     },
   },
 };
