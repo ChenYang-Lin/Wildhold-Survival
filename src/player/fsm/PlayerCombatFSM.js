@@ -1,3 +1,5 @@
+import { WEAPONS } from "../../data/weapons.js";
+
 export default class PlayerCombatFSM {
   constructor(owner) {
     this.owner = owner;
@@ -50,13 +52,11 @@ export default class PlayerCombatFSM {
   }
 
   updateIdle(input) {
-    if (!this.owner.scene.dayNightSystem.isNight) {
-      return;
-    }
+    if (!input.actionPressed) return;
 
-    if (!input.actionPressed) {
-      return;
-    }
+    const itemId = this.owner.scene.hotbarSystem.getSelectedItem();
+
+    if (!WEAPONS[itemId]) return;
 
     this.enterAttack(input);
   }

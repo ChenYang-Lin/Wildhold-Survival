@@ -1,17 +1,19 @@
+import { WEAPONS } from "../data/weapons.js";
+
 export default class HotbarSystem {
   constructor(scene) {
     this.scene = scene;
 
-    this.weaponIndex = 0;
-    this.buildIndex = 0;
+    this.dayIndex = 0;
+    this.nightIndex = 0;
   }
 
   getItems() {
     if (this.scene.dayNightSystem.isNight) {
-      return ["woodenSword"];
+      return ["woodenSword", "healthPotion"];
     }
 
-    return ["wall", "tower"];
+    return ["woodenSword", "wall", "tower"];
   }
 
   getSelectedIndex() {
@@ -19,16 +21,15 @@ export default class HotbarSystem {
 
     if (items.length === 0) return -1;
 
-    let index = this.scene.dayNightSystem.isNight ? this.weaponIndex : this.buildIndex;
+    let index = this.scene.dayNightSystem.isNight ? this.nightIndex : this.dayIndex;
 
-    // Keep selection valid if the available items changed.
     if (index >= items.length) {
       index = 0;
 
       if (this.scene.dayNightSystem.isNight) {
-        this.weaponIndex = index;
+        this.nightIndex = index;
       } else {
-        this.buildIndex = index;
+        this.dayIndex = index;
       }
     }
 
@@ -47,16 +48,18 @@ export default class HotbarSystem {
     const items = this.getItems();
 
     if (items.length === 0) return;
-
     if (index < 0 || index >= items.length) return;
 
     if (this.scene.dayNightSystem.isNight) {
-      this.weaponIndex = index;
-
-      const weaponId = items[index];
-      this.scene.equipmentSystem.equipWeapon(weaponId);
+      this.nightIndex = index;
     } else {
-      this.buildIndex = index;
+      this.dayIndex = index;
+    }
+
+    const itemId = items[index];
+
+    if (WEAPONS[itemId]) {
+      this.scene.equipmentSystem.equipWeapon(itemId);
     }
   }
 
@@ -77,7 +80,7 @@ export default class HotbarSystem {
 
     if (items.length === 0) return;
 
-    const index = this.scene.dayNightSystem.isNight ? (this.weaponIndex + 1) % items.length : (this.buildIndex + 1) % items.length;
+    const index = (this.getSelectedIndex() + 1) % items.length;
 
     this.select(index);
   }
@@ -87,9 +90,7 @@ export default class HotbarSystem {
 
     if (items.length === 0) return;
 
-    const index = this.scene.dayNightSystem.isNight
-      ? (this.weaponIndex - 1 + items.length) % items.length
-      : (this.buildIndex - 1 + items.length) % items.length;
+    const index = (this.getSelectedIndex() - 1 + items.length) % items.length;
 
     this.select(index);
   }

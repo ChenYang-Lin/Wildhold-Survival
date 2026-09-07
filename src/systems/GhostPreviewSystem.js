@@ -59,11 +59,7 @@ export default class GhostPreviewSystem {
     this.preview.setVisible(true);
     this.preview.setPosition(worldX, worldY);
 
-    const valid = this.scene.buildingManager.canPlace(
-      this.currentBuildingType,
-      gridX,
-      gridY,
-    );
+    const valid = this.scene.buildingManager.canPlace(this.currentBuildingType, gridX, gridY);
     if (valid) {
       this.preview.clearTint();
     } else {

@@ -53,19 +53,18 @@ export default class ActionSystem {
   update() {
     const state = this.inputController.state;
 
-    // Handle action pressed
     if (state.actionPressed) {
       const itemId = this.scene.hotbarSystem.getSelectedItem();
-      const isNight = this.scene.dayNightSystem.isNight;
 
       if (!itemId) return;
 
-      if (!isNight) {
+      if (BUILDINGS[itemId]) {
         this.handlePlaceable(itemId);
       }
+
+      // TODO: add potion handler
     }
 
-    // check mouse wheel scroll for Build/Combat item select in hotbar
     if (state.hotbarScroll > 0) {
       this.scene.hotbarSystem.next();
     }

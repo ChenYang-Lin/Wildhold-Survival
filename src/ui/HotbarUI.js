@@ -1,5 +1,6 @@
 import { BUILDINGS } from "../data/buildings.js";
 import { WEAPONS } from "../data/weapons.js";
+import { POTIONS } from "../data/potions.js";
 
 export default class HotbarUI {
   constructor(scene) {
@@ -185,11 +186,13 @@ export default class HotbarUI {
       slot.background.setPosition(x, y).setSize(width, height).setVisible(true);
 
       const itemId = items[i];
+
       const recipe = BUILDINGS[itemId];
-      const weaponIcon = WEAPONS[itemId];
+      const weapon = WEAPONS[itemId];
+      const potion = POTIONS[itemId];
 
       // Slot content
-      const itemData = recipe || weaponIcon;
+      const itemData = recipe || weapon || potion;
 
       // Item name
       slot.nameText

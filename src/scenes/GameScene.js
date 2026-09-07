@@ -41,6 +41,7 @@ import OverlayMessageUI from "../ui/OverlayMessageUI.js";
 // Factories
 import BuffFactory from "../factories/BuffFactory.js";
 import AuraFactory from "../factories/AuraFactory.js";
+import { BUILDINGS } from "../data/buildings.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -228,7 +229,7 @@ export default class GameScene extends Phaser.Scene {
     // Update Ghost preview for placeables (wall, etc)
     const itemId = this.hotbarSystem.getSelectedItem();
 
-    if (!this.dayNightSystem.isNight) {
+    if (BUILDINGS[itemId]) {
       this.ghostPreview.setBuilding(itemId);
     } else {
       this.ghostPreview.hide();
