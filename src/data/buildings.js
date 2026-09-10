@@ -42,6 +42,7 @@ export const BUILDINGS = {
 
     cost: {
       wood: 5,
+      stone: 3,
     },
   },
 };

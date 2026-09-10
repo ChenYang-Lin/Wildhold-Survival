@@ -1,6 +1,7 @@
 import { BUILDINGS } from "../data/buildings.js";
 import { WEAPONS } from "../data/weapons.js";
 import { POTIONS } from "../data/potions.js";
+import { RESOURCES } from "../data/resources.js";
 
 export default class HotbarUI {
   constructor(scene) {
@@ -10,7 +11,7 @@ export default class HotbarUI {
     this.slotHeight = 60;
 
     this.selectedSlotWidth = 100;
-    this.selectedSlotHeight = 90;
+    this.selectedSlotHeight = 100;
 
     this.slotSpacing = 8;
 
@@ -103,25 +104,7 @@ export default class HotbarUI {
 
     const icon = this.scene.add.image(0, 0, "").setScrollFactor(0).setDepth(10001);
 
-    const costText = this.scene.add
-      .text(0, 0, "", {
-        fontFamily: "Arial",
-        fontSize: "11px",
-        fontStyle: "normal",
-        color: "#ffffff",
-        align: "center",
-        shadow: {
-          offsetX: 1,
-          offsetY: 1,
-          color: "#000000",
-          blur: 0,
-          stroke: true,
-          fill: true,
-        },
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(10001);
+    const resourceCosts = [];
 
     background.on("pointerdown", () => {
       console.log("HOTBAR SLOT CLICKED:", index);
@@ -133,7 +116,7 @@ export default class HotbarUI {
       background,
       nameText,
       icon,
-      costText,
+      resourceCosts,
     };
   }
 
@@ -172,9 +155,15 @@ export default class HotbarUI {
         slot.background.setVisible(false);
         slot.nameText.setVisible(false);
         slot.icon.setVisible(false);
-        slot.costText.setVisible(false);
+
+        for (const entry of slot.resourceCosts) {
+          entry.icon.setVisible(false);
+          entry.text.setVisible(false);
+        }
+
         continue;
       }
+
       const isSelected = i === selectedIndex;
 
       const width = isSelected ? this.selectedSlotWidth : this.slotWidth;
@@ -204,10 +193,14 @@ export default class HotbarUI {
       this.setSlotIcon(slot, itemData, isSelected, x, y, width, height);
 
       // Item cost
-      slot.costText
-        .setPosition(x, y + height / 2 - 17)
-        .setText(isSelected && recipe ? this.getCostText(recipe.cost) : "")
-        .setVisible(isSelected && !!recipe);
+      if (isSelected && recipe) {
+        this.updateResourceCosts(slot, recipe.cost, x, y + height / 2 - 14);
+      } else {
+        for (const entry of slot.resourceCosts) {
+          entry.icon.setVisible(false);
+          entry.text.setVisible(false);
+        }
+      }
 
       // Slot background
       if (isSelected) {
@@ -224,12 +217,117 @@ export default class HotbarUI {
     this.resetUIPosition();
   }
 
+  updateResourceCosts(slot, cost, x, y) {
+    const resources = Object.entries(cost);
+
+    while (slot.resourceCosts.length < resources.length) {
+      slot.resourceCosts.push(this.createResourceCost());
+    }
+
+    const entries = [];
+
+    // Prepare visible resource entries
+    for (let i = 0; i < resources.length; i++) {
+      const [resourceId, requiredAmount] = resources[i];
+
+      const resourceData = RESOURCES[resourceId];
+
+      if (!resourceData) {
+        continue;
+      }
+
+      const inventoryItem = this.scene.inventorySystem.inventory.find((item) => item?.id === resourceId);
+
+      const currentAmount = inventoryItem?.amount ?? 0;
+
+      const text = `${requiredAmount}/${currentAmount}`;
+
+      const entry = slot.resourceCosts[i];
+
+      entry.icon.setTexture(resourceData.icon).setDisplaySize(16, 16);
+
+      const canAfford = currentAmount >= requiredAmount;
+
+      entry.text.setText(text).setColor(canAfford ? "#ffffff" : "#ff4444");
+
+      entries.push({
+        entry,
+        textWidth: entry.text.width,
+      });
+    }
+
+    // Hide unused entries
+    for (let i = resources.length; i < slot.resourceCosts.length; i++) {
+      slot.resourceCosts[i].icon.setVisible(false);
+      slot.resourceCosts[i].text.setVisible(false);
+    }
+
+    if (entries.length === 0) {
+      return;
+    }
+
+    // Layout settings
+    const iconSize = 16;
+    const iconTextGap = 4;
+    const entrySpacing = 12;
+
+    // Calculate total width of the entire resource group
+    let totalWidth = 0;
+
+    for (const item of entries) {
+      totalWidth += iconSize + iconTextGap + item.textWidth;
+    }
+
+    totalWidth += entrySpacing * (entries.length - 1);
+
+    // Start at the left edge of the centered group
+    let currentX = x - totalWidth / 2;
+
+    for (const item of entries) {
+      const { entry, textWidth } = item;
+
+      entry.icon.setPosition(currentX + iconSize / 2, y).setVisible(true);
+
+      entry.text.setPosition(currentX + iconSize + iconTextGap, y).setVisible(true);
+
+      currentX += iconSize + iconTextGap + textWidth + entrySpacing;
+    }
+  }
+
   getCenterX() {
     return this.scene.scale.width / 2;
   }
 
   getY() {
     return this.scene.scale.height - 60;
+  }
+
+  createResourceCost() {
+    const icon = this.scene.add.image(0, 0, "").setScrollFactor(0).setDepth(10002);
+
+    const text = this.scene.add
+      .text(0, 0, "", {
+        fontFamily: "Arial",
+        fontSize: "11px",
+        fontStyle: "normal",
+        color: "#ffffff",
+        shadow: {
+          offsetX: 1,
+          offsetY: 1,
+          color: "#000000",
+          blur: 0,
+          stroke: true,
+          fill: true,
+        },
+      })
+      .setOrigin(0, 0.5)
+      .setScrollFactor(0)
+      .setDepth(10002);
+
+    return {
+      icon,
+      text,
+    };
   }
 
   getTotalSlotWidth(items) {
@@ -248,12 +346,6 @@ export default class HotbarUI {
     return totalWidth;
   }
 
-  getCostText(cost) {
-    return Object.entries(cost)
-      .map(([resource, amount]) => `${resource} x ${amount}`)
-      .join("\n");
-  }
-
   setSlotIcon(slot, itemData, isSelected, x, y, width, height) {
     if (!itemData) {
       slot.icon.setVisible(false);
@@ -266,7 +358,9 @@ export default class HotbarUI {
 
     const scale = Math.min(maxIconWidth / itemData.spriteWidth, maxIconHeight / itemData.spriteHeight);
 
-    slot.icon.setTexture(itemData.icon).setPosition(x, y).setScale(scale).setVisible(true);
+    const iconY = y + 5;
+
+    slot.icon.setTexture(itemData.icon).setPosition(x, iconY).setScale(scale).setVisible(true);
   }
 
   resetUIPosition() {
