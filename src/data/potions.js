@@ -2,16 +2,26 @@ export const POTIONS = {
   healthPotion: {
     id: "healthPotion",
     name: "Health Potion",
-    icon: "woodenSwordIcon",
-    spriteWidth: 16,
-    spriteHeight: 16,
+    icon: "health_potion",
+    spriteWidth: 32,
+    spriteHeight: 32,
+
+    healAmount: 5,
+    cost: {
+      wood: 2,
+    },
   },
 
   staminaPotion: {
     id: "staminaPotion",
     name: "Stamina Potion",
-    icon: "staminaPotionIcon",
-    spriteWidth: 16,
-    spriteHeight: 16,
+    icon: "stamina_potion",
+    spriteWidth: 32,
+    spriteHeight: 32,
+
+    restoreAmount: 10,
+    cost: {
+      wood: 2,
+    },
   },
 };

@@ -1,4 +1,5 @@
 import { BUILDINGS } from "../data/buildings.js";
+import { POTIONS } from "../data/potions.js";
 
 export default class ActionSystem {
   constructor(scene, player, inputController) {
@@ -13,7 +14,6 @@ export default class ActionSystem {
     const gridX = Math.floor(state.aimWorldX / 32);
     const gridY = Math.floor(state.aimWorldY / 32);
 
-    // Check if there is enough resource for placing selected building (wall, tower, etc)
     const recipe = BUILDINGS[itemId];
 
     if (!recipe) return;
@@ -23,10 +23,27 @@ export default class ActionSystem {
       return;
     }
 
-    // Try to place building - if current spot is placeable; return boolean of success or fail place
-    const placed = this.scene.buildingManager.placeBuilding(recipe.id, gridX, gridY); // prettier-ignore
+    const placed = this.scene.buildingManager.placeBuilding(recipe.id, gridX, gridY);
+
     if (placed) {
       this.payCost(recipe);
+    }
+  }
+
+  handlePotion(itemId) {
+    const potion = POTIONS[itemId];
+
+    if (!potion) return;
+
+    if (!this.canAfford(potion)) {
+      console.log("Not enough resources");
+      return;
+    }
+
+    const used = this.applyPotion(potion);
+
+    if (used) {
+      this.payCost(potion);
     }
   }
 
@@ -50,6 +67,34 @@ export default class ActionSystem {
     }
   }
 
+  applyPotion(potion) {
+    if (potion.id === "healthPotion") {
+      if (this.player.health.isDead) {
+        return false;
+      }
+
+      if (this.player.health.hp >= this.player.health.maxHP) {
+        return false;
+      }
+
+      this.player.health.heal(potion.healAmount);
+
+      return true;
+    }
+
+    if (potion.id === "staminaPotion") {
+      if (this.player.stats.stamina >= this.player.stats.current.maxStamina) {
+        return false;
+      }
+
+      this.player.stats.recoverStamina(potion.restoreAmount);
+
+      return true;
+    }
+
+    return false;
+  }
+
   update() {
     const state = this.inputController.state;
 
@@ -60,9 +105,9 @@ export default class ActionSystem {
 
       if (BUILDINGS[itemId]) {
         this.handlePlaceable(itemId);
+      } else if (POTIONS[itemId]) {
+        this.handlePotion(itemId);
       }
-
-      // TODO: add potion handler
     }
 
     if (state.hotbarScroll > 0) {

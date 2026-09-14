@@ -63,6 +63,8 @@ export default class GameScene extends Phaser.Scene {
     this.load.image("wood", "assets/wood.png");
     this.load.image("rock", "assets/rock.png");
     this.load.image("stone", "assets/stone.png");
+    this.load.image("health_potion", "assets/potion_2.png");
+    this.load.image("stamina_potion", "assets/potion_3.png");
     this.load.image("woodenSwordIcon", "assets/weapon/woodenSword.png");
     this.load.image("ironSwordIcon", "assets/weapon/ironSword.png");
 

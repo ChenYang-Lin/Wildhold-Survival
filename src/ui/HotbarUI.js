@@ -176,12 +176,11 @@ export default class HotbarUI {
 
       const itemId = items[i];
 
-      const recipe = BUILDINGS[itemId];
+      const recipe = BUILDINGS[itemId] || POTIONS[itemId];
       const weapon = WEAPONS[itemId];
-      const potion = POTIONS[itemId];
 
       // Slot content
-      const itemData = recipe || weapon || potion;
+      const itemData = recipe || weapon;
 
       // Item name
       slot.nameText
@@ -194,7 +193,9 @@ export default class HotbarUI {
 
       // Item cost
       if (isSelected && recipe) {
-        this.updateResourceCosts(slot, recipe.cost, x, y + height / 2 - 14);
+        if (recipe?.cost) {
+          this.updateResourceCosts(slot, recipe.cost, x, y + height / 2 - 20);
+        }
       } else {
         for (const entry of slot.resourceCosts) {
           entry.icon.setVisible(false);
