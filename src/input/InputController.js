@@ -1,5 +1,6 @@
 import InputState from "./InputState.js";
 import ActionButtonUI from "./../ui/ActionButtonUI.js";
+import AttackButtonUI from "./../ui/AttackButtonUI.js";
 import MovementButtonUI from "../ui/MovementButtonUI.js";
 
 export default class InputController {
@@ -23,7 +24,9 @@ export default class InputController {
   setupMobile() {
     // Action button
     this.actionButtonUI = new ActionButtonUI(this.scene);
+    this.attackButtonUI = new AttackButtonUI(this.scene);
     this.movementButtonUI = new MovementButtonUI(this.scene);
+    this.setupActionButtonInput();
 
     // JOYSTICK --------------------------------------------------------------------------------------------------------------------
     this.joystickActive = false;
@@ -42,20 +45,18 @@ export default class InputController {
       .setDepth(10000);
 
     // Attack Button
-    this.actionButtonUI.button.on("pointerdown", (pointer) => {
-      console.log("BUTTON CLICKED");
-
-      this.state.actionPointerId = pointer.id;
-      this.state.actionPressed = true;
-      this.state.actionHeld = true;
+    this.attackButtonUI.button.on("pointerdown", (pointer) => {
+      this.state.attackPointerId = pointer.id;
+      this.state.attackPressed = true;
+      this.state.attackHeld = true;
     });
 
-    this.actionButtonUI.button.on("pointerup", (pointer) => {
-      if (pointer.id !== this.state.actionPointerId) return;
+    this.attackButtonUI.button.on("pointerup", (pointer) => {
+      if (pointer.id !== this.state.attackPointerId) return;
 
-      this.state.actionHeld = false;
-      this.state.actionReleased = true;
-      this.state.actionPointerId = null;
+      this.state.attackHeld = false;
+      this.state.attackReleased = true;
+      this.state.attackPointerId = null;
     });
 
     // Dash/Sprint button
@@ -145,12 +146,17 @@ export default class InputController {
   setupPC() {
     this.scene.input.mouse.disableContextMenu();
 
+    this.actionButtonUI = new ActionButtonUI(this.scene);
+    this.setupActionButtonInput();
+
     this.keys = this.scene.input.keyboard.addKeys({
       up: "W",
       down: "S",
       left: "A",
       right: "D",
     });
+
+    this.actionKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
     // restart button
     this.restartKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -161,14 +167,27 @@ export default class InputController {
       this.state.aimWorldY = pointer.worldY;
     });
 
-    // click = action
+    // Action key "E" listener
+    this.scene.input.keyboard.on("keydown-E", (event) => {
+      if (event.repeat) return;
+
+      this.state.actionPressed = true;
+      this.state.actionHeld = true;
+    });
+
+    this.scene.input.keyboard.on("keyup-E", () => {
+      this.state.actionHeld = false;
+      this.state.actionReleased = true;
+    });
+
+    // click = attack button pressed
     this.scene.input.on("pointerdown", (pointer) => {
       if (this.isOverUI(pointer)) return;
 
       if (pointer.button === 0) {
         // Left click = attack
-        this.state.actionPressed = true;
-        this.state.actionHeld = true;
+        this.state.attackPressed = true;
+        this.state.attackHeld = true;
       }
 
       if (pointer.button === 2) {
@@ -181,8 +200,8 @@ export default class InputController {
     // pointer released
     this.scene.input.on("pointerup", (pointer) => {
       if (pointer.button === 0) {
-        this.state.actionHeld = false;
-        this.state.actionReleased = true;
+        this.state.attackHeld = false;
+        this.state.attackReleased = true;
       }
 
       if (pointer.button === 2) {
@@ -201,6 +220,22 @@ export default class InputController {
     });
   }
 
+  setupActionButtonInput() {
+    this.actionButtonUI.button.on("pointerdown", (pointer) => {
+      this.state.actionPointerId = pointer.id;
+      this.state.actionPressed = true;
+      this.state.actionHeld = true;
+    });
+
+    this.actionButtonUI.button.on("pointerup", (pointer) => {
+      if (pointer.id !== this.state.actionPointerId) return;
+
+      this.state.actionHeld = false;
+      this.state.actionReleased = true;
+      this.state.actionPointerId = null;
+    });
+  }
+
   isOverUI(pointer) {
     const objects = this.scene.input.manager.hitTest(pointer, this.scene.input._list, this.scene.cameras.main);
 
@@ -209,49 +244,68 @@ export default class InputController {
 
   resetUIPosition() {
     const w = this.scene.scale.width;
-    const h = Math.min(this.scene.scale.height, window.innerHeight); // mobile screen shows windows.innerHeight is bigger than scene.scale.height
+    const h = Math.min(this.scene.scale.height, window.innerHeight);
 
-    this.joyBase.setPosition(120, h - 100);
-    this.joyThumb.setPosition(120, h - 100);
+    // Joystick
+    this.joyBase?.setPosition(120, h - 100);
+    this.joyThumb?.setPosition(120, h - 100);
 
-    this.actionButtonUI.button.setPosition(w - 200, h - 100);
-    this.actionButtonUI.text.setPosition(w - 200, h - 100);
-
-    this.movementButtonUI.button.setPosition(w - 100, h - 100);
-    this.movementButtonUI.text.setPosition(w - 100, h - 100);
-
+    // Hotbar
     this.scene.hotbarUI?.resetUIPosition();
+
+    // Player health
+    this.scene.healthUI?.resetUIPosition();
+
+    // Action
+    this.actionButtonUI?.resetUIPosition();
+
+    // Attack button - mobile only
+    if (this.attackButtonUI) {
+      this.attackButtonUI.button.setPosition(w - 150, h - 110);
+      this.attackButtonUI.text.setPosition(w - 150, h - 110);
+    }
+
+    // Dash button - mobile only
+    if (this.movementButtonUI) {
+      this.movementButtonUI.button.setPosition(w - 75, h - 45);
+      this.movementButtonUI.text.setPosition(w - 75, h - 45);
+    }
   }
 
   endFrame() {
     this.state.dashPressed = false;
+
     this.state.actionPressed = false;
     this.state.actionReleased = false;
+
+    this.state.attackPressed = false;
+    this.state.attackReleased = false;
+
     this.state.toggleBuildModePressed = false;
     this.state.hotbarScroll = 0;
   }
 
   update() {
-    // console.log("dashPressed:", this.state.dashPressed, "sprintHeld:", this.state.sprintHeld);
     if (!this.state.isMobile) {
       this.state.moveVector.set(0, 0);
 
-      // Keyboard Movement (arrow keys)
+      // Keyboard Movement
       if (this.cursors.left.isDown) this.state.moveVector.x = -1;
       if (this.cursors.right.isDown) this.state.moveVector.x = 1;
       if (this.cursors.up.isDown) this.state.moveVector.y = -1;
       if (this.cursors.down.isDown) this.state.moveVector.y = 1;
 
-      // Keyboard Movement (WASD)
+      // WASD
       if (this.keys.left.isDown) this.state.moveVector.x = -1;
       if (this.keys.right.isDown) this.state.moveVector.x = 1;
       if (this.keys.up.isDown) this.state.moveVector.y = -1;
       if (this.keys.down.isDown) this.state.moveVector.y = 1;
-    } else {
-      this.actionButtonUI.update();
     }
 
-    // Restart game
+    // Action button exists on both platforms
+    this.actionButtonUI?.update();
+
+    // Restart
     if (this.restartKey && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
       this.scene.scene.restart();
     }

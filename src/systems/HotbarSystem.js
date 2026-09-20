@@ -1,5 +1,3 @@
-import { WEAPONS } from "../data/weapons.js";
-
 export default class HotbarSystem {
   constructor(scene) {
     this.scene = scene;
@@ -10,10 +8,10 @@ export default class HotbarSystem {
 
   getItems() {
     if (this.scene.dayNightSystem.isNight) {
-      return ["woodenSword", "healthPotion"];
+      return ["healthPotion", "staminaPotion"];
     }
 
-    return ["woodenSword", "wall", "tower"];
+    return ["wall", "tower"];
   }
 
   getSelectedIndex() {
@@ -54,12 +52,6 @@ export default class HotbarSystem {
       this.nightIndex = index;
     } else {
       this.dayIndex = index;
-    }
-
-    const itemId = items[index];
-
-    if (WEAPONS[itemId]) {
-      this.scene.equipmentSystem.equipWeapon(itemId);
     }
   }
 

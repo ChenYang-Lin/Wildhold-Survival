@@ -2,53 +2,51 @@ export default class HealthUI {
   constructor(scene) {
     this.scene = scene;
 
-    this.playerText = scene.add.text(16, 16, "", { fontSize: "18px", color: "#ffffff" }).setScrollFactor(0); // prettier-ignore
-    this.campfireText = scene.add.text(16, 40, "", { fontSize: "18px", color: "#ffffff" }).setScrollFactor(0); // prettier-ignore
+    this.barWidth = 180;
+    this.barHeight = 18;
 
-    this.uiContainer = this.scene.add.container(0, 0);
-    this.uiContainer.setDepth(10000);
+    this.background = scene.add.rectangle(0, 0, this.barWidth, this.barHeight, 0x222222).setScrollFactor(0).setDepth(10000);
 
-    this.graphics = scene.add.graphics().setScrollFactor(0).setDepth(10000);
+    this.fill = scene.add.rectangle(0, 0, this.barWidth, this.barHeight, 0x44cc44).setOrigin(0, 0.5).setScrollFactor(0).setDepth(10001);
 
-    this.uiContainer.add(this.playerText);
-    this.uiContainer.add(this.campfireText);
+    this.text = scene.add
+      .text(0, 0, "", {
+        fontSize: "14px",
+        color: "#ffffff",
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(10002);
+
+    this.resetUIPosition();
   }
 
   update() {
     const player = this.scene.player;
-    const campfire = this.scene.campfire;
 
-    if (player.health.hp <= player.health.maxHP * 0.3) {
-      this.playerText.setColor("#ff4444");
+    const percent = Phaser.Math.Clamp(player.health.hp / player.health.maxHP, 0, 1);
+
+    this.fill.setSize(this.barWidth * percent, this.barHeight);
+
+    this.text.setText(`HP ${player.health.hp}/${player.health.maxHP}`);
+
+    if (percent <= 0.3) {
+      this.fill.setFillStyle(0xff4444);
     } else {
-      this.playerText.setColor("#ffffff");
+      this.fill.setFillStyle(0x44cc44);
     }
 
-    if (campfire.hp <= campfire.maxHP * 0.3) {
-      this.campfireText.setColor("#ff4444");
-    } else {
-      this.campfireText.setColor("#ffffff");
-    }
+    this.resetUIPosition();
+  }
 
-    this.playerText.setText(`Player HP: ${player.health.hp}/${player.health.maxHP}`);
-    this.campfireText.setText(`Campfire HP: ${campfire.hp}/${campfire.maxHP}`);
+  resetUIPosition() {
+    const centerX = this.scene.scale.width / 2;
+    const y = this.scene.scale.height - 25;
 
-    this.graphics.clear();
+    this.background.setPosition(centerX, y);
 
-    const playerPercent = Phaser.Math.Clamp(player.health.hp / player.health.maxHP, 0, 1);
+    this.fill.setPosition(centerX - this.barWidth / 2, y);
 
-    this.graphics.fillStyle(0x222222);
-    this.graphics.fillRect(16, 70, 150, 16);
-
-    this.graphics.fillStyle(0x00ff00);
-    this.graphics.fillRect(16, 70, 150 * playerPercent, 16);
-
-    const campfirePercent = Phaser.Math.Clamp(campfire.hp / campfire.maxHP, 0, 1); // prettier-ignore
-
-    this.graphics.fillStyle(0x222222);
-    this.graphics.fillRect(16, 100, 150, 16);
-
-    this.graphics.fillStyle(0xffaa00);
-    this.graphics.fillRect(16, 100, 150 * campfirePercent, 16);
+    this.text.setPosition(centerX, y);
   }
 }

@@ -144,6 +144,8 @@ export default class GameScene extends Phaser.Scene {
     this.hotbarUI = new HotbarUI(this);
     this.gameOverUI = new GameOverUI(this);
     this.overlayMessageUI = new OverlayMessageUI(this);
+
+    this.inputController.resetUIPosition();
   }
 
   createData() {

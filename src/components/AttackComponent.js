@@ -318,7 +318,7 @@ export default class AttackComponent {
       this.comboWindowOpen = true;
     }
 
-    if (this.comboWindowOpen && input.actionPressed) {
+    if (this.comboWindowOpen && input.attackReleased) {
       this.comboQueued = true;
     }
 

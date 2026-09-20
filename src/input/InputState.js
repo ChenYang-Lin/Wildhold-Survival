@@ -7,6 +7,12 @@ export default class InputState {
     this.aimWorldX = 0;
     this.aimWorldY = 0;
 
+    // attack
+    this.attackPointerId = null;
+    this.attackPressed = false;
+    this.attackHeld = false;
+    this.attackReleased = false;
+
     // actions
     this.actionPointerId = null;
     this.actionHeld = false;
