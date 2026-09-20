@@ -140,8 +140,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createUI() {
-    this.healthUI = new HealthUI(this);
     this.hotbarUI = new HotbarUI(this);
+    this.healthUI = new HealthUI(this);
     this.gameOverUI = new GameOverUI(this);
     this.overlayMessageUI = new OverlayMessageUI(this);
 
