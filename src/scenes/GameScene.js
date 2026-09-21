@@ -42,6 +42,7 @@ import OverlayMessageUI from "../ui/OverlayMessageUI.js";
 import BuffFactory from "../factories/BuffFactory.js";
 import AuraFactory from "../factories/AuraFactory.js";
 import { BUILDINGS } from "../data/buildings.js";
+import StaminaUI from "../ui/StaminaUI.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -142,6 +143,8 @@ export default class GameScene extends Phaser.Scene {
   createUI() {
     this.hotbarUI = new HotbarUI(this);
     this.healthUI = new HealthUI(this);
+    this.staminaUI = new StaminaUI(this);
+
     this.gameOverUI = new GameOverUI(this);
     this.overlayMessageUI = new OverlayMessageUI(this);
 
@@ -208,8 +211,11 @@ export default class GameScene extends Phaser.Scene {
     this.player.update(delta);
     this.ghostPreview.update();
     this.combatSystem.update(time, delta);
+
     this.healthUI.update();
     this.hotbarUI.update();
+    this.staminaUI.update();
+
     this.dayNightSystem.update(delta);
     this.campfire.update();
 
