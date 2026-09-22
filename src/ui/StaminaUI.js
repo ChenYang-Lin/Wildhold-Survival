@@ -4,37 +4,24 @@ export default class StaminaUI {
 
     const isMobile = scene.sys.game.device.input.touch;
 
-    this.barWidth = isMobile ? 46 : 56;
-    this.barHeight = isMobile ? 5 : 6;
+    this.radius = isMobile ? 24 : 28;
+    this.arcWidth = isMobile ? 5 : 6;
 
-    this.offsetY = isMobile ? 28 : 32;
+    this.offsetX = isMobile ? 18 : 22;
+    this.offsetY = isMobile ? -8 : -10;
 
-    // --------------------------------------------------
-    // SHADOW
-    // --------------------------------------------------
+    this.backgroundColor = 0x24292e;
+    this.fillColor = 0xf2c230;
 
-    this.shadow = scene.add
-      .rectangle(0, 2, this.barWidth + 4, this.barHeight + 4, 0x000000, 0.45)
-      .setOrigin(0.5)
-      .setDepth(9997);
+    // Top → bottom
+    this.startAngle = Phaser.Math.DegToRad(70);
+    this.endAngle = Phaser.Math.DegToRad(-70);
 
-    // --------------------------------------------------
-    // BACKGROUND
-    // --------------------------------------------------
+    this.background = scene.add.graphics();
+    this.fill = scene.add.graphics();
 
-    this.background = scene.add.rectangle(0, 0, this.barWidth, this.barHeight, 0x24292e, 0.95).setOrigin(0.5).setStrokeStyle(1, 0x343a42, 0.9).setDepth(9998);
-
-    // --------------------------------------------------
-    // FILL
-    // --------------------------------------------------
-
-    this.fill = scene.add.rectangle(0, 0, this.barWidth, this.barHeight, 0xd9b63f, 1).setOrigin(0, 0.5).setDepth(9999);
-
-    // --------------------------------------------------
-    // HIGHLIGHT
-    // --------------------------------------------------
-
-    this.highlight = scene.add.rectangle(0, -1, this.barWidth, 1, 0xffffff, 0.15).setOrigin(0, 0.5).setDepth(10000);
+    this.background.setDepth(9997);
+    this.fill.setDepth(9998);
 
     this.visible = false;
 
@@ -44,13 +31,13 @@ export default class StaminaUI {
   update() {
     const player = this.scene.player;
 
-    if (!player || !player.stats) {
+    if (!player || !player.stats || !player.body) {
       return;
     }
 
     const percent = Phaser.Math.Clamp(player.stats.staminaPercent, 0, 1);
 
-    // Hide when completely full.
+    // Hide stamina bar when completely full.
     if (percent >= 1) {
       this.setVisible(false);
       return;
@@ -58,36 +45,72 @@ export default class StaminaUI {
 
     this.setVisible(true);
 
-    this.fill.setSize(this.barWidth * percent, this.barHeight);
+    const x = player.body.right + this.offsetX;
+    const y = player.body.center.y + this.offsetY;
 
-    this.resetUIPosition();
+    this.background.setPosition(x, y);
+    this.fill.setPosition(x, y);
+
+    this.draw(percent);
+  }
+
+  draw(percent) {
+    const drawArc = (graphics, startAngle, endAngle, color, alpha) => {
+      graphics.clear();
+
+      graphics.lineStyle(this.arcWidth, color, alpha);
+
+      const steps = 64;
+
+      const startX = Math.cos(startAngle) * this.radius;
+
+      const startY = Math.sin(startAngle) * this.radius;
+
+      graphics.beginPath();
+      graphics.moveTo(startX, startY);
+
+      for (let i = 1; i <= steps; i++) {
+        const t = i / steps;
+
+        const angle = startAngle + (endAngle - startAngle) * t;
+
+        const x = Math.cos(angle) * this.radius;
+
+        const y = Math.sin(angle) * this.radius;
+
+        graphics.lineTo(x, y);
+      }
+
+      graphics.strokePath();
+    };
+
+    // Background
+    drawArc(this.background, this.startAngle, this.endAngle, this.backgroundColor, 0.85);
+
+    // Stamina fill
+    if (percent > 0) {
+      const currentAngle = this.startAngle + (this.endAngle - this.startAngle) * percent;
+
+      drawArc(this.fill, this.startAngle, currentAngle, this.fillColor, 1);
+    } else {
+      this.fill.clear();
+    }
   }
 
   setVisible(visible) {
     this.visible = visible;
 
-    this.shadow.setVisible(visible);
     this.background.setVisible(visible);
     this.fill.setVisible(visible);
-    this.highlight.setVisible(visible);
   }
 
   resetUIPosition() {
-    const player = this.scene.player;
+    // Not needed because this is world-space UI
+    // and follows the player every frame.
+  }
 
-    if (!player || !player.body) {
-      return;
-    }
-
-    const x = player.body.center.x;
-    const y = player.body.top - this.offsetY;
-
-    this.shadow.setPosition(x, y + 2);
-
-    this.background.setPosition(x, y);
-
-    this.fill.setPosition(x - this.barWidth / 2, y);
-
-    this.highlight.setPosition(x - this.barWidth / 2, y - this.barHeight / 2 + 1);
+  destroy() {
+    this.background.destroy();
+    this.fill.destroy();
   }
 }
