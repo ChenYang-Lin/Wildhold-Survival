@@ -12,6 +12,7 @@ export default class PlayerMovementFSM {
     // Dash
     this.dashDuration = 250;
     this.dashSpeed = 400;
+    this.dashStaminaCost = 10;
 
     this.dashTimer = 0;
     this.dashDirection = new Phaser.Math.Vector2(0, 0);
@@ -57,10 +58,17 @@ export default class PlayerMovementFSM {
   }
 
   enterDash(input) {
-    if (this.state === this.STATE_DASH) return;
+    if (this.state === this.STATE_DASH) return false;
+
+    // Not enough stamina.
+    if (!this.owner.stats.hasStamina(this.dashStaminaCost)) {
+      return false;
+    }
+
+    // Consume stamina for the dash.
+    this.owner.stats.consumeStamina(this.dashStaminaCost);
 
     this.state = this.STATE_DASH;
-
     this.dashTimer = this.dashDuration;
 
     const move = input.moveVector.clone();
@@ -87,9 +95,11 @@ export default class PlayerMovementFSM {
           break;
       }
     }
+
+    return true;
   }
 
-  updateWalk(input, delta) {
+  updateWalk(input) {
     if (input.moveVector.lengthSq() === 0) {
       this.enterIdle();
       return;
@@ -101,8 +111,6 @@ export default class PlayerMovementFSM {
     }
 
     this.owner.movement.update(input.moveVector, this.owner.stats.speed);
-
-    this.owner.stats.updateStaminaRegen(delta);
   }
 
   updateSprint(input, delta) {
@@ -122,10 +130,9 @@ export default class PlayerMovementFSM {
     this.owner.stats.consumeStamina(this.owner.stats.staminaDrainRate * (delta / 1000));
   }
 
-  updateIdle(input, delta) {
+  updateIdle(input) {
     if (input.moveVector.lengthSq() === 0) {
       this.owner.movement.stop();
-      this.owner.stats.updateStaminaRegen(delta);
       return;
     }
 

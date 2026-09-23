@@ -99,10 +99,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     const input = this.scene.inputController.state;
 
-    // Dash pressed => cancel attack and enter dash state in movementFSM.
+    // Stamina regeneration is independent of movement/combat state.
+    this.stats.updateStaminaRegen(delta);
+
+    // Dash pressed => cancel attack and enter dash state.
     if (input.dashPressed && this.movementFSM.state !== this.movementFSM.STATE_DASH) {
-      this.combatFSM.cancelAttack();
-      this.movementFSM.enterDash(input);
+      const dashed = this.movementFSM.enterDash(input);
+
+      if (dashed) {
+        this.combatFSM.cancelAttack();
+      }
     }
 
     if (this.movementFSM.state === this.movementFSM.STATE_DASH) {
