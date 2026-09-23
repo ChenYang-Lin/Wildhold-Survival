@@ -16,7 +16,7 @@ export default class HealthUI {
     // SIZE
     // --------------------------------------------------
 
-    this.barWidth = this.config.panelWidth;
+    this.barWidth = this.config.healthWidth;
     this.barHeight = this.config.healthHeight;
 
     // --------------------------------------------------
