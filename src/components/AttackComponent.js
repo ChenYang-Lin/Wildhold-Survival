@@ -209,7 +209,7 @@ export default class AttackComponent {
       enemy.takeDamage(damage);
 
       if (attack.flinch) {
-        enemy.enterFlinch(attack.flinch.duration);
+        enemy.enterFlinch(attack.flinch.duration, this.owner.movement.facing, attack.flinch.force);
       }
     });
 

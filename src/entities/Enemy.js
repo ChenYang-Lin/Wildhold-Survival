@@ -240,22 +240,47 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.anims.play(`${this.type}_attack_${this.facing}`);
   }
 
-  enterFlinch(duration = 200) {
+  enterFlinch(duration = 200, direction = null, force = 140) {
     if (!this.active) return;
     if (this.aiState === this.STATE_DEAD) return;
 
     this.aiState = this.STATE_FLINCH;
-
     this.flinchTimer = duration;
 
-    // Interrupt current combat action.
     this.combat.cancelAttack?.();
-    this.cancelSpecialAction?.(); // for GoblinShaman
+    this.cancelSpecialAction?.();
 
-    // Stop movement.
-    this.stopMoving();
+    if (direction) {
+      let x = 0;
+      let y = 0;
 
-    // Play idle animation for now.
+      switch (direction) {
+        case "up":
+          y = -1;
+          break;
+        case "down":
+          y = 1;
+          break;
+        case "left":
+          x = -1;
+          break;
+        case "right":
+          x = 1;
+          break;
+      }
+
+      this.setVelocity(x * force, y * force);
+    }
+
+    this.setTintFill(0xffffff);
+
+    this.scene.time.delayedCall(60, () => {
+      if (!this.active) return;
+      if (this.aiState === this.STATE_DEAD) return;
+
+      this.clearTint();
+    });
+
     this.anims.play(`${this.type}_idle_${this.facing}`);
   }
 
@@ -318,13 +343,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   updateFlinch(delta) {
-    this.stopMoving();
-
     this.flinchTimer -= delta;
+
+    const decay = 0.92;
+
+    this.setVelocity(this.body.velocity.x * decay, this.body.velocity.y * decay);
 
     if (this.flinchTimer <= 0) {
       this.flinchTimer = 0;
 
+      this.stopMoving();
       this.enterIdle();
     }
   }

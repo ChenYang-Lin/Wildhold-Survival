@@ -7,6 +7,7 @@ const melee1 = {
 
   flinch: {
     duration: 200,
+    force: 100,
   },
 
   animation: {
@@ -26,6 +27,7 @@ const melee2 = {
 
   flinch: {
     duration: 200,
+    force: 100,
   },
 
   animation: {
@@ -45,6 +47,7 @@ const melee3 = {
 
   flinch: {
     duration: 250,
+    force: 100,
   },
 
   animation: {
@@ -65,6 +68,7 @@ export const sprintAttack = {
 
   flinch: {
     duration: 250,
+    force: 140,
   },
 
   lunge: {
