@@ -4,6 +4,11 @@ const melee1 = {
   hitTimeRatio: 0.4,
   hitboxDuration: 80,
   comboWindowStartRatio: 0.6,
+
+  flinch: {
+    duration: 200,
+  },
+
   animation: {
     up: "survivor_attack_3_up",
     down: "survivor_attack_2_down",
@@ -18,6 +23,11 @@ const melee2 = {
   hitTimeRatio: 0.4,
   hitboxDuration: 80,
   comboWindowStartRatio: 0.6,
+
+  flinch: {
+    duration: 200,
+  },
+
   animation: {
     up: "survivor_attack_2_up",
     down: "survivor_attack_3_down",
@@ -32,13 +42,17 @@ const melee3 = {
   hitTimeRatio: 0.5,
   hitboxDuration: 100,
   comboWindowStartRatio: 0.6,
+
+  flinch: {
+    duration: 250,
+  },
+
   animation: {
     up: "survivor_attack_3_up",
     down: "survivor_attack_2_down",
     left: "survivor_attack_2_left",
     right: "survivor_attack_2_right",
   },
-  knockback: 100,
 };
 
 export const meleeCombo = [melee1, melee2, melee3];
@@ -48,7 +62,10 @@ export const sprintAttack = {
   damageMultiplier: 1.5,
   hitTimeRatio: 0.25,
   hitboxDuration: 80,
-  knockback: 150,
+
+  flinch: {
+    duration: 250,
+  },
 
   lunge: {
     speed: 200,

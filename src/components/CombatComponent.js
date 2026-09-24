@@ -12,6 +12,10 @@ export default class CombatComponent {
     this.attackDelay = stats.attackDelay ?? 500;
     this.attackRecoverDuration = stats.attackRecoverDuration ?? 800;
     this.hitboxLifetime = stats.hitboxLifetime ?? 80;
+
+    this.windupTimer = null;
+    this.attackDelayTimer = null;
+    this.attackRecoverTimer = null;
   }
 
   startAttackCooldown() {
@@ -33,30 +37,59 @@ export default class CombatComponent {
     return distance - target.body.width / 2 <= this.attackRange;
   }
 
+  cancelAttack() {
+    if (this.windupTimer) {
+      this.windupTimer.remove(false);
+      this.windupTimer = null;
+    }
+
+    if (this.attackDelayTimer) {
+      this.attackDelayTimer.remove(false);
+      this.attackDelayTimer = null;
+    }
+
+    if (this.attackRecoverTimer) {
+      this.attackRecoverTimer.remove(false);
+      this.attackRecoverTimer = null;
+    }
+  }
+
   performAttack(callbacks) {
     callbacks = callbacks ?? {};
 
     this.startAttackCooldown();
 
-    this.scene.time.delayedCall(this.attackDelay, () => {
-      if (!this.owner.active) return;
+    this.attackDelayTimer = this.scene.time.delayedCall(this.attackDelay, () => {
+      this.attackDelayTimer = null;
 
+      if (!this.owner.active) return;
       if (this.owner.health.isDead) return;
+      if (this.owner.aiState === this.owner.STATE_FLINCH) return;
 
       this.owner.attack();
     });
 
-    this.scene.time.delayedCall(this.attackRecoverDuration, () => {
-      if (!this.owner.active) return;
+    this.attackRecoverTimer = this.scene.time.delayedCall(this.attackRecoverDuration, () => {
+      this.attackRecoverTimer = null;
 
+      if (!this.owner.active) return;
       if (this.owner.health.isDead) return;
+      if (this.owner.aiState === this.owner.STATE_FLINCH) return;
 
       callbacks.onRecover?.();
     });
   }
 
   startAttackSequence(options) {
-    this.scene.time.delayedCall(this.windupDuration, () => {
+    this.cancelAttack();
+
+    this.windupTimer = this.scene.time.delayedCall(this.windupDuration, () => {
+      this.windupTimer = null;
+
+      if (!this.owner.active) return;
+      if (this.owner.health.isDead) return;
+      if (this.owner.aiState === this.owner.STATE_FLINCH) return;
+
       options?.onWindupComplete?.();
     });
   }

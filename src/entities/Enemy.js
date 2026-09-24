@@ -14,6 +14,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.facing = "down";
     this.aggroRange = 200;
+    this.flinchTimer = 0;
 
     // Components
     this.health = new HealthComponent(this, stats.maxHP ?? 3);
@@ -36,15 +37,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.STATE_CHASE = "chase";
     this.STATE_WINDUP = "windup";
     this.STATE_ATTACK = "attack";
+    this.STATE_FLINCH = "flinch";
     this.STATE_RETREAT = "retreat";
     this.STATE_DEAD = "dead";
 
     this.aiState = null;
     this.enterNavigate();
-
-    // knockback
-    this.knockbackTimer = 0;
-    this.knockbackVelocity = new Phaser.Math.Vector2();
   }
 
   static preload(scene) {
@@ -134,50 +132,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(0, 0);
   }
 
-  applyKnockback(direction, force, duration = 200) {
-    if (!this.active) return;
-    if (this.aiState === this.STATE_DEAD) return;
-
-    this.knockbackTimer = duration;
-
-    switch (direction) {
-      case "up":
-        this.knockbackVelocity.set(0, -force);
-        break;
-
-      case "down":
-        this.knockbackVelocity.set(0, force);
-        break;
-
-      case "left":
-        this.knockbackVelocity.set(-force, 0);
-        break;
-
-      case "right":
-        this.knockbackVelocity.set(force, 0);
-        break;
-
-      default:
-        this.knockbackVelocity.set(0, 0);
-        this.knockbackTimer = 0;
-        return;
-    }
-
-    this.setVelocity(this.knockbackVelocity.x, this.knockbackVelocity.y);
-  }
-
-  updateKnockback(delta) {
-    this.setVelocity(this.knockbackVelocity.x, this.knockbackVelocity.y);
-
-    this.knockbackTimer -= delta;
-
-    if (this.knockbackTimer <= 0) {
-      this.knockbackTimer = 0;
-      this.knockbackVelocity.set(0, 0);
-      this.stopMoving();
-    }
-  }
-
   takeDamage(amount) {
     if (this.aiState === this.STATE_DEAD) return;
 
@@ -196,8 +150,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   die() {
-    this.knockbackTimer = 0;
-    this.knockbackVelocity.set(0, 0);
     this.stopMoving();
 
     this.healthBar.destroy();
@@ -207,6 +159,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   // Enemy die instantly on retreat (temporary function, might change retreat function)
   retreat() {
     this.enterDead();
+  }
+
+  enterIdle() {
+    if (this.aiState === this.STATE_IDLE) return;
+
+    this.aiState = this.STATE_IDLE;
+
+    this.stopMoving();
+
+    this.anims.play(`${this.type}_idle_${this.facing}`);
   }
 
   enterNavigate() {
@@ -278,14 +240,29 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.anims.play(`${this.type}_attack_${this.facing}`);
   }
 
+  enterFlinch(duration = 200) {
+    if (!this.active) return;
+    if (this.aiState === this.STATE_DEAD) return;
+
+    this.aiState = this.STATE_FLINCH;
+
+    this.flinchTimer = duration;
+
+    // Interrupt current combat action.
+    this.combat.cancelAttack?.();
+    this.cancelSpecialAction?.(); // for GoblinShaman
+
+    // Stop movement.
+    this.stopMoving();
+
+    // Play idle animation for now.
+    this.anims.play(`${this.type}_idle_${this.facing}`);
+  }
+
   enterDead() {
     if (this.aiState === this.STATE_DEAD) return;
 
     this.aiState = this.STATE_DEAD;
-
-    // Clear knockback immediately
-    this.knockbackTimer = 0;
-    this.knockbackVelocity.set(0, 0);
 
     // Stop physics movement
     this.stopMoving();
@@ -303,6 +280,15 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.aiState = this.STATE_RETREAT;
 
     this.retreatDirection = Phaser.Math.Angle.Between(this.x, this.y, this.spawnX, this.spawnY);
+  }
+
+  updateIdle() {
+    if (this.ai.hasValidTarget()) {
+      this.enterChase();
+      return;
+    }
+
+    this.enterNavigate();
   }
 
   updateNavigate(time) {
@@ -331,6 +317,18 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.stopMoving();
   }
 
+  updateFlinch(delta) {
+    this.stopMoving();
+
+    this.flinchTimer -= delta;
+
+    if (this.flinchTimer <= 0) {
+      this.flinchTimer = 0;
+
+      this.enterIdle();
+    }
+  }
+
   updateRetreat() {
     const dist = Phaser.Math.Distance.Between(this.x, this.y, this.spawnX, this.spawnY);
 
@@ -355,11 +353,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (!this.active) return;
     if (this.aiState === this.STATE_DEAD) return;
 
-    if (this.knockbackTimer > 0) {
-      this.updateKnockback(delta);
+    if (this.aiState === this.STATE_FLINCH) {
+      this.updateFlinch(delta);
     } else if (!this.isActionLocked?.()) {
-      // isActionLocked => GoblinShaman casting
       switch (this.aiState) {
+        case this.STATE_IDLE:
+          this.updateIdle();
+          break;
+
         case this.STATE_NAVIGATE:
           this.updateNavigate(time);
           break;
@@ -385,7 +386,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
           break;
       }
     }
-    // console.log("ENEMY FINAL VELOCITY", this.body.velocity.x, this.body.velocity.y, "state =", this.aiState, "knockback =", this.knockbackTimer);
 
     this.setDepth(this.body.center.y);
     this.healthBar.update();

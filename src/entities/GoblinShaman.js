@@ -150,12 +150,18 @@ export default class GoblinShaman extends Enemy {
     this.anims.play(`${this.type}_spellcast_${this.facing}`);
 
     this.once(Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + `${this.type}_spellcast_${this.facing}`, () => {
+      if (!this.active) return;
+      if (!this.isCastingSpell) return;
+      if (this.aiState === this.STATE_FLINCH) return;
+
       this.anims.pause();
 
       this.castBar.show(this.castingTime);
 
       this.scene.time.delayedCall(this.castingTime, () => {
         if (!this.active) return;
+        if (!this.isCastingSpell) return;
+        if (this.aiState === this.STATE_FLINCH) return;
 
         const spell = this.createRandomSpell();
 
@@ -206,6 +212,16 @@ export default class GoblinShaman extends Enemy {
 
   isActionLocked() {
     return this.isCastingSpell || this.aiState === this.STATE_WINDUP || this.aiState === this.STATE_ATTACK;
+  }
+
+  cancelSpecialAction() {
+    if (!this.isCastingSpell) return;
+
+    this.isCastingSpell = false;
+
+    this.castBar?.hide();
+
+    this.anims.resume();
   }
 
   die() {

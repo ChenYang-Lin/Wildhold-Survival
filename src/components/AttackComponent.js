@@ -208,9 +208,8 @@ export default class AttackComponent {
 
       enemy.takeDamage(damage);
 
-      // knockback
-      if (attack.knockback) {
-        enemy.applyKnockback(this.owner.movement.facing, attack.knockback);
+      if (attack.flinch) {
+        enemy.enterFlinch(attack.flinch.duration);
       }
     });
 
