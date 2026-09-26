@@ -1,9 +1,9 @@
+import { BUILDINGS } from "../data/buildings.js";
+import { POTIONS } from "../data/potions.js";
+
 export default class HotbarSystem {
   constructor(scene) {
     this.scene = scene;
-
-    this.dayIndex = 0;
-    this.nightIndex = 0;
   }
 
   getItems() {
@@ -14,76 +14,20 @@ export default class HotbarSystem {
     return ["wall", "tower"];
   }
 
-  getSelectedIndex() {
-    const items = this.getItems();
+  getItemData(itemId) {
+    return BUILDINGS[itemId] || POTIONS[itemId];
+  }
 
-    if (items.length === 0) return -1;
+  activateItem(itemId) {
+    if (!itemId) return;
 
-    let index = this.scene.dayNightSystem.isNight ? this.nightIndex : this.dayIndex;
-
-    if (index >= items.length) {
-      index = 0;
-
-      if (this.scene.dayNightSystem.isNight) {
-        this.nightIndex = index;
-      } else {
-        this.dayIndex = index;
-      }
+    if (BUILDINGS[itemId]) {
+      this.scene.placementSystem.start(itemId);
+      return;
     }
 
-    return index;
-  }
-
-  getSelectedItem() {
-    const index = this.getSelectedIndex();
-
-    if (index === -1) return null;
-
-    return this.getItems()[index];
-  }
-
-  select(index) {
-    const items = this.getItems();
-
-    if (items.length === 0) return;
-    if (index < 0 || index >= items.length) return;
-
-    if (this.scene.dayNightSystem.isNight) {
-      this.nightIndex = index;
-    } else {
-      this.dayIndex = index;
+    if (POTIONS[itemId]) {
+      this.scene.actionSystem.handlePotion(itemId);
     }
-  }
-
-  selectItem(id) {
-    const items = this.getItems();
-
-    const index = items.indexOf(id);
-
-    if (index === -1) return false;
-
-    this.select(index);
-
-    return true;
-  }
-
-  next() {
-    const items = this.getItems();
-
-    if (items.length === 0) return;
-
-    const index = (this.getSelectedIndex() + 1) % items.length;
-
-    this.select(index);
-  }
-
-  previous() {
-    const items = this.getItems();
-
-    if (items.length === 0) return;
-
-    const index = (this.getSelectedIndex() - 1 + items.length) % items.length;
-
-    this.select(index);
   }
 }

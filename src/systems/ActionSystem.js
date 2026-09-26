@@ -8,27 +8,7 @@ export default class ActionSystem {
     this.inputController = inputController;
   }
 
-  handlePlaceable(itemId) {
-    const state = this.inputController.state;
-
-    const gridX = Math.floor(state.aimWorldX / 32);
-    const gridY = Math.floor(state.aimWorldY / 32);
-
-    const recipe = BUILDINGS[itemId];
-
-    if (!recipe) return;
-
-    if (!this.canAfford(recipe)) {
-      console.log("Not enough resources");
-      return;
-    }
-
-    const placed = this.scene.buildingManager.placeBuilding(recipe.id, gridX, gridY);
-
-    if (placed) {
-      this.payCost(recipe);
-    }
-  }
+  handlePlaceable(itemId) {}
 
   handlePotion(itemId) {
     const potion = POTIONS[itemId];
@@ -95,29 +75,5 @@ export default class ActionSystem {
     return false;
   }
 
-  update() {
-    const state = this.inputController.state;
-
-    if (state.actionPressed) {
-      const itemId = this.scene.hotbarSystem.getSelectedItem();
-
-      if (!itemId) return;
-
-      if (BUILDINGS[itemId]) {
-        this.handlePlaceable(itemId);
-      } else if (POTIONS[itemId]) {
-        this.handlePotion(itemId);
-      }
-    }
-
-    if (state.hotbarScroll > 0) {
-      this.scene.hotbarSystem.next();
-    }
-
-    if (state.hotbarScroll < 0) {
-      this.scene.hotbarSystem.previous();
-    }
-
-    state.hotbarScroll = 0;
-  }
+  update() {}
 }

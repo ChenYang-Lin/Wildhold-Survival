@@ -78,6 +78,15 @@ export default class InputController {
     this.scene.input.on("pointerdown", (pointer) => {
       if (this.isOverUI(pointer)) return;
 
+      if (this.scene.placementSystem?.isPlacing) {
+        this.state.aimWorldX = pointer.worldX;
+        this.state.aimWorldY = pointer.worldY;
+
+        this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
+
+        return;
+      }
+
       // Joystick
       if (pointer.x < this.scene.scale.width * 0.4 && this.joyPointerId === null) {
         this.joyPointerId = pointer.id;
@@ -180,9 +189,18 @@ export default class InputController {
       this.state.actionReleased = true;
     });
 
-    // click = attack button pressed
+    // click = placing building or attack button pressed or dash
     this.scene.input.on("pointerdown", (pointer) => {
       if (this.isOverUI(pointer)) return;
+
+      if (this.scene.placementSystem?.isPlacing) {
+        this.state.aimWorldX = pointer.worldX;
+        this.state.aimWorldY = pointer.worldY;
+
+        this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
+
+        return;
+      }
 
       if (pointer.button === 0) {
         // Left click = attack

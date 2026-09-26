@@ -54,10 +54,6 @@ export default class PlayerCombatFSM {
   updateIdle(input) {
     if (!input.attackPressed) return;
 
-    const itemId = this.owner.scene.hotbarSystem.getSelectedItem();
-
-    // if (!WEAPONS[itemId]) return;
-
     this.enterAttack(input);
   }
 

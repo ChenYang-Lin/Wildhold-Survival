@@ -43,6 +43,7 @@ import BuffFactory from "../factories/BuffFactory.js";
 import AuraFactory from "../factories/AuraFactory.js";
 import { BUILDINGS } from "../data/buildings.js";
 import StaminaUI from "../ui/StaminaUI.js";
+import PlacementSystem from "../systems/PlacementSystem.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -123,6 +124,7 @@ export default class GameScene extends Phaser.Scene {
     this.inputController = new InputController(this);
     this.actionSystem = new ActionSystem(this, this.player, this.inputController); // prettier-ignore
     this.buildingManager = new BuildingManager(this);
+    this.placementSystem = new PlacementSystem(this);
     this.ghostPreview = new GhostPreviewSystem(this);
     this.lightingSystem = new LightingSystem(this);
     this.combatSystem = new CombatSystem(this);
@@ -209,7 +211,7 @@ export default class GameScene extends Phaser.Scene {
     this.actionSystem.update();
     this.inputController.update();
     this.player.update(delta);
-    this.ghostPreview.update();
+    this.placementSystem.update();
     this.combatSystem.update(time, delta);
 
     this.healthUI.update();
@@ -234,15 +236,6 @@ export default class GameScene extends Phaser.Scene {
     // Restart game
     if (this.restartKey && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
       this.scene.restart();
-    }
-
-    // Update Ghost preview for placeables (wall, etc)
-    const itemId = this.hotbarSystem.getSelectedItem();
-
-    if (BUILDINGS[itemId]) {
-      this.ghostPreview.setBuilding(itemId);
-    } else {
-      this.ghostPreview.hide();
     }
   }
 }

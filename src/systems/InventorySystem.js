@@ -10,7 +10,7 @@ export default class InventorySystem {
 
     this.inventory = [
       { id: "wood", type: "resource", amount: 10 },
-      { id: "stone", type: "resource", amount: 0 },
+      { id: "stone", type: "resource", amount: 10 },
       { id: "apple", type: "resource", amount: 0 },
     ];
 

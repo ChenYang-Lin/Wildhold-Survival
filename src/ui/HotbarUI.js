@@ -21,19 +21,10 @@ export default class HotbarUI {
     this.slotWidth = this.config.slotWidth;
     this.slotHeight = this.config.slotHeight;
 
-    this.selectedSlotWidth = this.config.selectedSlotWidth;
-
-    this.selectedSlotHeight = this.config.selectedSlotHeight;
-
     this.slotSpacing = this.config.slotSpacing;
-
-    this.arrowWidth = this.config.arrowWidth;
-    this.arrowHeight = this.config.arrowHeight;
 
     this.panelPadding = this.config.panelPadding;
     this.viewportPadding = this.config.viewportPadding;
-
-    this.actionGap = this.config.actionGap;
 
     this.slots = [];
 
@@ -42,85 +33,6 @@ export default class HotbarUI {
     this.viewportLeft = 0;
     this.viewportRight = 0;
     this.viewportWidth = 0;
-
-    this.slots = [];
-
-    // Left button
-    this.leftButton = this.scene.add
-      .circle(0, 0, this.arrowWidth / 2, 0x171b20, 0.96)
-      .setStrokeStyle(2, 0x555d66, 0.9)
-      .setScrollFactor(0)
-      .setDepth(10000)
-      .setInteractive({
-        useHandCursor: true,
-      });
-
-    this.leftButton.isUI = true;
-
-    this.leftButtonText = this.scene.add
-      .text(0, 0, "<", {
-        fontSize: "24px",
-        fontStyle: "bold",
-        color: "#d9dde2",
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(10001);
-
-    // Right button
-    this.rightButton = this.scene.add
-      .circle(0, 0, this.arrowWidth / 2, 0x171b20, 0.96)
-      .setStrokeStyle(2, 0x555d66, 0.9)
-      .setScrollFactor(0)
-      .setDepth(10000)
-      .setInteractive({
-        useHandCursor: true,
-      });
-
-    this.rightButton.isUI = true;
-
-    this.rightButtonText = this.scene.add
-      .text(0, 0, ">", {
-        fontSize: "24px",
-        fontStyle: "bold",
-        color: "#d9dde2",
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(10001);
-
-    // Previous item
-    this.leftButton.on("pointerdown", () => {
-      console.log("LEFT BUTTON CLICKED");
-
-      this.scene.hotbarSystem.previous();
-      this.update();
-    });
-
-    // Next item
-    this.rightButton.on("pointerdown", () => {
-      console.log("RIGHT BUTTON CLICKED");
-
-      this.scene.hotbarSystem.next();
-      this.update();
-    });
-
-    // Pointer over visual effects
-    this.leftButton.on("pointerover", () => {
-      this.leftButton.setFillStyle(0x292f36);
-    });
-
-    this.leftButton.on("pointerout", () => {
-      this.leftButton.setFillStyle(0x171b20);
-    });
-
-    this.rightButton.on("pointerover", () => {
-      this.rightButton.setFillStyle(0x292f36);
-    });
-
-    this.rightButton.on("pointerout", () => {
-      this.rightButton.setFillStyle(0x171b20);
-    });
 
     this.resetUIPosition();
   }
@@ -168,15 +80,20 @@ export default class HotbarUI {
       costBackground,
       resourceCosts,
 
-      // The actual HotbarSystem index this visual slot represents.
       itemIndex: -1,
+      itemId: null,
     };
 
     background.on("pointerdown", () => {
       if (slot.itemIndex === -1) return;
 
-      this.scene.hotbarSystem.select(slot.itemIndex);
-      this.update();
+      const itemId = slot.itemId;
+
+      if (!itemId) return;
+
+      this.playSlotPress(slot);
+
+      this.scene.hotbarSystem.activateItem(itemId);
     });
 
     return slot;
@@ -186,16 +103,16 @@ export default class HotbarUI {
     return this.panelHeight;
   }
 
-  getItemWidth(index, selectedIndex) {
-    return index === selectedIndex ? this.selectedSlotWidth : this.slotWidth;
+  getItemWidth() {
+    return this.slotWidth;
   }
 
-  getVisibleRange(items, selectedIndex) {
+  getVisibleRange(items) {
     let width = 0;
     let end = this.scrollIndex;
 
     for (let i = this.scrollIndex; i < items.length; i++) {
-      const itemWidth = this.getItemWidth(i, selectedIndex);
+      const itemWidth = this.getItemWidth(i);
 
       const spacing = i === this.scrollIndex ? 0 : this.slotSpacing;
 
@@ -213,64 +130,29 @@ export default class HotbarUI {
     };
   }
 
-  ensureSelectedVisible(items, selectedIndex) {
-    if (items.length === 0) {
-      this.scrollIndex = 0;
-      return;
-    }
+  playSlotPress(slot) {
+    this.scene.tweens.killTweensOf(slot.background);
+    this.scene.tweens.killTweensOf(slot.iconFrame);
+    this.scene.tweens.killTweensOf(slot.icon);
 
-    // Selected item is before the viewport.
-    if (selectedIndex < this.scrollIndex) {
-      this.scrollIndex = selectedIndex;
-    }
+    slot.background.setScale(1);
+    slot.iconFrame.setScale(1);
+    slot.icon.setScale(slot.icon.scaleX, slot.icon.scaleY);
 
-    let range = this.getVisibleRange(items, selectedIndex);
-
-    // Selected item is after the viewport.
-    if (selectedIndex >= range.end) {
-      this.scrollIndex = selectedIndex;
-
-      range = this.getVisibleRange(items, selectedIndex);
-    }
-
-    // Don't allow scrolling past the final item.
-    if (range.end >= items.length) {
-      while (this.scrollIndex > 0) {
-        const testStart = this.scrollIndex - 1;
-
-        let width = 0;
-        let end = testStart;
-
-        for (let i = testStart; i < items.length; i++) {
-          const itemWidth = this.getItemWidth(i, selectedIndex);
-
-          const spacing = i === testStart ? 0 : this.slotSpacing;
-
-          if (width + spacing + itemWidth > this.viewportWidth) {
-            break;
-          }
-
-          width += spacing + itemWidth;
-          end = i + 1;
-        }
-
-        if (end < items.length) {
-          break;
-        }
-
-        this.scrollIndex = testStart;
-      }
-    }
+    this.scene.tweens.add({
+      targets: [slot.background, slot.iconFrame, slot.icon],
+      scaleX: 0.94,
+      scaleY: 0.94,
+      duration: 60,
+      yoyo: true,
+      ease: "Quad.easeOut",
+    });
   }
 
   update() {
     const items = this.scene.hotbarSystem.getItems();
-    const selectedIndex = this.scene.hotbarSystem.getSelectedIndex();
 
-    // Make sure the selected item can be seen.
-    this.ensureSelectedVisible(items, selectedIndex);
-
-    const range = this.getVisibleRange(items, selectedIndex);
+    const range = this.getVisibleRange(items);
 
     while (this.slots.length < items.length) {
       this.slots.push(this.createSlot());
@@ -282,9 +164,7 @@ export default class HotbarUI {
     let visibleWidth = 0;
 
     for (let i = range.start; i < range.end; i++) {
-      const isSelected = i === selectedIndex;
-
-      visibleWidth += isSelected ? this.selectedSlotWidth : this.slotWidth;
+      visibleWidth += this.slotWidth;
 
       if (i < range.end - 1) {
         visibleWidth += this.slotSpacing;
@@ -300,6 +180,7 @@ export default class HotbarUI {
       // This visual slot isn't currently being used.
       if (slotIndex < range.start || slotIndex >= range.end) {
         slot.itemIndex = -1;
+        slot.itemId = null;
 
         slot.shadow.setVisible(false);
         slot.background.setVisible(false);
@@ -321,11 +202,8 @@ export default class HotbarUI {
 
       slot.itemIndex = itemIndex;
 
-      const isSelected = itemIndex === selectedIndex;
-
-      const width = isSelected ? this.selectedSlotWidth : this.slotWidth;
-
-      const height = isSelected ? this.selectedSlotHeight : this.slotHeight;
+      const width = this.slotWidth;
+      const height = this.slotHeight;
 
       const x = currentX + width / 2;
 
@@ -339,14 +217,7 @@ export default class HotbarUI {
       // ICON FRAME
       // --------------------------------------------------
 
-      if (isSelected) {
-        slot.iconFrame
-          .setPosition(x, y + 3)
-          .setSize(54, 42)
-          .setVisible(true);
-      } else {
-        slot.iconFrame.setPosition(x, y).setSize(40, 40).setVisible(true);
-      }
+      slot.iconFrame.setPosition(x, y).setSize(40, 40).setVisible(true);
 
       // --------------------------------------------------
       // SHADOW
@@ -363,7 +234,10 @@ export default class HotbarUI {
 
       const itemId = items[itemIndex];
 
-      const itemData = BUILDINGS[itemId] || POTIONS[itemId];
+      slot.itemIndex = itemIndex;
+      slot.itemId = itemId;
+
+      const itemData = this.scene.hotbarSystem.getItemData(itemId);
 
       // --------------------------------------------------
       // NAME
@@ -372,14 +246,14 @@ export default class HotbarUI {
       slot.nameText
         .setPosition(x, y - height / 2 + 11)
         .setFontSize("11px")
-        .setText(isSelected && itemData ? itemData.name : "")
-        .setVisible(isSelected);
+        .setText(itemData?.name ?? "")
+        .setVisible(true);
 
       // --------------------------------------------------
       // ICON
       // --------------------------------------------------
 
-      this.setSlotIcon(slot, itemData, isSelected, x, y, width, height);
+      this.setSlotIcon(slot, itemData, x, y);
 
       // --------------------------------------------------
       // COST
@@ -392,29 +266,19 @@ export default class HotbarUI {
         entry.text.setVisible(false);
       }
 
-      if (isSelected && itemData?.cost) {
+      if (itemData?.cost) {
         this.updateResourceCosts(slot, itemData.cost, x, y + height / 2 - 12);
       }
 
       // --------------------------------------------------
       // STYLE
       // --------------------------------------------------
+      slot.background.setFillStyle(0x171b20).setStrokeStyle(1, 0x454c55, 0.9);
 
-      if (isSelected) {
-        slot.background.setFillStyle(0x252a30).setStrokeStyle(3, 0xf5c542, 1);
+      slot.iconFrame.setFillStyle(0x111419).setStrokeStyle(1, 0x343a42, 0.8);
 
-        slot.iconFrame.setFillStyle(0x15191e).setStrokeStyle(1, 0x8b7430, 0.9);
-
-        slot.shadow.setFillStyle(0x000000, 0.6);
-
-        slot.nameText.setColor("#f5c542");
-      } else {
-        slot.background.setFillStyle(0x171b20).setStrokeStyle(1, 0x454c55, 0.9);
-
-        slot.iconFrame.setFillStyle(0x111419).setStrokeStyle(1, 0x343a42, 0.8);
-
-        slot.shadow.setFillStyle(0x000000, 0.4);
-      }
+      slot.shadow.setFillStyle(0x000000, 0.4);
+      slot.nameText.setColor("#ffffff");
 
       currentX += width + this.slotSpacing;
     }
@@ -534,21 +398,18 @@ export default class HotbarUI {
     };
   }
 
-  setSlotIcon(slot, itemData, isSelected, x, y, width, height) {
+  setSlotIcon(slot, itemData, x, y) {
     if (!itemData) {
       slot.icon.setVisible(false);
       return;
     }
 
-    const maxIconWidth = isSelected ? 34 : 32;
-
-    const maxIconHeight = isSelected ? 34 : 32;
+    const maxIconWidth = 32;
+    const maxIconHeight = 32;
 
     const scale = Math.min(maxIconWidth / itemData.spriteWidth, maxIconHeight / itemData.spriteHeight);
 
-    const iconY = isSelected ? y + 2 : y;
-
-    slot.icon.setTexture(itemData.icon).setPosition(x, iconY).setScale(scale).setVisible(true);
+    slot.icon.setTexture(itemData.icon).setPosition(x, y).setScale(scale).setVisible(true);
   }
 
   updateDock() {
@@ -575,55 +436,16 @@ export default class HotbarUI {
 
   resetUIPosition() {
     const centerX = this.getCenterX();
+
     const y = this.getY();
 
     const panelLeft = centerX - this.panelWidth / 2;
-
     const panelRight = centerX + this.panelWidth / 2;
 
-    // --------------------------------------------------
-    // LEFT ARROW
-    // --------------------------------------------------
-
-    const leftX = panelLeft + this.panelPadding + this.arrowWidth / 2;
-
-    this.leftButton.setPosition(leftX, y);
-
-    this.leftButtonText.setPosition(leftX, y);
-
-    // --------------------------------------------------
-    // ACTION BUTTON
-    // --------------------------------------------------
-
-    // ActionButtonUI is still owned by InputController.
-    // We only use its radius to reserve space for it.
-    const actionRadius = this.scene.inputController?.actionButtonUI?.radius ?? 38;
-
-    // --------------------------------------------------
-    // RIGHT ARROW
-    // --------------------------------------------------
-
-    const actionX = panelRight - this.panelPadding - actionRadius;
-
-    const rightX = actionX - actionRadius - this.actionGap - this.arrowWidth / 2;
-
-    this.rightButton.setPosition(rightX, y);
-
-    this.rightButtonText.setPosition(rightX, y);
-
-    // --------------------------------------------------
-    // ITEM VIEWPORT
-    // --------------------------------------------------
-
-    this.viewportLeft = leftX + this.arrowWidth / 2 + this.viewportPadding;
-
-    this.viewportRight = rightX - this.arrowWidth / 2 - this.viewportPadding;
+    this.viewportLeft = panelLeft + this.panelPadding;
+    this.viewportRight = panelRight - this.panelPadding;
 
     this.viewportWidth = Math.max(0, this.viewportRight - this.viewportLeft);
-
-    // --------------------------------------------------
-    // DOCK
-    // --------------------------------------------------
 
     this.updateDock();
   }

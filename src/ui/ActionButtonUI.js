@@ -150,9 +150,10 @@ export default class ActionButtonUI {
   }
 
   update() {
+    return;
     const itemId = this.scene.hotbarSystem.getSelectedItem();
 
-    const itemData = BUILDINGS[itemId] || POTIONS[itemId];
+    const itemData = this.scene.hotbarSystem.getItemData(itemId);
 
     if (!itemData) {
       this.button.setFillStyle(0x34383d);
@@ -210,6 +211,7 @@ export default class ActionButtonUI {
   }
 
   resetUIPosition() {
+    return;
     if (!this.scene.hotbarUI) {
       return;
     }

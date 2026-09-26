@@ -6,7 +6,7 @@ export default class DayNightSystem {
 
     this.isNight = false;
 
-    this.dayDuration = 5000;
+    this.dayDuration = 15000;
     this.nightDuration = 60000;
 
     this.timer = this.dayDuration;
