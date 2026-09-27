@@ -28,13 +28,31 @@ export default class HotbarUI {
 
     this.slots = [];
 
-    this.scrollIndex = 0;
-
+    //
     this.viewportLeft = 0;
     this.viewportRight = 0;
     this.viewportWidth = 0;
 
+    // HotBar scroll
+    this.scrollOffset = 0;
+
+    this.hotbarPointerId = null;
+    this.hotbarDragStartX = 0;
+    this.hotbarStartScrollOffset = 0;
+    this.hotbarDragging = false;
+
+    this.hotbarDragThreshold = 8;
+
+    this.viewportMask = this.scene.make
+      .graphics({
+        x: 0,
+        y: 0,
+        add: false,
+      })
+      .setScrollFactor(0);
+
     this.resetUIPosition();
+    this.setupDragScrolling();
   }
 
   createSlot() {
@@ -84,17 +102,19 @@ export default class HotbarUI {
       itemId: null,
     };
 
-    background.on("pointerdown", () => {
-      if (slot.itemIndex === -1) return;
+    // background.on("pointerdown", () => {
+    //   if (slot.itemIndex === -1) return;
 
-      const itemId = slot.itemId;
+    //   const itemId = slot.itemId;
 
-      if (!itemId) return;
+    //   if (!itemId) return;
 
-      this.playSlotPress(slot);
+    //   this.playSlotPress(slot);
 
-      this.scene.hotbarSystem.activateItem(itemId);
-    });
+    //   this.scene.hotbarSystem.activateItem(itemId);
+    // });
+
+    this.applyViewportMask(slot);
 
     return slot;
   }
@@ -107,27 +127,91 @@ export default class HotbarUI {
     return this.slotWidth;
   }
 
-  getVisibleRange(items) {
-    let width = 0;
-    let end = this.scrollIndex;
-
-    for (let i = this.scrollIndex; i < items.length; i++) {
-      const itemWidth = this.getItemWidth(i);
-
-      const spacing = i === this.scrollIndex ? 0 : this.slotSpacing;
-
-      if (width + spacing + itemWidth > this.viewportWidth) {
-        break;
-      }
-
-      width += spacing + itemWidth;
-      end = i + 1;
+  getContentWidth(items) {
+    if (items.length === 0) {
+      return 0;
     }
 
-    return {
-      start: this.scrollIndex,
-      end,
-    };
+    return items.length * this.slotWidth + (items.length - 1) * this.slotSpacing;
+  }
+
+  getMaxScrollOffset(items) {
+    return Math.max(0, this.getContentWidth(items) - this.viewportWidth);
+  }
+
+  clampScrollOffset() {
+    const items = this.scene.hotbarSystem.getItems();
+
+    this.scrollOffset = Phaser.Math.Clamp(this.scrollOffset, 0, this.getMaxScrollOffset(items));
+  }
+
+  getSlotAtPointer(pointer) {
+    for (const slot of this.slots) {
+      if (!slot.background.visible) continue;
+      if (slot.itemIndex === -1) continue;
+
+      const bounds = slot.background.getBounds();
+
+      if (bounds.contains(pointer.x, pointer.y)) {
+        return slot;
+      }
+    }
+
+    return null;
+  }
+
+  setupDragScrolling() {
+    this.scene.input.on("pointerdown", (pointer) => {
+      if (!this.isPointerInViewport(pointer)) return;
+
+      this.hotbarPointerId = pointer.id;
+      this.hotbarDragStartX = pointer.x;
+      this.hotbarStartScrollOffset = this.scrollOffset;
+      this.hotbarDragging = false;
+    });
+
+    this.scene.input.on("pointermove", (pointer) => {
+      if (pointer.id !== this.hotbarPointerId) return;
+
+      const dx = pointer.x - this.hotbarDragStartX;
+
+      if (!this.hotbarDragging) {
+        if (Math.abs(dx) < this.hotbarDragThreshold) {
+          return;
+        }
+
+        this.hotbarDragging = true;
+      }
+
+      this.scrollOffset = this.hotbarStartScrollOffset - dx;
+
+      this.clampScrollOffset();
+    });
+
+    this.scene.input.on("pointerup", (pointer) => {
+      if (pointer.id !== this.hotbarPointerId) return;
+
+      if (!this.hotbarDragging) {
+        const slot = this.getSlotAtPointer(pointer);
+
+        if (slot && slot.itemIndex !== -1 && slot.itemId) {
+          this.playSlotPress(slot);
+          this.scene.hotbarSystem.activateItem(slot.itemId);
+        }
+      }
+
+      this.hotbarPointerId = null;
+      this.hotbarDragging = false;
+    });
+  }
+
+  isPointerInViewport(pointer) {
+    const y = this.getY();
+
+    const top = y - this.panelHeight / 2;
+    const bottom = y + this.panelHeight / 2;
+
+    return pointer.x >= this.viewportLeft && pointer.x <= this.viewportRight && pointer.y >= top && pointer.y <= bottom;
   }
 
   playSlotPress(slot) {
@@ -152,33 +236,32 @@ export default class HotbarUI {
   update() {
     const items = this.scene.hotbarSystem.getItems();
 
-    const range = this.getVisibleRange(items);
-
     while (this.slots.length < items.length) {
       this.slots.push(this.createSlot());
     }
 
+    this.clampScrollOffset();
+
+    const contentWidth = this.getContentWidth(items);
+
     const y = this.getY();
 
-    // Calculate width of visible items.
-    let visibleWidth = 0;
+    let currentX;
 
-    for (let i = range.start; i < range.end; i++) {
-      visibleWidth += this.slotWidth;
-
-      if (i < range.end - 1) {
-        visibleWidth += this.slotSpacing;
-      }
+    if (contentWidth <= this.viewportWidth) {
+      // Not enough items to overflow.
+      // Keep them centered.
+      currentX = this.viewportLeft + (this.viewportWidth - contentWidth) / 2;
+    } else {
+      // Overflowing content starts at the left edge
+      // and moves continuously with scrollOffset.
+      currentX = this.viewportLeft - this.scrollOffset;
     }
-
-    // Center visible items inside the viewport.
-    let currentX = this.viewportLeft + (this.viewportWidth - visibleWidth) / 2;
 
     for (let slotIndex = 0; slotIndex < this.slots.length; slotIndex++) {
       const slot = this.slots[slotIndex];
 
-      // This visual slot isn't currently being used.
-      if (slotIndex < range.start || slotIndex >= range.end) {
+      if (slotIndex >= items.length) {
         slot.itemIndex = -1;
         slot.itemId = null;
 
@@ -197,51 +280,27 @@ export default class HotbarUI {
         continue;
       }
 
-      // The actual item represented by this visual slot.
-      const itemIndex = slotIndex;
-
-      slot.itemIndex = itemIndex;
+      slot.itemIndex = slotIndex;
 
       const width = this.slotWidth;
       const height = this.slotHeight;
 
       const x = currentX + width / 2;
 
-      // --------------------------------------------------
-      // BACKGROUND
-      // --------------------------------------------------
-
       slot.background.setPosition(x, y).setSize(width, height).setVisible(true);
 
-      // --------------------------------------------------
-      // ICON FRAME
-      // --------------------------------------------------
-
       slot.iconFrame.setPosition(x, y).setSize(40, 40).setVisible(true);
-
-      // --------------------------------------------------
-      // SHADOW
-      // --------------------------------------------------
 
       slot.shadow
         .setPosition(x, y + 3)
         .setSize(width + 4, height + 4)
         .setVisible(true);
 
-      // --------------------------------------------------
-      // ITEM
-      // --------------------------------------------------
+      const itemId = items[slotIndex];
 
-      const itemId = items[itemIndex];
-
-      slot.itemIndex = itemIndex;
       slot.itemId = itemId;
 
       const itemData = this.scene.hotbarSystem.getItemData(itemId);
-
-      // --------------------------------------------------
-      // NAME
-      // --------------------------------------------------
 
       slot.nameText
         .setPosition(x, y - height / 2 + 11)
@@ -249,15 +308,7 @@ export default class HotbarUI {
         .setText(itemData?.name ?? "")
         .setVisible(true);
 
-      // --------------------------------------------------
-      // ICON
-      // --------------------------------------------------
-
       this.setSlotIcon(slot, itemData, x, y);
-
-      // --------------------------------------------------
-      // COST
-      // --------------------------------------------------
 
       slot.costBackground.setVisible(false);
 
@@ -270,9 +321,6 @@ export default class HotbarUI {
         this.updateResourceCosts(slot, itemData.cost, x, y + height / 2 - 12);
       }
 
-      // --------------------------------------------------
-      // STYLE
-      // --------------------------------------------------
       slot.background.setFillStyle(0x171b20).setStrokeStyle(1, 0x454c55, 0.9);
 
       slot.iconFrame.setFillStyle(0x111419).setStrokeStyle(1, 0x343a42, 0.8);
@@ -392,6 +440,11 @@ export default class HotbarUI {
       .setScrollFactor(0)
       .setDepth(10002);
 
+    const mask = this.viewportMask.createGeometryMask();
+
+    icon.setMask(mask);
+    text.setMask(mask);
+
     return {
       icon,
       text,
@@ -410,6 +463,32 @@ export default class HotbarUI {
     const scale = Math.min(maxIconWidth / itemData.spriteWidth, maxIconHeight / itemData.spriteHeight);
 
     slot.icon.setTexture(itemData.icon).setPosition(x, y).setScale(scale).setVisible(true);
+  }
+
+  applyViewportMask(slot) {
+    const mask = this.viewportMask.createGeometryMask();
+
+    slot.shadow.setMask(mask);
+    slot.background.setMask(mask);
+    slot.iconFrame.setMask(mask);
+    slot.nameText.setMask(mask);
+    slot.icon.setMask(mask);
+    slot.costBackground.setMask(mask);
+
+    for (const entry of slot.resourceCosts) {
+      entry.icon.setMask(mask);
+      entry.text.setMask(mask);
+    }
+  }
+
+  updateViewportMask() {
+    this.viewportMask.clear();
+
+    this.viewportMask.fillStyle(0xffffff);
+
+    const y = this.getY();
+
+    this.viewportMask.fillRect(this.viewportLeft, y - this.panelHeight / 2, this.viewportWidth, this.panelHeight);
   }
 
   updateDock() {
@@ -447,6 +526,7 @@ export default class HotbarUI {
 
     this.viewportWidth = Math.max(0, this.viewportRight - this.viewportLeft);
 
+    this.updateViewportMask();
     this.updateDock();
   }
 }
