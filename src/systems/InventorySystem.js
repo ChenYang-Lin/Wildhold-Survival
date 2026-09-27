@@ -75,12 +75,10 @@ export default class InventorySystem {
     let text = "Inventory\n";
 
     this.inventory.forEach((slot, i) => {
-      const selected = i === this.selectedSlot ? ">" : " ";
-
       if (slot) {
-        text += `${selected}[${i + 1}] ${slot.id}: ${slot.amount}\n`;
+        text += `[${i + 1}] ${slot.id}: ${slot.amount}\n`;
       } else {
-        text += `${selected}[${i + 1}] Empty\n`;
+        text += `[${i + 1}] Empty\n`;
       }
     });
 

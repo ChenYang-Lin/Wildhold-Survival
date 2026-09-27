@@ -13,21 +13,8 @@ export default class InputState {
     this.attackHeld = false;
     this.attackReleased = false;
 
-    // actions
-    this.actionPointerId = null;
-    this.actionHeld = false;
-    this.actionPressed = false;
-    this.actionReleased = false;
-
-    // hotbar
-    this.selectedSlot = 0;
-
     // platform
     this.isMobile = false;
-
-    // Combat - Build (hotbar)
-    this.toggleBuildModePressed = false;
-    this.hotbarScroll = 0;
 
     // Movement
     this.dashPressed = false;

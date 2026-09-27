@@ -20,7 +20,6 @@ import DamageTextSystem from "../systems/DamageTextSystem.js";
 import SpellEffectSystem from "../systems/SpellEffectSystem.js";
 import DayNightSystem from "../systems/DayNightSystem.js";
 import EquipmentSystem from "../systems/EquipmentSystem.js";
-import GhostPreviewSystem from "../systems/GhostPreviewSystem.js";
 import HotbarSystem from "../systems/HotbarSystem.js";
 import InventorySystem from "../systems/InventorySystem.js";
 import LightingSystem from "../systems/LightingSystem.js";
@@ -41,7 +40,6 @@ import OverlayMessageUI from "../ui/OverlayMessageUI.js";
 // Factories
 import BuffFactory from "../factories/BuffFactory.js";
 import AuraFactory from "../factories/AuraFactory.js";
-import { BUILDINGS } from "../data/buildings.js";
 import StaminaUI from "../ui/StaminaUI.js";
 import PlacementSystem from "../systems/PlacementSystem.js";
 
@@ -125,7 +123,6 @@ export default class GameScene extends Phaser.Scene {
     this.actionSystem = new ActionSystem(this, this.player, this.inputController); // prettier-ignore
     this.buildingManager = new BuildingManager(this);
     this.placementSystem = new PlacementSystem(this);
-    this.ghostPreview = new GhostPreviewSystem(this);
     this.lightingSystem = new LightingSystem(this);
     this.combatSystem = new CombatSystem(this);
     this.damageTextSystem = new DamageTextSystem(this);

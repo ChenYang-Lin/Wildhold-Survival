@@ -1,4 +1,3 @@
-import { BUILDINGS } from "../data/buildings.js";
 import { POTIONS } from "../data/potions.js";
 
 export default class ActionSystem {
@@ -7,8 +6,6 @@ export default class ActionSystem {
     this.player = player;
     this.inputController = inputController;
   }
-
-  handlePlaceable(itemId) {}
 
   handlePotion(itemId) {
     const potion = POTIONS[itemId];

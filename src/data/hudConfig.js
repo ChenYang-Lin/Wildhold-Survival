@@ -4,8 +4,6 @@ export const HUD_CONFIG = {
     panelHeight: 96,
     slotWidth: 56,
     slotHeight: 56,
-    selectedSlotWidth: 94,
-    selectedSlotHeight: 86,
     slotSpacing: 7,
     arrowWidth: 40,
     arrowHeight: 40,
@@ -24,8 +22,6 @@ export const HUD_CONFIG = {
 
     slotWidth: 46,
     slotHeight: 46,
-    selectedSlotWidth: 76,
-    selectedSlotHeight: 60, // was 70
 
     slotSpacing: 5,
     arrowWidth: 34,

@@ -1,5 +1,4 @@
 import InputState from "./InputState.js";
-import ActionButtonUI from "./../ui/ActionButtonUI.js";
 import AttackButtonUI from "./../ui/AttackButtonUI.js";
 import MovementButtonUI from "../ui/MovementButtonUI.js";
 
@@ -22,11 +21,8 @@ export default class InputController {
   }
 
   setupMobile() {
-    // Action button
-    this.actionButtonUI = new ActionButtonUI(this.scene);
     this.attackButtonUI = new AttackButtonUI(this.scene);
     this.movementButtonUI = new MovementButtonUI(this.scene);
-    this.setupActionButtonInput();
 
     // JOYSTICK --------------------------------------------------------------------------------------------------------------------
     this.joystickActive = false;
@@ -130,7 +126,7 @@ export default class InputController {
       }
     });
 
-    // POINTER UP (joystick release + action release)
+    // POINTER UP (joystick release)
     this.scene.input.on("pointerup", (pointer) => {
       // Joystick
       if (pointer.id === this.joyPointerId) {
@@ -155,17 +151,12 @@ export default class InputController {
   setupPC() {
     this.scene.input.mouse.disableContextMenu();
 
-    this.actionButtonUI = new ActionButtonUI(this.scene);
-    this.setupActionButtonInput();
-
     this.keys = this.scene.input.keyboard.addKeys({
       up: "W",
       down: "S",
       left: "A",
       right: "D",
     });
-
-    this.actionKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
     // restart button
     this.restartKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
@@ -176,20 +167,7 @@ export default class InputController {
       this.state.aimWorldY = pointer.worldY;
     });
 
-    // Action key "E" listener
-    this.scene.input.keyboard.on("keydown-E", (event) => {
-      if (event.repeat) return;
-
-      this.state.actionPressed = true;
-      this.state.actionHeld = true;
-    });
-
-    this.scene.input.keyboard.on("keyup-E", () => {
-      this.state.actionHeld = false;
-      this.state.actionReleased = true;
-    });
-
-    // click = placing building or attack button pressed or dash
+    // click = placement movement, attack, or dash
     this.scene.input.on("pointerdown", (pointer) => {
       if (this.isOverUI(pointer)) return;
 
@@ -226,32 +204,6 @@ export default class InputController {
         this.state.sprintHeld = false;
       }
     });
-
-    // toggler for Build mode and Combat mode
-    this.scene.input.keyboard.on("keydown-B", () => {
-      this.state.toggleBuildModePressed = true;
-    });
-
-    // mouse wheel scroll for selecting items in combar/build hotbar
-    this.scene.input.on("wheel", (_, __, ___, deltaY) => {
-      this.state.hotbarScroll = deltaY > 0 ? 1 : -1;
-    });
-  }
-
-  setupActionButtonInput() {
-    this.actionButtonUI.button.on("pointerdown", (pointer) => {
-      this.state.actionPointerId = pointer.id;
-      this.state.actionPressed = true;
-      this.state.actionHeld = true;
-    });
-
-    this.actionButtonUI.button.on("pointerup", (pointer) => {
-      if (pointer.id !== this.state.actionPointerId) return;
-
-      this.state.actionHeld = false;
-      this.state.actionReleased = true;
-      this.state.actionPointerId = null;
-    });
   }
 
   isOverUI(pointer) {
@@ -274,9 +226,6 @@ export default class InputController {
     // Player health
     this.scene.healthUI?.resetUIPosition();
 
-    // Action
-    this.actionButtonUI?.resetUIPosition();
-
     // Attack button - mobile only
     if (this.attackButtonUI) {
       this.attackButtonUI.button.setPosition(w - 150, h - 110);
@@ -293,14 +242,8 @@ export default class InputController {
   endFrame() {
     this.state.dashPressed = false;
 
-    this.state.actionPressed = false;
-    this.state.actionReleased = false;
-
     this.state.attackPressed = false;
     this.state.attackReleased = false;
-
-    this.state.toggleBuildModePressed = false;
-    this.state.hotbarScroll = 0;
   }
 
   update() {
@@ -319,9 +262,6 @@ export default class InputController {
       if (this.keys.up.isDown) this.state.moveVector.y = -1;
       if (this.keys.down.isDown) this.state.moveVector.y = 1;
     }
-
-    // Action button exists on both platforms
-    this.actionButtonUI?.update();
 
     // Restart
     if (this.restartKey && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
