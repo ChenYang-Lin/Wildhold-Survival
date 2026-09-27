@@ -7,6 +7,8 @@ export default class InputController {
     this.scene = scene;
     this.state = new InputState();
 
+    this.placementPointerId = null;
+
     this.cursors = scene.input.keyboard.createCursorKeys();
 
     this.state.isMobile = this.scene.sys.game.device.input.touch;
@@ -75,6 +77,8 @@ export default class InputController {
       if (this.isOverUI(pointer)) return;
 
       if (this.scene.placementSystem?.isPlacing) {
+        this.placementPointerId = pointer.id;
+
         this.state.aimWorldX = pointer.worldX;
         this.state.aimWorldY = pointer.worldY;
 
@@ -99,6 +103,12 @@ export default class InputController {
     this.scene.input.on("pointermove", (pointer) => {
       this.state.aimWorldX = pointer.worldX;
       this.state.aimWorldY = pointer.worldY;
+
+      if (this.scene.placementSystem?.isPlacing && pointer.id === this.placementPointerId) {
+        this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
+
+        return;
+      }
 
       if (!this.joystickActive) return;
       if (pointer.id !== this.joyPointerId) return;
@@ -128,6 +138,10 @@ export default class InputController {
 
     // POINTER UP (joystick release)
     this.scene.input.on("pointerup", (pointer) => {
+      if (pointer.id === this.placementPointerId) {
+        this.placementPointerId = null;
+      }
+
       // Joystick
       if (pointer.id === this.joyPointerId) {
         this.joystickActive = false;
@@ -161,10 +175,16 @@ export default class InputController {
     // restart button
     this.restartKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
-    // mouse move = aim
+    // mouse move
     this.scene.input.on("pointermove", (pointer) => {
       this.state.aimWorldX = pointer.worldX;
       this.state.aimWorldY = pointer.worldY;
+
+      if (this.scene.placementSystem?.isPlacing && pointer.id === this.placementPointerId) {
+        this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
+
+        return;
+      }
     });
 
     // click = placement movement, attack, or dash
@@ -172,6 +192,8 @@ export default class InputController {
       if (this.isOverUI(pointer)) return;
 
       if (this.scene.placementSystem?.isPlacing) {
+        this.placementPointerId = pointer.id;
+
         this.state.aimWorldX = pointer.worldX;
         this.state.aimWorldY = pointer.worldY;
 
@@ -195,6 +217,10 @@ export default class InputController {
 
     // pointer released
     this.scene.input.on("pointerup", (pointer) => {
+      if (pointer.id === this.placementPointerId) {
+        this.placementPointerId = null;
+      }
+
       if (pointer.button === 0) {
         this.state.attackHeld = false;
         this.state.attackReleased = true;
