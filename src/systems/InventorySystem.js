@@ -95,7 +95,7 @@ export default class InventorySystem {
   }
 
   consumeResource(id, amount) {
-    const item = this.inventory.find((i) => i.id === id);
+    const item = this.inventory.find((i) => i?.id === id);
 
     if (!item) return false;
 
