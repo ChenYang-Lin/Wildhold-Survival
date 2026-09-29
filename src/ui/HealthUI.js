@@ -60,7 +60,20 @@ export default class HealthUI {
     // TEXT
     // --------------------------------------------------
 
-    this.text = scene.add
+    this.labelText = scene.add
+      .text(0, 0, "HP:", {
+        fontFamily: "Arial",
+        fontSize: isMobile ? "11px" : "13px",
+        fontStyle: "bold",
+        color: "#ffffff",
+        stroke: "#000000",
+        strokeThickness: 3,
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(10002);
+
+    this.valueText = scene.add
       .text(0, 0, "", {
         fontFamily: "Arial",
         fontSize: isMobile ? "11px" : "13px",
@@ -106,7 +119,8 @@ export default class HealthUI {
     // TEXT
     // --------------------------------------------------
 
-    this.text.setText(`HP ${player.health.hp}/${player.health.maxHP}`);
+    this.labelText.setText("HP:");
+    this.valueText.setText(`${player.health.hp}/${player.health.maxHP}`);
 
     this.resetUIPosition();
   }
@@ -126,6 +140,10 @@ export default class HealthUI {
 
     const y = hotbarY + hotbarUI.getDockHeight() / 2 + this.barHeight / 2 + gap;
 
+    // ---------------------------------------------
+    // HEALTH BAR
+    // ---------------------------------------------
+
     this.shadow.setPosition(centerX, y + 2);
 
     this.outer.setPosition(centerX, y);
@@ -136,6 +154,18 @@ export default class HealthUI {
 
     this.highlight.setPosition(centerX - this.barWidth / 2, y - this.barHeight / 2 + 5);
 
-    this.text.setPosition(centerX, y);
+    // ---------------------------------------------
+    // HEALTH TEXT
+    // ---------------------------------------------
+
+    const sidePadding = hotbarUI.isMobile ? 8 : 12;
+
+    const labelX = centerX - this.barWidth / 2 - sidePadding - this.labelText.width / 2;
+
+    const valueX = centerX + this.barWidth / 2 + sidePadding + this.valueText.width / 2;
+
+    this.labelText.setPosition(labelX, y);
+
+    this.valueText.setPosition(valueX, y);
   }
 }

@@ -9,7 +9,7 @@ export const HUD_CONFIG = {
     arrowHeight: 40,
 
     healthWidth: 390,
-    healthHeight: 22,
+    healthHeight: 12,
 
     panelPadding: 10,
     viewportPadding: 8,
@@ -18,7 +18,7 @@ export const HUD_CONFIG = {
 
   mobile: {
     panelWidth: 320,
-    panelHeight: 66, // was 80
+    panelHeight: 66,
 
     slotWidth: 54,
     slotHeight: 46,
@@ -27,8 +27,8 @@ export const HUD_CONFIG = {
     arrowWidth: 34,
     arrowHeight: 34,
 
-    healthWidth: 200, // new
-    healthHeight: 16, // was 19
+    healthWidth: 200,
+    healthHeight: 10,
 
     panelPadding: 8,
     viewportPadding: 6,
