@@ -53,6 +53,7 @@ export default class HotbarUI {
 
     this.resetUIPosition();
     this.setupDragScrolling();
+    this.refresh();
   }
 
   createSlot() {
@@ -298,7 +299,7 @@ export default class HotbarUI {
     }
   }
 
-  update() {
+  refresh() {
     const items = this.scene.hotbarSystem.getItems();
 
     while (this.slots.length > items.length) {
