@@ -17,6 +17,7 @@ export default class DayNightSystem {
 
   startNight() {
     this.isNight = true;
+    this.scene.hotbarUI.refresh();
 
     this.timer = this.nightDuration;
 
@@ -45,6 +46,7 @@ export default class DayNightSystem {
 
   startDay() {
     this.isNight = false;
+    this.scene.hotbarUI.refresh();
 
     this.day++;
     this.timer = this.dayDuration;
