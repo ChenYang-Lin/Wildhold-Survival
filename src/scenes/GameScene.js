@@ -42,6 +42,7 @@ import BuffFactory from "../factories/BuffFactory.js";
 import AuraFactory from "../factories/AuraFactory.js";
 import StaminaUI from "../ui/StaminaUI.js";
 import PlacementSystem from "../systems/PlacementSystem.js";
+import MiniMapUI from "../ui/MiniMapUI.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -90,6 +91,8 @@ export default class GameScene extends Phaser.Scene {
     this.createData();
 
     this.createWorld();
+
+    this.miniMapUI = new MiniMapUI(this);
 
     // Set boundry ----------------------------------------------------------------------------------------------------------
     const bounds = this.mapManager.getWorldBounds();

@@ -252,6 +252,9 @@ export default class InputController {
     // Player health
     this.scene.healthUI?.resetUIPosition();
 
+    // Mini-map
+    this.scene.miniMapUI?.resetUIPosition();
+
     // Attack button - mobile only
     if (this.attackButtonUI) {
       this.attackButtonUI.button.setPosition(w - 150, h - 110);
