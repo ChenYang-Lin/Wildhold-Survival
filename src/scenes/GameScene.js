@@ -48,6 +48,8 @@ export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
 
+    this.cameraMode = "FOLLOW_PLAYER";
+
     this.DEBUG_MODE = false;
   }
 
@@ -197,6 +199,37 @@ export default class GameScene extends Phaser.Scene {
     return this.scale.height;
   }
 
+  enterFreeCamera(worldX, worldY) {
+    const camera = this.cameras.main;
+
+    this.cameraMode = "FREE_CAMERA";
+
+    camera.stopFollow();
+    camera.centerOn(worldX, worldY);
+  }
+
+  returnToPlayerCamera() {
+    console.log("return to player camera");
+    const camera = this.cameras.main;
+
+    this.cameraMode = "FOLLOW_PLAYER";
+
+    camera.startFollow(this.player, false);
+    camera.centerOn(this.player.x, this.player.y);
+  }
+
+  handlePlayerCamera() {
+    if (this.cameraMode !== "FREE_CAMERA") return;
+
+    const input = this.inputController.state;
+
+    const isMoving = input.moveVector.lengthSq() > 0 || this.player.movementFSM.state === this.player.movementFSM.STATE_DASH;
+
+    if (isMoving) {
+      this.returnToPlayerCamera();
+    }
+  }
+
   update(time, delta) {
     if (this.gameStateManager.isPaused()) {
       this.player.movement.stop();
@@ -210,7 +243,12 @@ export default class GameScene extends Phaser.Scene {
 
     this.actionSystem.update();
     this.inputController.update();
+
+    // Return camera back to the player when it moves.
+    this.handlePlayerCamera();
+
     this.player.update(delta);
+    this.miniMapUI.update();
     this.placementSystem.update();
     this.combatSystem.update(time, delta);
 

@@ -2,6 +2,9 @@ export default class MiniMapUI {
   constructor(scene) {
     this.scene = scene;
 
+    this.isDragging = false;
+    this.dragPointerId = null;
+
     const isMobile = scene.sys.game.device.input.touch;
 
     this.panelWidth = isMobile ? 130 : 180;
@@ -10,6 +13,7 @@ export default class MiniMapUI {
     this.margin = 12;
 
     this.create();
+
     this.resetUIPosition();
   }
 
@@ -31,6 +35,65 @@ export default class MiniMapUI {
 
     this.border.isUI = true;
 
+    // Minimap input - click / drag camera
+    this.panel.setInteractive({ useHandCursor: true });
+
+    this.isDragging = false;
+    this.dragPointerId = null;
+
+    this.panel.on("pointerdown", (pointer) => {
+      const worldPoint = this.camera.getWorldPoint(pointer.x, pointer.y);
+
+      this.scene.enterFreeCamera(worldPoint.x, worldPoint.y);
+
+      this.isDragging = true;
+      this.dragPointerId = pointer.id;
+    });
+
+    this.panel.on("pointermove", (pointer) => {
+      if (!this.isDragging) return;
+      if (pointer.id !== this.dragPointerId) return;
+
+      const worldPoint = this.camera.getWorldPoint(pointer.x, pointer.y);
+
+      this.scene.cameras.main.centerOn(worldPoint.x, worldPoint.y);
+    });
+
+    this.scene.input.on("pointerup", (pointer) => {
+      if (pointer.id !== this.dragPointerId) return;
+
+      this.isDragging = false;
+      this.dragPointerId = null;
+    });
+
+    // Button for recenter camera back to the player
+    this.recenterButton = scene.add
+      .circle(0, 0, 14, 0x22282f, 0.95)
+      .setStrokeStyle(1, 0x6b737c)
+      .setScrollFactor(0)
+      .setDepth(11002)
+      .setInteractive({ useHandCursor: true });
+
+    this.recenterButton.isUI = true;
+
+    this.recenterText = scene.add
+      .text(0, 0, "⌖", {
+        fontFamily: "Arial",
+        fontSize: "16px",
+        color: "#ffffff",
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(11003);
+
+    this.recenterText.isUI = true;
+
+    this.recenterButton.on("pointerdown", (pointer, localX, localY, event) => {
+      event.stopPropagation();
+
+      this.recenterCameraOnPlayer();
+    });
+
     // Create minimap camera
     this.camera = scene.cameras.add(0, 0, this.panelWidth, this.panelHeight);
 
@@ -43,6 +106,34 @@ export default class MiniMapUI {
 
     this.camera.ignore(objectsToIgnore);
 
+    // Create the player marker AFTER the minimap ignore list.
+    // This makes the marker intentionally belong to the minimap.
+    this.playerMarker = scene.add.circle(scene.player.x, scene.player.y, 4, 0xff0000, 1).setDepth(11002);
+
+    // The main gameplay camera should not render the minimap marker.
+    scene.cameras.main.ignore(this.playerMarker);
+
+    // Base marker
+    const baseNode = scene.navigationManager.getBaseNode();
+
+    this.baseMarker = scene.add.circle(baseNode.x, baseNode.y, 5, 0xffd34d, 1).setDepth(11002);
+
+    // Main gameplay camera should not render the base marker.
+    scene.cameras.main.ignore(this.baseMarker);
+
+    // Enemy camp markers
+    this.campMarkers = [];
+
+    const campNodes = scene.navigationManager.getCampNodes();
+
+    for (const campNode of campNodes) {
+      const marker = scene.add.circle(campNode.x, campNode.y, 4, 0xff5555, 1).setDepth(11002);
+
+      scene.cameras.main.ignore(marker);
+
+      this.campMarkers.push(marker);
+    }
+
     this.setupCamera();
   }
 
@@ -52,13 +143,29 @@ export default class MiniMapUI {
     const scaleX = this.panelWidth / bounds.width;
     const scaleY = this.panelHeight / bounds.height;
 
-    // Use the smaller scale so the entire world fits.
     const zoom = Math.min(scaleX, scaleY);
 
     this.camera.setZoom(zoom);
 
-    // Center the camera on the world.
     this.camera.centerOn(bounds.width / 2, bounds.height / 2);
+
+    if (this.playerMarker) {
+      this.playerMarker.setScale(1 / zoom);
+    }
+
+    if (this.baseMarker) {
+      this.baseMarker.setScale(1 / zoom);
+    }
+
+    if (this.campMarkers) {
+      for (const marker of this.campMarkers) {
+        marker.setScale(1 / zoom);
+      }
+    }
+  }
+
+  recenterCameraOnPlayer() {
+    this.scene.returnToPlayerCamera();
   }
 
   resetUIPosition() {
@@ -70,14 +177,31 @@ export default class MiniMapUI {
 
     this.camera.setViewport(this.margin, this.margin, this.panelWidth, this.panelHeight);
 
+    this.recenterButton.setPosition(this.margin + this.panelWidth - 16, this.margin + this.panelHeight + 18);
+    this.recenterText.setPosition(this.recenterButton.x, this.recenterButton.y);
+
     this.setupCamera();
   }
 
   update() {
-    // Nothing dynamic yet.
+    if (!this.playerMarker) return;
+
+    this.playerMarker.setPosition(this.scene.player.x, this.scene.player.y);
   }
 
   destroy() {
+    this.playerMarker?.destroy();
+    this.baseMarker?.destroy();
+
+    if (this.campMarkers) {
+      for (const marker of this.campMarkers) {
+        marker.destroy();
+      }
+    }
+
+    this.recenterButton?.destroy();
+    this.recenterText?.destroy();
+
     this.panel?.destroy();
     this.border?.destroy();
 

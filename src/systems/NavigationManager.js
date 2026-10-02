@@ -68,6 +68,10 @@ export default class NavigationManager {
     return null;
   }
 
+  getCampNodes() {
+    return [...this.nodes.values()].filter((node) => node.type === "camp");
+  }
+
   getCampNode(id) {
     return this.nodes.get(`Camp_${id}`);
   }
