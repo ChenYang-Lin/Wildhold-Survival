@@ -1,10 +1,7 @@
 // Entities
 import Archer from "../entities/Archer.js";
 import Campfire from "../entities/Campfire.js";
-import Enemy from "../entities/Enemy.js";
-import Rock from "../entities/Rock.js";
 import Tower from "../entities/Tower.js";
-import Tree from "../entities/Tree.js";
 import Goblin from "../entities/Goblin.js";
 import GoblinTank from "../entities/GoblinTank.js";
 import GoblinShaman from "../entities/GoblinShaman.js";
@@ -208,14 +205,46 @@ export default class GameScene extends Phaser.Scene {
     camera.centerOn(worldX, worldY);
   }
 
-  returnToPlayerCamera() {
-    console.log("return to player camera");
+  updateCameraReturn(delta) {
+    if (this.cameraMode !== "RETURNING_TO_PLAYER") return;
+
     const camera = this.cameras.main;
 
-    this.cameraMode = "FOLLOW_PLAYER";
+    this.cameraReturnElapsed += delta;
 
-    camera.startFollow(this.player, false);
-    camera.centerOn(this.player.x, this.player.y);
+    const progress = Phaser.Math.Clamp(this.cameraReturnElapsed / this.cameraReturnDuration, 0, 1);
+
+    // Smooth ease-in-out.
+    const easedProgress = Phaser.Math.Easing.Sine.InOut(progress);
+
+    const targetX = this.player.x;
+    const targetY = this.player.y;
+
+    const x = Phaser.Math.Linear(this.cameraReturnStartX, targetX, easedProgress);
+
+    const y = Phaser.Math.Linear(this.cameraReturnStartY, targetY, easedProgress);
+
+    camera.centerOn(x, y);
+
+    if (progress >= 1) {
+      this.cameraMode = "FOLLOW_PLAYER";
+
+      camera.startFollow(this.player, false);
+    }
+  }
+
+  returnToPlayerCamera() {
+    const camera = this.cameras.main;
+
+    this.cameraMode = "RETURNING_TO_PLAYER";
+
+    camera.stopFollow();
+
+    this.cameraReturnStartX = camera.midPoint.x;
+    this.cameraReturnStartY = camera.midPoint.y;
+
+    this.cameraReturnElapsed = 0;
+    this.cameraReturnDuration = 250;
   }
 
   handlePlayerCamera() {
@@ -248,7 +277,11 @@ export default class GameScene extends Phaser.Scene {
     this.handlePlayerCamera();
 
     this.player.update(delta);
+
+    this.updateCameraReturn(delta);
+
     this.miniMapUI.update();
+
     this.placementSystem.update();
     this.combatSystem.update(time, delta);
 

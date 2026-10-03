@@ -106,6 +106,14 @@ export default class MiniMapUI {
 
     this.camera.ignore(objectsToIgnore);
 
+    // The minimap should never render the lighting/fog system.
+    this.camera.ignore([
+      scene.lightingSystem.darknessRT,
+      scene.lightingSystem.playerLightStamp,
+      scene.lightingSystem.campfireLightStamp,
+      scene.lightingSystem.campfireGlow,
+    ]);
+
     // Create the player marker AFTER the minimap ignore list.
     // This makes the marker intentionally belong to the minimap.
     this.playerMarker = scene.add.circle(scene.player.x, scene.player.y, 4, 0xff0000, 1).setDepth(11002);
@@ -134,6 +142,12 @@ export default class MiniMapUI {
       this.campMarkers.push(marker);
     }
 
+    // Main camera viewport marker on minimap
+    this.cameraViewport = scene.add.rectangle(0, 0, 0, 0).setFillStyle(0xffffff, 0).setStrokeStyle(2, 0xffffff, 0.8).setDepth(11004);
+
+    // The main gameplay camera should not render this marker.
+    scene.cameras.main.ignore(this.cameraViewport);
+
     this.setupCamera();
   }
 
@@ -148,6 +162,10 @@ export default class MiniMapUI {
     this.camera.setZoom(zoom);
 
     this.camera.centerOn(bounds.width / 2, bounds.height / 2);
+
+    if (this.cameraViewport) {
+      this.cameraViewport.setStrokeStyle(2 / zoom, 0xffffff, 0.8);
+    }
 
     if (this.playerMarker) {
       this.playerMarker.setScale(1 / zoom);
@@ -186,12 +204,19 @@ export default class MiniMapUI {
   update() {
     if (!this.playerMarker) return;
 
+    const mainCamera = this.scene.cameras.main;
+
     this.playerMarker.setPosition(this.scene.player.x, this.scene.player.y);
+
+    this.cameraViewport.setPosition(mainCamera.midPoint.x, mainCamera.midPoint.y);
+
+    this.cameraViewport.setSize(mainCamera.displayWidth, mainCamera.displayHeight);
   }
 
   destroy() {
     this.playerMarker?.destroy();
     this.baseMarker?.destroy();
+    this.cameraViewport?.destroy();
 
     if (this.campMarkers) {
       for (const marker of this.campMarkers) {
