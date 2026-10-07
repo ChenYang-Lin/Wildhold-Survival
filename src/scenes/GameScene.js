@@ -20,7 +20,7 @@ import EquipmentSystem from "../systems/EquipmentSystem.js";
 import HotbarSystem from "../systems/HotbarSystem.js";
 import InventorySystem from "../systems/InventorySystem.js";
 import LightingSystem from "../systems/LightingSystem.js";
-import ObjectiveSystem from "../systems/ObjectiveSystem.js";
+import QuestSystem from "../systems/QuestSystem.js";
 import ResourceManager from "../systems/ResourceManger.js";
 import ResourceSystem from "../systems/ResourceSystem.js";
 import GameStateManager from "../systems/GameStateManager.js";
@@ -40,6 +40,8 @@ import AuraFactory from "../factories/AuraFactory.js";
 import StaminaUI from "../ui/StaminaUI.js";
 import PlacementSystem from "../systems/PlacementSystem.js";
 import MiniMapUI from "../ui/MiniMapUI.js";
+import ObjectiveUI from "../ui/ObjectiveUI.js";
+import TutorialSystem from "../systems/TutorialSystem.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -133,7 +135,8 @@ export default class GameScene extends Phaser.Scene {
     this.hotbarSystem = new HotbarSystem(this);
     this.dayNightSystem = new DayNightSystem(this);
     this.resourceSystem = new ResourceSystem(this);
-    this.objectiveSystem = new ObjectiveSystem(this);
+    this.questSystem = new QuestSystem(this);
+    this.tutorialSystem = new TutorialSystem(this);
     this.resourceManager = new ResourceManager(this);
     this.waveManager = new WaveManager(this);
     this.gameStateManager = new GameStateManager(this);
@@ -145,6 +148,8 @@ export default class GameScene extends Phaser.Scene {
     this.hotbarUI = new HotbarUI(this);
     this.healthUI = new HealthUI(this);
     this.staminaUI = new StaminaUI(this);
+
+    this.objectiveUI = new ObjectiveUI(this, this.questSystem);
 
     this.gameOverUI = new GameOverUI(this);
     this.overlayMessageUI = new OverlayMessageUI(this);

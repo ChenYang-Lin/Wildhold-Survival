@@ -25,11 +25,11 @@ export default class PlacementSystem {
   start(itemId) {
     const recipe = BUILDINGS[itemId];
 
-    if (!recipe) return;
+    if (!recipe) return false;
 
     if (!this.scene.actionSystem.canAfford(recipe)) {
       console.log("Not enough resources");
-      return;
+      return false;
     }
 
     // Don't allow a second placement session.
@@ -47,6 +47,8 @@ export default class PlacementSystem {
     this.createControls();
 
     this.updatePlacement(position.gridX, position.gridY);
+
+    return true;
   }
 
   moveToWorldPosition(x, y) {
@@ -120,6 +122,8 @@ export default class PlacementSystem {
       if (!this.isPlacing) return;
 
       this.preview.setAlpha(0.55);
+
+      this.scene.tutorialSystem?.handleAction("placement.drag");
     });
   }
 
@@ -236,6 +240,8 @@ export default class PlacementSystem {
     }
 
     this.scene.actionSystem.payCost(this.recipe);
+
+    this.scene.tutorialSystem?.handleAction("placement.build");
 
     this.finish();
   }

@@ -21,13 +21,26 @@ export default class HotbarSystem {
   activateItem(itemId) {
     if (!itemId) return;
 
+    const actionId = `hotbar.${itemId}`;
+
+    if (!this.scene.tutorialSystem?.isActionAllowed(actionId)) {
+      return;
+    }
+
     if (BUILDINGS[itemId]) {
-      this.scene.placementSystem.start(itemId);
+      const started = this.scene.placementSystem.start(itemId);
+
+      if (started) {
+        this.scene.tutorialSystem?.handleAction(actionId);
+      }
+
       return;
     }
 
     if (POTIONS[itemId]) {
       this.scene.actionSystem.handlePotion(itemId);
+
+      this.scene.tutorialSystem?.handleAction(actionId);
     }
   }
 }

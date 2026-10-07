@@ -62,7 +62,7 @@ export default class DayNightSystem {
 
     this.retreatEnemies();
 
-    this.scene.objectiveSystem.onSurviveNight();
+    this.scene.questSystem.onSurviveNight();
 
     console.log("Day started");
   }

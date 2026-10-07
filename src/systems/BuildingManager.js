@@ -125,7 +125,7 @@ export default class BuildingManager {
     }
 
     // Objective hook
-    this.scene.objectiveSystem.onBuildingPlaced(type);
+    this.scene.questSystem.onBuildingPlaced(type);
     return obj;
   }
 

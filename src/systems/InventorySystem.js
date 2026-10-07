@@ -27,7 +27,7 @@ export default class InventorySystem {
 
   addItem(id, type, amount) {
     if (type === "resource") {
-      this.scene.objectiveSystem.addResource(id, amount);
+      this.scene.questSystem.addResource(id, amount);
     }
 
     // stack existing
