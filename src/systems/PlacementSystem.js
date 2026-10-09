@@ -173,6 +173,10 @@ export default class PlacementSystem {
       if (!this.isPlacing) return;
       if (!this.isValid) return;
 
+      if (!this.scene.tutorialSystem?.isActionAllowed("placement.build")) {
+        return;
+      }
+
       this.confirm();
     });
 
@@ -180,6 +184,10 @@ export default class PlacementSystem {
       event.stopPropagation();
 
       if (!this.isPlacing) return;
+
+      if (!this.scene.tutorialSystem?.isActionAllowed("placement.cancel")) {
+        return;
+      }
 
       this.cancel();
     });
@@ -232,6 +240,11 @@ export default class PlacementSystem {
     if (!this.isPlacing) return;
     if (!this.isValid) return;
 
+    // Check permission before placing the building.
+    if (!this.scene.tutorialSystem?.isActionAllowed("placement.build")) {
+      return;
+    }
+
     const placed = this.scene.buildingManager.placeBuilding(this.recipe.id, this.gridX, this.gridY);
 
     if (!placed) {
@@ -250,6 +263,8 @@ export default class PlacementSystem {
     if (!this.isPlacing) return;
 
     this.finish();
+
+    this.scene.tutorialSystem?.onPlacementCancelled();
   }
 
   finish() {

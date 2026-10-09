@@ -23,7 +23,17 @@ export default class HotbarSystem {
 
     const actionId = `hotbar.${itemId}`;
 
+    console.log(
+      "Hotbar action:",
+      actionId,
+      "tutorial active:",
+      this.scene.tutorialSystem?.active,
+      "current step:",
+      this.scene.tutorialSystem?.getCurrentStep()?.id,
+    );
+
     if (!this.scene.tutorialSystem?.isActionAllowed(actionId)) {
+      console.log("Hotbar action blocked:", actionId);
       return;
     }
 

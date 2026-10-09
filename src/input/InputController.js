@@ -44,6 +44,8 @@ export default class InputController {
 
     // Attack Button
     this.attackButtonUI.button.on("pointerdown", (pointer) => {
+      if (!this.isActionAllowed("combat.attack")) return; // For tutorial, restrict player inputs during the tutorial;
+
       this.state.attackPointerId = pointer.id;
       this.state.attackPressed = true;
       this.state.attackHeld = true;
@@ -59,6 +61,7 @@ export default class InputController {
 
     // Dash/Sprint button
     this.movementButtonUI.button.on("pointerdown", (pointer) => {
+      if (!this.isActionAllowed("player.dash")) return; // For tutorial, restrict player inputs during the tutorial;
       this.state.movementPointerId = pointer.id;
 
       this.state.dashPressed = true;
@@ -88,7 +91,7 @@ export default class InputController {
       }
 
       // Joystick
-      if (pointer.x < this.scene.scale.width * 0.4 && this.joyPointerId === null) {
+      if (pointer.x < this.scene.scale.width * 0.4 && this.joyPointerId === null && this.isActionAllowed("player.move")) {
         this.joyPointerId = pointer.id;
         this.joystickActive = true;
 
@@ -202,13 +205,13 @@ export default class InputController {
         return;
       }
 
-      if (pointer.button === 0) {
+      if (pointer.button === 0 && this.isActionAllowed("combat.attack")) {
         // Left click = attack
         this.state.attackPressed = true;
         this.state.attackHeld = true;
       }
 
-      if (pointer.button === 2) {
+      if (pointer.button === 2 && this.isActionAllowed("player.dash")) {
         // Right click = dash + sprint
         this.state.dashPressed = true;
         this.state.sprintHeld = true;
@@ -236,6 +239,10 @@ export default class InputController {
     const objects = this.scene.input.manager.hitTest(pointer, this.scene.input._list, this.scene.cameras.main);
 
     return objects.some((obj) => obj.isUI);
+  }
+
+  isActionAllowed(actionId) {
+    return this.scene.tutorialSystem?.isActionAllowed(actionId) ?? true;
   }
 
   resetUIPosition() {
@@ -279,17 +286,19 @@ export default class InputController {
     if (!this.state.isMobile) {
       this.state.moveVector.set(0, 0);
 
-      // Keyboard Movement
-      if (this.cursors.left.isDown) this.state.moveVector.x = -1;
-      if (this.cursors.right.isDown) this.state.moveVector.x = 1;
-      if (this.cursors.up.isDown) this.state.moveVector.y = -1;
-      if (this.cursors.down.isDown) this.state.moveVector.y = 1;
+      if (this.isActionAllowed("player.move")) {
+        // Keyboard Movement
+        if (this.cursors.left.isDown) this.state.moveVector.x = -1;
+        if (this.cursors.right.isDown) this.state.moveVector.x = 1;
+        if (this.cursors.up.isDown) this.state.moveVector.y = -1;
+        if (this.cursors.down.isDown) this.state.moveVector.y = 1;
 
-      // WASD
-      if (this.keys.left.isDown) this.state.moveVector.x = -1;
-      if (this.keys.right.isDown) this.state.moveVector.x = 1;
-      if (this.keys.up.isDown) this.state.moveVector.y = -1;
-      if (this.keys.down.isDown) this.state.moveVector.y = 1;
+        // WASD
+        if (this.keys.left.isDown) this.state.moveVector.x = -1;
+        if (this.keys.right.isDown) this.state.moveVector.x = 1;
+        if (this.keys.up.isDown) this.state.moveVector.y = -1;
+        if (this.keys.down.isDown) this.state.moveVector.y = 1;
+      }
     }
 
     // Restart
