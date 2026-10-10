@@ -2,6 +2,8 @@ export default class DayNightSystem {
   constructor(scene) {
     this.scene = scene;
 
+    this.started = false; // Start day/night system after the player comepleted Beginner Tutorial.
+
     this.day = 1;
 
     this.isNight = false;
@@ -9,10 +11,17 @@ export default class DayNightSystem {
     this.dayDuration = 15000;
     this.nightDuration = 60000;
 
-    this.timer = this.dayDuration;
-    const count = 3 + this.day;
-
     this.dayNightText = scene.add.text(250, 20, "", { fontSize: "18px", color: "#ffffff" }).setScrollFactor(0).setDepth(10000); // prettier-ignore
+  }
+
+  startCycle() {
+    if (this.started) return;
+
+    this.started = true;
+    this.isNight = false;
+    this.timer = this.dayDuration;
+
+    console.log("Day/night cycle started");
   }
 
   startNight() {
@@ -76,6 +85,11 @@ export default class DayNightSystem {
   }
 
   update(delta) {
+    if (!this.started) {
+      this.dayNightText.setText("Day 1\nWaiting for survival phase");
+      return;
+    }
+
     this.timer -= delta;
     const seconds = Math.floor(this.timer / 1000);
 

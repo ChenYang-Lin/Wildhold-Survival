@@ -266,6 +266,7 @@ export default class InputController {
     if (this.attackButtonUI) {
       this.attackButtonUI.button.setPosition(w - 150, h - 110);
       this.attackButtonUI.text.setPosition(w - 150, h - 110);
+      this.attackButtonUI.highlightRing?.setPosition(w - 150, h - 110);
     }
 
     // Dash button - mobile only

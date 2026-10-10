@@ -5,21 +5,21 @@ export default class TutorialSystem {
     this.steps = [
       {
         id: "select_wall",
-        instruction: "Select Wall",
+        instruction: "Select Wall from the hotbar.",
         allowedActions: ["hotbar.wall"],
         restrictedActions: ["player.move", "combat.attack", "player.dash", "hotbar.tower", "hotbar.healthPotion", "hotbar.staminaPotion"],
         pauseSimulation: false,
       },
       {
         id: "place_wall",
-        instruction: "Move the Wall into position",
+        instruction: "Drag the wall to a valid tile to position it.",
         allowedActions: ["placement.drag", "placement.cancel"],
         restrictedActions: ["player.move", "combat.attack", "player.dash", "hotbar.wall", "hotbar.tower", "hotbar.healthPotion", "hotbar.staminaPotion"],
         pauseSimulation: true,
       },
       {
         id: "build_wall",
-        instruction: "Press BUILD",
+        instruction: "Wall positioned! Press BUILD to place it.",
         allowedActions: ["placement.build", "placement.cancel"],
         restrictedActions: ["player.move", "combat.attack", "player.dash", "hotbar.wall", "hotbar.tower", "hotbar.healthPotion", "hotbar.staminaPotion"],
         pauseSimulation: true,
@@ -27,13 +27,33 @@ export default class TutorialSystem {
     ];
 
     this.currentStepIndex = 0;
-    this.active = true;
+    this.active = false;
   }
 
   getCurrentStep() {
     if (!this.active) return null;
 
     return this.steps[this.currentStepIndex] ?? null;
+  }
+
+  getPrompt() {
+    const quest = this.scene.questSystem?.getCurrentQuest();
+
+    if (!quest) return "";
+
+    if (quest.id === "explore") {
+      return "Move to the yellow highlighted tile.";
+    }
+
+    if (quest.id === "gather_wood") {
+      return this.scene.inputController?.state.isMobile ? "Tap ATTACK while near a tree to gather wood." : "Left-click a tree to attack it and gather wood.";
+    }
+
+    if (quest.id === "build_wall") {
+      return this.getCurrentStep()?.instruction ?? "";
+    }
+
+    return "";
   }
 
   isActionAllowed(actionId) {
@@ -48,6 +68,10 @@ export default class TutorialSystem {
     }
 
     return step.allowedActions.includes(actionId);
+  }
+
+  setAttackHint(enabled) {
+    this.scene.inputController?.attackButtonUI?.setTutorialHighlight(enabled);
   }
 
   handleAction(actionId) {
@@ -75,10 +99,18 @@ export default class TutorialSystem {
     this.restartCurrentTutorialStep();
   }
 
-  restartCurrentTutorialStep() {
-    this.currentStepIndex = 0;
+  refreshPrompt() {
+    this.scene.objectiveUI?.update();
+  }
 
-    console.log("Tutorial restarted: select_wall");
+  start() {
+    if (this.active) return;
+
+    this.currentStepIndex = 0;
+    this.active = true;
+
+    console.log("Wall tutorial started");
+    this.refreshPrompt();
   }
 
   completeCurrentStep() {
@@ -94,5 +126,14 @@ export default class TutorialSystem {
       this.active = false;
       console.log("Tutorial complete");
     }
+
+    this.refreshPrompt();
+  }
+
+  restartCurrentTutorialStep() {
+    this.currentStepIndex = 0;
+
+    console.log("Tutorial restarted: select_wall");
+    this.refreshPrompt();
   }
 }

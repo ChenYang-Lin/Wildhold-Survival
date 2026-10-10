@@ -93,6 +93,10 @@ export default class GameScene extends Phaser.Scene {
 
     this.createWorld();
 
+    this.events.once(Phaser.Scenes.Events.POST_UPDATE, () => {
+      this.questSystem.start();
+    });
+
     this.miniMapUI = new MiniMapUI(this);
 
     // Set boundry ----------------------------------------------------------------------------------------------------------
@@ -282,6 +286,8 @@ export default class GameScene extends Phaser.Scene {
     this.handlePlayerCamera();
 
     this.player.update(delta);
+
+    this.questSystem.update();
 
     this.updateCameraReturn(delta);
 
