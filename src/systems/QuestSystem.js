@@ -31,6 +31,28 @@ export default class QuestSystem {
         ],
       },
       {
+        id: "gather_supplies",
+        title: "Gather Building Supplies",
+        objectives: [
+          {
+            id: "collect_wood",
+            type: "collect",
+            text: "Gather 10 Wood",
+            target: 10,
+            progress: 0,
+            requirements: { item: "wood" },
+          },
+          {
+            id: "collect_stone",
+            type: "collect",
+            text: "Gather 5 Stone",
+            target: 5,
+            progress: 0,
+            requirements: { item: "stone" },
+          },
+        ],
+      },
+      {
         id: "build_wall",
         title: "Build Your First Wall",
         objectives: [
@@ -88,7 +110,7 @@ export default class QuestSystem {
 
     if (!quest) return null;
 
-    return quest.objectives[this.currentObjectiveIndex] ?? null;
+    return quest.objectives.find((objective) => objective.progress < objective.target) ?? null;
   }
 
   start() {
@@ -124,6 +146,10 @@ export default class QuestSystem {
 
     if (quest.id === "protect_tent") {
       this.scene.dayNightSystem.startCycle();
+    }
+
+    if (quest.id === "kill_enemy") {
+      this.spawnQuestGoblin();
     }
 
     this.scene.events.emit("quest:started", quest);
@@ -197,6 +223,34 @@ export default class QuestSystem {
     return destination;
   }
 
+  spawnQuestGoblin() {
+    const camp = this.scene.mapManager.getEnemyCamp(1);
+
+    if (!camp) {
+      console.warn("Tutorial goblin spawn failed: Camp 1 not found.");
+      return;
+    }
+
+    const campNode = this.scene.navigationManager.getNode(camp.name);
+
+    if (!campNode) {
+      console.warn(`Tutorial goblin spawn failed: navigation node "${camp.name}" not found.`);
+      return;
+    }
+
+    const x = camp.x + Phaser.Math.Between(-16, 16);
+    const y = camp.y + Phaser.Math.Between(-16, 16);
+
+    const goblin = this.scene.combatSystem.spawnEnemy(x, y, {}, "goblin", campNode);
+
+    if (!goblin) {
+      console.warn("Tutorial goblin spawn failed.");
+      return;
+    }
+
+    goblin.ai.setTargetMode("player");
+  }
+
   setDestinationTarget(tile) {
     this.targetDestination = tile;
     this.destinationMarker?.destroy();
@@ -248,34 +302,31 @@ export default class QuestSystem {
     }
   }
 
-  addProgress(amount = 1) {
-    const objective = this.getCurrentObjective();
-
+  addProgress(amount = 1, objective = this.getCurrentObjective()) {
     if (!objective || amount <= 0) return;
+    if (objective.progress >= objective.target) return;
 
     objective.progress = Math.min(objective.progress + amount, objective.target);
 
     if (objective.progress >= objective.target) {
-      this.completeCurrentObjective();
+      this.completeCurrentObjective(objective);
     }
 
     this.scene.objectiveUI?.update();
   }
 
-  completeCurrentObjective() {
-    const objective = this.getCurrentObjective();
-
-    if (!objective) return;
-
-    objective.progress = objective.target;
+  completeCurrentObjective(objective) {
+    if (!objective || objective.progress < objective.target) return;
 
     console.log(`Objective complete: ${objective.id}`);
 
     const quest = this.getCurrentQuest();
 
-    this.currentObjectiveIndex++;
+    if (!quest) return;
 
-    if (this.currentObjectiveIndex >= quest.objectives.length) {
+    const allObjectivesComplete = quest.objectives.every((item) => item.progress >= item.target);
+
+    if (allObjectivesComplete) {
       this.completeCurrentQuest();
     }
   }
@@ -296,36 +347,51 @@ export default class QuestSystem {
   }
 
   addResource(itemId, amount) {
-    const objective = this.getCurrentObjective();
+    const quest = this.getCurrentQuest();
 
-    if (!objective || objective.type !== "collect") return;
-    if (objective.requirements?.item !== itemId) return;
+    if (!quest || amount <= 0) return;
 
-    this.addProgress(amount);
+    const matchingObjectives = quest.objectives.filter(
+      (objective) => objective.type === "collect" && objective.requirements?.item === itemId && objective.progress < objective.target,
+    );
+
+    for (const objective of matchingObjectives) {
+      this.addProgress(amount, objective);
+    }
   }
 
   onBuildingPlaced(buildingId) {
-    const objective = this.getCurrentObjective();
+    const quest = this.getCurrentQuest();
+    if (!quest) return;
 
-    if (!objective || objective.type !== "build") return;
-    if (objective.requirements?.building !== buildingId) return;
+    const objectives = quest.objectives.filter(
+      (objective) => objective.type === "build" && objective.requirements?.building === buildingId && objective.progress < objective.target,
+    );
 
-    this.addProgress(1);
+    for (const objective of objectives) {
+      this.addProgress(1, objective);
+    }
   }
 
   onEnemyKilled(enemy) {
-    const objective = this.getCurrentObjective();
+    const quest = this.getCurrentQuest();
+    if (!quest) return;
 
-    if (!objective || objective.type !== "kill") return;
+    const objectives = quest.objectives.filter((objective) => objective.type === "kill" && objective.progress < objective.target);
 
-    this.addProgress(1);
+    for (const objective of objectives) {
+      this.addProgress(1, objective);
+    }
   }
 
   onSurviveNight() {
-    const objective = this.getCurrentObjective();
+    const quest = this.getCurrentQuest();
+    if (!quest) return;
 
-    if (!objective || objective.type !== "survive") return;
+    const objectives = quest.objectives.filter((objective) => objective.type === "survive" && objective.progress < objective.target);
 
-    this.addProgress(1);
+    for (const objective of objectives) {
+      this.addProgress(1, objective);
+    }
   }
 }

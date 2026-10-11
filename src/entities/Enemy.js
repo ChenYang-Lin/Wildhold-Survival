@@ -289,6 +289,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.aiState = this.STATE_DEAD;
 
+    this.scene.questSystem?.onEnemyKilled(this);
+
     // Stop physics movement
     this.stopMoving();
 

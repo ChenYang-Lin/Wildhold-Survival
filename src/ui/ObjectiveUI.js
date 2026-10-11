@@ -7,6 +7,8 @@ export default class ObjectiveUI {
       .text(scene.scale.width / 2, 20, "", {
         fontSize: "18px",
         color: "#ffff00",
+        align: "center",
+        lineSpacing: 4,
       })
       .setOrigin(0.5, 0)
       .setScrollFactor(0)
@@ -28,30 +30,35 @@ export default class ObjectiveUI {
     this.update();
   }
 
+  formatObjective(objective) {
+    const completed = objective.progress >= objective.target;
+
+    let text = objective.text;
+
+    if (objective.type === "reach_destination") {
+      text = "Reach the highlighted tile next to the tree";
+    } else if (objective.type !== "survive") {
+      text = `${text} (${Math.floor(objective.progress)}/${objective.target})`;
+    }
+
+    return completed ? `✓ ${text}` : `• ${text}`;
+  }
+
   update() {
     const quest = this.questSystem.getCurrentQuest();
-    const objective = this.questSystem.getCurrentObjective();
 
-    if (!quest || !objective) {
+    if (!quest) {
       this.text.setText("All quests complete!");
       this.hintText.setText("");
       return;
     }
 
-    let objectiveText = objective.text;
+    const objectiveLines = quest.objectives.map((objective) => this.formatObjective(objective));
 
-    // A destination is a one-time action, so don't show a confusing 0/1.
-    if (objective.type === "reach_destination") {
-      objectiveText = "Reach the highlighted tile next to the tree";
-    } else if (objective.type === "collect") {
-      objectiveText = `${objective.text} (${Math.floor(objective.progress)}/${objective.target})`;
-    } else if (objective.type === "build") {
-      objectiveText = `${objective.text} (${Math.floor(objective.progress)}/${objective.target})`;
-    } else if (objective.type === "kill" || objective.type === "survive") {
-      objectiveText = `${objective.text} (${Math.floor(objective.progress)}/${objective.target})`;
-    }
+    this.text.setText([quest.title, ...objectiveLines].join("\n"));
 
-    this.text.setText(`${quest.title}\n${objectiveText}`);
+    // Keep the hint below the full objective list.
+    this.hintText.setY(this.text.y + this.text.height + 10);
 
     const hint = this.scene.tutorialSystem?.getPrompt() ?? "";
     this.hintText.setText(hint);

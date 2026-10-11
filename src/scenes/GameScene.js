@@ -93,6 +93,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.createWorld();
 
+    // Wait for the first physics update before reading the player's body position.
     this.events.once(Phaser.Scenes.Events.POST_UPDATE, () => {
       this.questSystem.start();
     });

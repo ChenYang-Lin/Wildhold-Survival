@@ -18,6 +18,13 @@ export default class EnemyAIComponent {
     this.maxDetour = 10;
 
     this.obstacleTile = null;
+
+    this.targetMode = "default"; // For Quest/Tutorial; targeting the player during the tutorial
+
+    // path finding when chasing the player
+    this.playerPathTarget = null;
+    this.pendingPlayerPathTarget = null;
+    this.playerPathTarget = null;
   }
 
   hasValidTarget() {
@@ -28,8 +35,63 @@ export default class EnemyAIComponent {
     return this.currentTarget;
   }
 
+  setTargetMode(mode) {
+    this.targetMode = mode;
+
+    if (mode === "player") {
+      this.currentTarget = null;
+      this.targetNode = null;
+      this.path.length = 0;
+      this.currentWaypoint = 0;
+      this.obstacleTile = null;
+      this.playerPathTarget = null;
+      this.pathCooldown = 0;
+    }
+  }
+
+  updatePlayerPath(time) {
+    const player = this.currentTarget;
+
+    if (!player?.active) return;
+
+    const playerTile = this.scene.mapManager.worldToGrid(player.body.center.x, player.body.center.y);
+
+    const targetKey = `${playerTile.gridX},${playerTile.gridY}`;
+
+    // Remember the latest player position, but don't interrupt
+    // the enemy's current movement toward its waypoint.
+    if (targetKey !== this.playerPathTarget) {
+      this.pendingPlayerPathTarget = targetKey;
+    }
+
+    const shouldRetry = this.path.length === 0 && time >= this.pathCooldown;
+
+    const targetChanged = this.pendingPlayerPathTarget !== null && this.pendingPlayerPathTarget !== this.playerPathTarget;
+
+    if (!targetChanged && !shouldRetry) return;
+
+    // Keep following the existing route until a waypoint is reached.
+    if (this.path.length > 0) return;
+
+    const start = this.scene.mapManager.worldToGrid(this.owner.body.center.x, this.owner.body.center.y);
+
+    const path = this.scene.pathfindingManager.findPath(start.gridX, start.gridY, playerTile.gridX, playerTile.gridY, "enemy");
+
+    this.playerPathTarget = targetKey;
+    this.pendingPlayerPathTarget = null;
+    this.pathCooldown = time + this.pathInterval;
+    this.path = path;
+    this.currentWaypoint = 0;
+  }
+
   findHighestPriorityTarget() {
     const owner = this.owner;
+    const player = this.scene.player;
+
+    // Tutorial encounter: only target the player.
+    if (this.targetMode === "player") {
+      return player?.active ? player : null;
+    }
 
     const tower = this.scene.buildingManager.getNearestTower(owner.body.center.x, owner.body.center.y, owner.aggroRange);
 
@@ -37,9 +99,7 @@ export default class EnemyAIComponent {
       return tower;
     }
 
-    const player = this.scene.player;
-
-    if (owner.distanceTo(player) < owner.aggroRange) {
+    if (player && owner.distanceTo(player) < owner.aggroRange) {
       return player;
     }
 
@@ -175,6 +235,45 @@ export default class EnemyAIComponent {
     this.owner.anims.play(`${this.owner.type}_walk_${this.owner.facing}`, true);
   }
 
+  followPlayerPath() {
+    if (this.path.length === 0) {
+      this.owner.stopMoving();
+      return;
+    }
+
+    const waypoint = this.path[this.currentWaypoint];
+
+    if (!waypoint) {
+      this.path.length = 0;
+      this.owner.stopMoving();
+      return;
+    }
+
+    if (this.scene.mapManager.isTileBlocked(waypoint.gridX, waypoint.gridY)) {
+      this.path.length = 0;
+      this.playerPathTarget = null;
+      this.owner.stopMoving();
+      return;
+    }
+
+    const world = this.scene.mapManager.gridToWorld(waypoint.gridX, waypoint.gridY);
+
+    const targetX = world.x + this.scene.mapManager.map.tileWidth / 2;
+    const targetY = world.y + this.scene.mapManager.map.tileHeight / 2;
+
+    const distance = Phaser.Math.Distance.Between(this.owner.body.center.x, this.owner.body.center.y, targetX, targetY);
+
+    const arriveDistance = (this.owner.stats.speed * this.scene.game.loop.delta) / 1000 + 2;
+
+    if (distance < arriveDistance) {
+      this.currentWaypoint++;
+      this.owner.stopMoving();
+      return;
+    }
+
+    this.owner.moveBodyCenterTowards(targetX, targetY);
+  }
+
   tryAcquireTarget() {
     const target = this.findHighestPriorityTarget();
 
@@ -192,7 +291,7 @@ export default class EnemyAIComponent {
       return;
     }
 
-    if (this.owner.distanceTo(this.currentTarget) > this.owner.aggroRange) {
+    if (this.targetMode !== "player" && this.owner.distanceTo(this.currentTarget) > this.owner.aggroRange) {
       this.owner.enterNavigate();
       return;
     }
@@ -202,8 +301,15 @@ export default class EnemyAIComponent {
       return;
     }
 
-    const pos = this.owner.getPosition(this.currentTarget);
+    if (this.currentTarget === this.scene.player) {
+      const time = this.scene.time.now;
 
+      this.updatePlayerPath(time);
+      this.followPlayerPath();
+      return;
+    }
+
+    const pos = this.owner.getPosition(this.currentTarget);
     this.owner.moveBodyCenterTowards(pos.x, pos.y);
   }
 
