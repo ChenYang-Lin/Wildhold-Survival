@@ -21,10 +21,9 @@ export default class EnemyAIComponent {
 
     this.targetMode = "default"; // For Quest/Tutorial; targeting the player during the tutorial
 
+    this.playerPathTarget = null;
     // path finding when chasing the player
-    this.playerPathTarget = null;
     this.pendingPlayerPathTarget = null;
-    this.playerPathTarget = null;
   }
 
   hasValidTarget() {
@@ -46,6 +45,7 @@ export default class EnemyAIComponent {
       this.obstacleTile = null;
       this.playerPathTarget = null;
       this.pathCooldown = 0;
+      this.pendingPlayerPathTarget = null;
     }
   }
 
@@ -196,6 +196,13 @@ export default class EnemyAIComponent {
 
     if (this.scene.mapManager.isTileBlocked(waypoint.gridX, waypoint.gridY)) {
       this.path.length = 0;
+      this.playerPathTarget = null;
+      this.owner.stopMoving();
+
+      if (this.owner.pendingSearch) {
+        this.owner.enterSearching();
+      }
+
       return;
     }
 
@@ -238,6 +245,11 @@ export default class EnemyAIComponent {
   followPlayerPath() {
     if (this.path.length === 0) {
       this.owner.stopMoving();
+
+      if (this.owner.pendingSearch) {
+        this.owner.enterSearching();
+      }
+
       return;
     }
 
@@ -253,6 +265,10 @@ export default class EnemyAIComponent {
       this.path.length = 0;
       this.playerPathTarget = null;
       this.owner.stopMoving();
+
+      if (this.owner.pendingSearch) {
+        this.owner.enterSearching();
+      }
       return;
     }
 
@@ -268,6 +284,11 @@ export default class EnemyAIComponent {
     if (distance < arriveDistance) {
       this.currentWaypoint++;
       this.owner.stopMoving();
+
+      if (this.owner.pendingSearch) {
+        this.owner.enterSearching();
+      }
+
       return;
     }
 

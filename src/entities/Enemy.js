@@ -35,11 +35,20 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.STATE_NAVIGATE = "navigate";
     this.STATE_BREAK_OBSTACLE = "break_obstacle";
     this.STATE_CHASE = "chase";
+    this.STATE_SEARCHING = "searching";
     this.STATE_WINDUP = "windup";
     this.STATE_ATTACK = "attack";
     this.STATE_FLINCH = "flinch";
     this.STATE_RETREAT = "retreat";
     this.STATE_DEAD = "dead";
+
+    // Configurable chase/search behavior (milliseconds)
+    this.chaseDuration = stats.chaseDuration ?? 3000;
+    this.searchDuration = stats.searchDuration ?? 750;
+
+    this.chaseUntil = 0;
+    this.searchUntil = 0;
+    this.pendingSearch = false;
 
     this.aiState = null;
     this.enterNavigate();
@@ -179,6 +188,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.ai.currentTarget = null;
     this.ai.obstacleTile = null;
     this.ai.path.length = 0;
+    this.ai.currentWaypoint = 0;
+    this.pendingSearch = false;
   }
 
   enterBreakObstacle() {
@@ -190,7 +201,36 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   enterChase() {
+    if (this.aiState === this.STATE_CHASE) return;
+
     this.aiState = this.STATE_CHASE;
+    this.chaseUntil = this.scene.time.now + this.chaseDuration;
+    this.pendingSearch = false;
+  }
+
+  enterSearching() {
+    if (this.aiState === this.STATE_SEARCHING) return;
+
+    this.aiState = this.STATE_SEARCHING;
+    this.searchUntil = this.scene.time.now + this.searchDuration;
+    this.pendingSearch = false;
+
+    this.stopMoving();
+
+    // Face the player while searching.
+    if (this.ai.hasValidTarget()) {
+      this.faceTarget(this.ai.currentTarget);
+    }
+
+    this.anims.play(`${this.type}_idle_${this.facing}`);
+
+    // Discard the old route. We'll calculate a fresh one
+    // when the enemy resumes chasing.
+    this.ai.path.length = 0;
+    this.ai.currentWaypoint = 0;
+    this.ai.playerPathTarget = null;
+    this.ai.pendingPlayerPathTarget = null;
+    this.ai.pathCooldown = 0;
   }
 
   enterWindup(target) {
@@ -332,8 +372,42 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.ai.updateBreakObstacle(time);
   }
 
-  updateChase() {
+  updateChase(time) {
     this.ai.updateChase();
+
+    // The AI may have transitioned to an attack, navigation,
+    // or another state during its update.
+    if (this.aiState !== this.STATE_CHASE) return;
+
+    if (this.ai.getAttackTarget() === this.scene.player && time >= this.chaseUntil) {
+      this.pendingSearch = true;
+    }
+  }
+
+  updateSearching(time) {
+    const target = this.ai.getAttackTarget();
+
+    if (!target?.active) {
+      this.enterNavigate();
+      return;
+    }
+
+    // Normal enemies should stop chasing a player who leaves
+    // their aggro range. Tutorial enemies retain their special behavior.
+    if (target === this.scene.player && this.ai.targetMode !== "player" && this.distanceTo(target) > this.aggroRange) {
+      this.enterNavigate();
+      return;
+    }
+
+    // Never delay an available attack because of the search timer.
+    if (target === this.scene.player && this.combat.isTargetInAttackRange(target)) {
+      this.enterWindup(target);
+      return;
+    }
+
+    if (time >= this.searchUntil) {
+      this.enterChase();
+    }
   }
 
   updateWindup() {
@@ -400,7 +474,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
           break;
 
         case this.STATE_CHASE:
-          this.updateChase();
+          this.updateChase(time);
+          break;
+
+        case this.STATE_SEARCHING:
+          this.updateSearching(time);
           break;
 
         case this.STATE_WINDUP:

@@ -12,6 +12,9 @@ export default class Archer extends Enemy {
       attackDelay: stats.attackDelay ?? 800,
       attackRecoverDuration: stats.attackRecoverDuration ?? 1200,
       hitboxLifetime: stats.hitboxLifetime ?? 80,
+
+      chaseDuration: stats.chaseDuration ?? 4500,
+      searchDuration: stats.searchDuration ?? 500,
     };
 
     super(scene, x, y, "goblin_archer", "goblin_archer_idle_down", archerStats, campNode);

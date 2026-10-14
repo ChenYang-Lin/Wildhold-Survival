@@ -12,6 +12,9 @@ export default class Goblin extends Enemy {
       attackDelay: stats.attackDelay ?? 500,
       attackRecoverDuration: stats.attackRecoverDuration ?? 800,
       hitboxLifetime: stats.hitboxLifetime ?? 80,
+
+      chaseDuration: stats.chaseDuration ?? 3000,
+      searchDuration: stats.searchDuration ?? 750,
     };
 
     super(scene, x, y, "goblin", "goblin_idle_down", goblinStats, campNode);
