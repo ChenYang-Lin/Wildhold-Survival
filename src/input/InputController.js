@@ -85,6 +85,7 @@ export default class InputController {
         this.state.aimWorldX = pointer.worldX;
         this.state.aimWorldY = pointer.worldY;
 
+        // For Placing System, move the preview building to dragged place.
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
         return;
@@ -108,6 +109,7 @@ export default class InputController {
       this.state.aimWorldY = pointer.worldY;
 
       if (this.scene.placementSystem?.isPlacing && pointer.id === this.placementPointerId) {
+        // For Placing System, move the preview building to dragged place.
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
         return;
@@ -142,6 +144,7 @@ export default class InputController {
     // POINTER UP (joystick release)
     this.scene.input.on("pointerup", (pointer) => {
       if (pointer.id === this.placementPointerId) {
+        this.scene.placementSystem?.notifyTutorialOfValidPosition();
         this.placementPointerId = null;
       }
 
@@ -183,6 +186,7 @@ export default class InputController {
       this.state.aimWorldX = pointer.worldX;
       this.state.aimWorldY = pointer.worldY;
 
+      // For Placing System, move the preview building to dragged place.
       if (this.scene.placementSystem?.isPlacing && pointer.id === this.placementPointerId) {
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
@@ -200,6 +204,7 @@ export default class InputController {
         this.state.aimWorldX = pointer.worldX;
         this.state.aimWorldY = pointer.worldY;
 
+        // For Placing System, move the preview building to dragged place.
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
         return;
@@ -221,6 +226,7 @@ export default class InputController {
     // pointer released
     this.scene.input.on("pointerup", (pointer) => {
       if (pointer.id === this.placementPointerId) {
+        this.scene.placementSystem?.notifyTutorialOfValidPosition();
         this.placementPointerId = null;
       }
 

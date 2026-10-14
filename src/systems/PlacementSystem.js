@@ -123,8 +123,14 @@ export default class PlacementSystem {
 
       this.preview.setAlpha(0.55);
 
-      this.scene.tutorialSystem?.handleAction("placement.drag");
+      this.notifyTutorialOfValidPosition();
     });
+  }
+
+  notifyTutorialOfValidPosition() {
+    if (!this.isPlacing || !this.isValid) return;
+
+    this.scene.tutorialSystem?.handleAction("placement.drag");
   }
 
   createControls() {
