@@ -10,30 +10,34 @@ export default class ObjectiveUI {
     this.background = scene.add.graphics();
 
     this.sectionText = scene.add.text(0, 0, "QUEST", {
+      fontFamily: "Arial, sans-serif",
       fontSize: "11px",
       fontStyle: "bold",
-      color: "#d9bc7a",
-      letterSpacing: 2,
+      color: "#e7c879",
+      letterSpacing: 1,
     });
 
     this.titleText = scene.add.text(0, 0, "", {
-      fontSize: "18px",
+      fontFamily: "Arial, sans-serif",
+      fontSize: "16px",
       fontStyle: "bold",
       color: "#ffffff",
       wordWrap: { width: this.panelWidth - this.padding * 2 },
     });
 
     this.objectiveText = scene.add.text(0, 0, "", {
-      fontSize: "15px",
-      color: "#e7e7e7",
-      lineSpacing: 6,
+      fontFamily: "Arial, sans-serif",
+      fontSize: "13px",
+      color: "#f0f0f0",
+      lineSpacing: 4,
       wordWrap: { width: this.panelWidth - this.padding * 2 },
     });
 
     this.hintText = scene.add.text(0, 0, "", {
-      fontSize: "13px",
-      color: "#b8bdc5",
-      lineSpacing: 4,
+      fontFamily: "Arial, sans-serif",
+      fontSize: "12px",
+      color: "#c5cbd3",
+      lineSpacing: 3,
       wordWrap: { width: this.panelWidth - this.padding * 2 },
     });
 
