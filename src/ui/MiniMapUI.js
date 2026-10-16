@@ -7,8 +7,8 @@ export default class MiniMapUI {
 
     const isMobile = scene.sys.game.device.input.touch;
 
-    this.panelWidth = isMobile ? 130 : 180;
-    this.panelHeight = isMobile ? 130 : 180;
+    this.panelWidth = isMobile ? 100 : 180;
+    this.panelHeight = isMobile ? 100 : 180;
 
     this.margin = 12;
 
@@ -184,6 +184,9 @@ export default class MiniMapUI {
 
   recenterCameraOnPlayer() {
     this.scene.returnToPlayerCamera();
+
+    // Hide the button immediately when returning to the player.
+    this.updateRecenterButton();
   }
 
   resetUIPosition() {
@@ -195,10 +198,15 @@ export default class MiniMapUI {
 
     this.camera.setViewport(this.margin, this.margin, this.panelWidth, this.panelHeight);
 
-    this.recenterButton.setPosition(this.margin + this.panelWidth - 16, this.margin + this.panelHeight + 18);
-    this.recenterText.setPosition(this.recenterButton.x, this.recenterButton.y);
+    // Top-right of the minimap.
+    const buttonX = this.margin + this.panelWidth + 18;
+    const buttonY = this.margin + 16;
+
+    this.recenterButton.setPosition(buttonX, buttonY);
+    this.recenterText.setPosition(buttonX, buttonY);
 
     this.setupCamera();
+    this.updateRecenterButton();
   }
 
   update() {
@@ -211,6 +219,23 @@ export default class MiniMapUI {
     this.cameraViewport.setPosition(mainCamera.midPoint.x, mainCamera.midPoint.y);
 
     this.cameraViewport.setSize(mainCamera.displayWidth, mainCamera.displayHeight);
+
+    this.updateRecenterButton();
+  }
+
+  updateRecenterButton() {
+    if (!this.recenterButton || !this.recenterText) return;
+
+    // Show the button only when the player has manually moved
+    // the camera away from player-follow mode.
+    const isFreeCamera = this.scene.cameraMode === "FREE_CAMERA";
+
+    this.recenterButton.setVisible(isFreeCamera);
+    this.recenterText.setVisible(isFreeCamera);
+
+    if (this.recenterButton.input) {
+      this.recenterButton.input.enabled = isFreeCamera;
+    }
   }
 
   destroy() {

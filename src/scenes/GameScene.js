@@ -108,7 +108,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Camera ----------------------------------------------------------------------------------------------------------
     // this.cameras.main.startFollow(this.player, false);
-    this.cameras.main.startFollow(this.player, true, 0.5, 0.5);
+    this.cameras.main.startFollow(this.player, true, 0.2, 0.2);
 
     this.setupCollisions();
 

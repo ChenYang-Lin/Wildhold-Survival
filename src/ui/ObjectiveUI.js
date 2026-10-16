@@ -3,47 +3,80 @@ export default class ObjectiveUI {
     this.scene = scene;
     this.questSystem = questSystem;
 
-    this.panelWidth = 300;
-    this.padding = 16;
-    this.gap = 10;
+    this.panelWidth = 260;
+    this.padding = 4;
+    this.gap = 5;
 
     this.background = scene.add.graphics();
 
-    this.sectionText = scene.add.text(0, 0, "QUEST", {
-      fontFamily: "Arial, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-      color: "#e7c879",
-      letterSpacing: 1,
-    });
+    this.questIcon = scene.add
+      .text(0, 0, "◆", {
+        fontFamily: "Arial, sans-serif",
+        fontSize: "17px",
+        color: "#f4c75b",
+        stroke: "#5b3d12",
+        strokeThickness: 2,
+      })
+      .setOrigin(0.5);
 
     this.titleText = scene.add.text(0, 0, "", {
       fontFamily: "Arial, sans-serif",
-      fontSize: "16px",
+      fontSize: "15px",
       fontStyle: "bold",
       color: "#ffffff",
-      wordWrap: { width: this.panelWidth - this.padding * 2 },
+      wordWrap: {
+        width: this.panelWidth - this.padding * 2 - 20,
+      },
+      stroke: "#111820",
+      strokeThickness: 3,
     });
+
+    // Gold underline beneath the title.
+    this.titleUnderline = scene.add.graphics();
 
     this.objectiveText = scene.add.text(0, 0, "", {
       fontFamily: "Arial, sans-serif",
       fontSize: "13px",
-      color: "#f0f0f0",
-      lineSpacing: 4,
-      wordWrap: { width: this.panelWidth - this.padding * 2 },
+      color: "#ffffff",
+      lineSpacing: 3,
+      wordWrap: {
+        width: this.panelWidth - this.padding * 2,
+      },
+      stroke: "#111820",
+      strokeThickness: 2,
     });
 
     this.hintText = scene.add.text(0, 0, "", {
       fontFamily: "Arial, sans-serif",
       fontSize: "12px",
-      color: "#c5cbd3",
-      lineSpacing: 3,
-      wordWrap: { width: this.panelWidth - this.padding * 2 },
+      color: "#e0e5ed",
+      lineSpacing: 2,
+      wordWrap: {
+        width: this.panelWidth - this.padding * 2,
+      },
+      stroke: "#111820",
+      strokeThickness: 2,
     });
 
-    this.container = scene.add.container(0, 0, [this.background, this.sectionText, this.titleText, this.objectiveText, this.hintText]);
+    this.container = scene.add.container(0, 0, [this.background, this.questIcon, this.titleText, this.titleUnderline, this.objectiveText, this.hintText]);
 
     this.container.setScrollFactor(0).setDepth(10000);
+
+    // Animate the icon gently while a quest is active.
+    this.iconTween = scene.tweens.add({
+      targets: this.questIcon,
+      scaleX: 1.12,
+      scaleY: 1.12,
+      alpha: 0.75,
+      duration: 800,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+    });
+
+    // Tap the tracker to expand/collapse the hint.
+    this.container.setSize(this.panelWidth, 80);
+    this.container.setInteractive(new Phaser.Geom.Rectangle(0, 0, this.panelWidth, 80), Phaser.Geom.Rectangle.Contains);
 
     this.handleResize = this.handleResize.bind(this);
     scene.scale.on("resize", this.handleResize);
@@ -60,37 +93,34 @@ export default class ObjectiveUI {
       text = "Reach the highlighted tile";
     }
 
-    if (objective.type === "collect") {
-      text = `${text}  ${Math.floor(objective.progress)}/${objective.target}`;
-    } else if (objective.type !== "reach_destination" && objective.type !== "survive") {
+    if (objective.type === "collect" || (objective.type !== "reach_destination" && objective.type !== "survive")) {
       text = `${text}  ${Math.floor(objective.progress)}/${objective.target}`;
     }
 
-    return completed ? `✓  ${text}` : `•  ${text}`;
+    return completed ? `✓ ${text}` : `• ${text}`;
   }
 
   update() {
     const quest = this.questSystem.getCurrentQuest();
+    const hint = this.scene.tutorialSystem?.getPrompt() ?? "";
+
+    this.hintText.setText(hint);
+    this.hintText.setVisible(hint.length > 0);
 
     if (!quest) {
-      this.sectionText.setText("QUEST");
+      this.questIcon.setVisible(false);
       this.titleText.setText("All quests complete!");
       this.objectiveText.setText("");
-      this.hintText.setText("");
       this.layoutPanel();
       return;
     }
 
+    this.questIcon.setVisible(true);
     this.titleText.setText(quest.title);
 
-    // Show every objective in the current quest.
-    // This matters for quests that require both wood and stone.
     const objectiveLines = quest.objectives.map((objective) => this.formatObjective(objective));
 
     this.objectiveText.setText(objectiveLines.join("\n"));
-
-    const hint = this.scene.tutorialSystem?.getPrompt() ?? "";
-    this.hintText.setText(hint);
 
     this.layoutPanel();
   }
@@ -99,37 +129,53 @@ export default class ObjectiveUI {
     const x = this.padding;
     let y = this.padding;
 
-    this.sectionText.setPosition(x, y);
-    y += this.sectionText.height + 8;
+    this.questIcon.setPosition(x + 8, y + 8);
+    this.titleText.setPosition(x + 22, y);
 
-    this.titleText.setPosition(x, y);
-    y += this.titleText.height + this.gap;
+    // Reserve space for the title before drawing the underline.
+    y += this.titleText.height + 3;
 
+    // Thicker gold underline.
+    this.titleUnderline.clear();
+
+    const underlineWidth = Math.min(this.titleText.width, this.panelWidth - x - 22);
+
+    this.titleUnderline.fillStyle(0xd6b45e, 1);
+    this.titleUnderline.fillRoundedRect(x + 22, y, underlineWidth, 3, 1);
+
+    y += 8;
+
+    // Objectives.
     if (this.objectiveText.text.length > 0) {
       this.objectiveText.setPosition(x, y);
       y += this.objectiveText.height;
     }
 
-    if (this.hintText.text.length > 0) {
-      y += this.gap;
+    // Always position the hint, even when hidden.
+    y += this.gap;
+    this.hintText.setPosition(x, y);
 
-      // Subtle separator between objectives and tutorial guidance.
+    if (this.hintText.visible && this.hintText.text.length > 0) {
+      y += this.gap;
       this.hintText.setPosition(x, y);
       y += this.hintText.height;
     }
 
-    const panelHeight = y + this.padding;
-
     this.background.clear();
 
-    this.background.fillStyle(0x111820, 0.88);
-    this.background.fillRoundedRect(0, 0, this.panelWidth, panelHeight, 8);
+    const miniMap = this.scene.miniMapUI;
+    const objectiveY = miniMap ? miniMap.margin + miniMap.panelHeight + 10 : 122;
 
-    this.background.lineStyle(1, 0xc1a66b, 0.45);
-    this.background.strokeRoundedRect(0, 0, this.panelWidth, panelHeight, 8);
+    this.container.setPosition(12, objectiveY);
 
-    // Fixed to the left-middle of the screen.
-    this.container.setPosition(24, Math.max(16, (this.scene.scale.height - panelHeight) / 2));
+    // Make the hit area cover the visible tracker content.
+    const hitHeight = Math.max(44, y + this.padding);
+
+    this.container.setSize(this.panelWidth, hitHeight);
+
+    if (this.container.input?.hitArea) {
+      this.container.input.hitArea.setTo(0, 0, this.panelWidth, hitHeight);
+    }
   }
 
   handleResize() {
@@ -138,6 +184,8 @@ export default class ObjectiveUI {
 
   destroy() {
     this.scene.scale.off("resize", this.handleResize);
+
+    this.iconTween?.stop();
     this.container.destroy();
   }
 }
