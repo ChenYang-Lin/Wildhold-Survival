@@ -68,6 +68,9 @@ export default class HealthUI {
     // Order matters: the trim is drawn last to stay visible.
     this.container.add([this.frame, this.background, this.damageTrail, this.fill, this.divisions, this.levelBackground, this.levelText]);
 
+    // update the health UI after the physics step: solves the health bar jittering issue.
+    this.scene.events.on(Phaser.Scenes.Events.POST_UPDATE, this.update, this);
+
     this.update();
   }
 
@@ -203,9 +206,10 @@ export default class HealthUI {
   }
 
   destroy() {
+    this.scene.events.off(Phaser.Scenes.Events.POST_UPDATE, this.update, this);
+
     this.stopDamageAnimation();
     this.container?.destroy(true);
-
     this.container = null;
   }
 }

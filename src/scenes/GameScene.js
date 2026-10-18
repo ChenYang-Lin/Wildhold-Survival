@@ -107,8 +107,7 @@ export default class GameScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
 
     // Camera ----------------------------------------------------------------------------------------------------------
-    // this.cameras.main.startFollow(this.player, false);
-    this.cameras.main.startFollow(this.player, true, 1, 1);
+    this.cameras.main.startFollow(this.player, false, 1, 1);
 
     this.setupCollisions();
 
@@ -239,8 +238,7 @@ export default class GameScene extends Phaser.Scene {
 
     if (progress >= 1) {
       this.cameraMode = "FOLLOW_PLAYER";
-
-      camera.startFollow(this.player, false);
+      this.cameras.main.startFollow(this.player, false, 1, 1);
     }
   }
 
@@ -298,7 +296,6 @@ export default class GameScene extends Phaser.Scene {
     this.placementSystem.update();
     this.combatSystem.update(time, delta);
 
-    this.healthUI.update();
     this.staminaUI.update();
 
     this.dayNightSystem.update(delta);
