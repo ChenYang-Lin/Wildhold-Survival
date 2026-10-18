@@ -1,171 +1,211 @@
-import { HUD_CONFIG } from "../data/hudConfig.js";
-
 export default class HealthUI {
   constructor(scene) {
     this.scene = scene;
 
-    // --------------------------------------------------
-    // RESPONSIVE CONFIG
-    // --------------------------------------------------
-
     const isMobile = scene.sys.game.device.input.touch;
 
-    this.config = isMobile ? HUD_CONFIG.mobile : HUD_CONFIG.desktop;
+    // Layout
+    this.barWidth = 80;
+    this.levelSize = 12;
+    this.barHeight = this.levelSize;
+    this.frameThickness = 2;
+    this.playerYOffset = isMobile ? 22 : 26;
 
-    // --------------------------------------------------
-    // SIZE
-    // --------------------------------------------------
+    this.innerWidth = this.barWidth - this.frameThickness * 2;
+    this.innerHeight = this.barHeight - this.frameThickness * 2;
 
-    this.barWidth = this.config.healthWidth;
-    this.barHeight = this.config.healthHeight;
+    this.barLeft = this.levelSize / 2;
+    this.barCenterX = this.barLeft + this.barWidth / 2;
+    this.fillLeft = this.barLeft + this.frameThickness;
+    this.fillTop = -this.innerHeight / 2;
 
-    // --------------------------------------------------
-    // SHADOW
-    // --------------------------------------------------
+    this.lastMaxHP = null;
+    this.lastLevel = null;
+    this.lastHP = null;
 
-    this.shadow = scene.add
-      .rectangle(0, 3, this.barWidth + 8, this.barHeight + 8, 0x000000, 0.45)
-      .setScrollFactor(0)
-      .setDepth(9997);
+    this.damageDelay = 100;
+    this.damageDuration = 250;
 
-    // --------------------------------------------------
-    // OUTER FRAME
-    // --------------------------------------------------
+    this.damageState = { width: 0 };
+    this.damageTween = null;
+    this.damageTimer = null;
 
-    this.outer = scene.add
-      .rectangle(0, 0, this.barWidth + 6, this.barHeight + 6, 0x101318, 1)
-      .setStrokeStyle(1, 0x555d66, 0.9)
-      .setScrollFactor(0)
-      .setDepth(9998);
+    // One container keeps the badge and bar aligned.
+    this.container = scene.add.container(0, 0);
+    this.container.setDepth(1000);
 
-    // --------------------------------------------------
-    // BAR BACKGROUND
-    // --------------------------------------------------
+    // Level badge: dark.
+    this.levelBackground = scene.add.rectangle(0, 0, this.levelSize, this.levelSize, 0x20242b, 1);
 
-    this.background = scene.add.rectangle(0, 0, this.barWidth, this.barHeight, 0x24292e, 1).setStrokeStyle(1, 0x343a42, 0.9).setScrollFactor(0).setDepth(9999);
-
-    // --------------------------------------------------
-    // HEALTH FILL
-    // --------------------------------------------------
-
-    this.fill = scene.add.rectangle(0, 0, this.barWidth, this.barHeight, 0x44cc44, 1).setOrigin(0, 0.5).setScrollFactor(0).setDepth(10000);
-
-    // --------------------------------------------------
-    // INNER HIGHLIGHT
-    // --------------------------------------------------
-
-    this.highlight = scene.add.rectangle(0, -5, this.barWidth, 2, 0xffffff, 0.12).setOrigin(0, 0.5).setScrollFactor(0).setDepth(10001);
-
-    // --------------------------------------------------
-    // TEXT
-    // --------------------------------------------------
-
-    this.labelText = scene.add
-      .text(0, 0, "HP:", {
+    this.levelText = scene.add
+      .text(0, 0, "1", {
         fontFamily: "Arial",
-        fontSize: isMobile ? "11px" : "13px",
+        fontSize: isMobile ? "8px" : "8px",
         fontStyle: "bold",
-        color: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 3,
+        color: "#fff1c2",
+        stroke: "#17191e",
+        strokeThickness: 2,
+        align: "center",
       })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(10002);
+      .setOrigin(0.5);
 
-    this.valueText = scene.add
-      .text(0, 0, "", {
-        fontFamily: "Arial",
-        fontSize: isMobile ? "11px" : "13px",
-        fontStyle: "bold",
-        color: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 3,
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(10002);
+    // Outer frame. Drawn as a solid dark rectangle.
+    this.frame = scene.add.rectangle(this.barCenterX, 0, this.barWidth, this.barHeight, 0x101217, 1);
 
-    this.resetUIPosition();
+    // Dark area behind the health fill.
+    this.background = scene.add.rectangle(this.fillLeft + this.innerWidth / 2, 0, this.innerWidth, this.innerHeight, 0x080a0d, 1);
+
+    // Health fill.
+    this.fill = scene.add.rectangle(this.fillLeft, 0, 0, this.innerHeight, 0x43c83e, 1);
+    this.fill.setOrigin(0, 0.5);
+
+    // Damage trail remains behind the main fill.
+    this.damageTrail = scene.add.rectangle(this.fillLeft, 0, 0, this.innerHeight, 0xc6a04a, 1);
+    this.damageTrail.setOrigin(0, 0.5);
+
+    this.divisions = scene.add.graphics();
+
+    // Order matters: the trim is drawn last to stay visible.
+    this.container.add([this.frame, this.background, this.damageTrail, this.fill, this.divisions, this.levelBackground, this.levelText]);
+
+    this.update();
+  }
+
+  drawHealthDivisions(maxHP) {
+    this.divisions.clear();
+
+    if (!Number.isFinite(maxHP) || maxHP <= 0) return;
+
+    const top = -this.innerHeight / 2;
+    const middle = 0;
+    const bottom = this.innerHeight / 2;
+
+    for (let hp = 10; hp < maxHP; hp += 10) {
+      const x = this.fillLeft + (hp / maxHP) * this.innerWidth;
+
+      const isThousand = hp % 1000 === 0;
+      const isHundred = hp % 100 === 0;
+
+      if (isThousand) {
+        this.divisions.lineStyle(2, 0x101217, 1);
+        this.divisions.beginPath();
+        this.divisions.moveTo(x, top);
+        this.divisions.lineTo(x, bottom);
+        this.divisions.strokePath();
+      } else if (isHundred && maxHP < 4000) {
+        this.divisions.lineStyle(1, 0x101217, 1);
+        this.divisions.beginPath();
+        this.divisions.moveTo(x, top);
+        this.divisions.lineTo(x, bottom);
+        this.divisions.strokePath();
+      } else if (!isHundred && maxHP < 400) {
+        this.divisions.lineStyle(1, 0x27302a, 1);
+        this.divisions.beginPath();
+        this.divisions.moveTo(x, top);
+        this.divisions.lineTo(x, middle);
+        this.divisions.strokePath();
+      }
+    }
+  }
+
+  stopDamageAnimation() {
+    this.damageTween?.stop();
+    this.damageTimer?.remove(false);
+
+    this.damageTween = null;
+    this.damageTimer = null;
+  }
+
+  setDamageTrailWidth(width) {
+    this.damageState.width = Phaser.Math.Clamp(width, 0, this.innerWidth);
+    this.damageTrail.setSize(this.damageState.width, this.innerHeight);
+  }
+
+  animateDamage(previousWidth, targetWidth) {
+    this.stopDamageAnimation();
+
+    this.setDamageTrailWidth(Math.max(previousWidth, targetWidth));
+
+    this.damageTimer = this.scene.time.delayedCall(this.damageDelay, () => {
+      this.damageTimer = null;
+
+      this.damageTween = this.scene.tweens.add({
+        targets: this.damageState,
+        width: targetWidth,
+        duration: this.damageDuration,
+        ease: "Quad.easeOut",
+        onUpdate: () => {
+          this.setDamageTrailWidth(this.damageState.width);
+        },
+        onComplete: () => {
+          this.damageTween = null;
+          this.setDamageTrailWidth(targetWidth);
+        },
+      });
+    });
   }
 
   update() {
     const player = this.scene.player;
 
-    const percent = Phaser.Math.Clamp(player.health.hp / player.health.maxHP, 0, 1);
+    if (!player?.health || !this.container) return;
 
-    // --------------------------------------------------
-    // FILL
-    // --------------------------------------------------
+    const { hp, maxHP } = player.health;
 
-    this.fill.setSize(this.barWidth * percent, this.barHeight);
+    if (!Number.isFinite(maxHP) || maxHP <= 0) return;
 
-    // --------------------------------------------------
-    // COLOR
-    // --------------------------------------------------
+    const currentHP = Phaser.Math.Clamp(Number.isFinite(hp) ? hp : 0, 0, maxHP);
 
-    if (percent <= 0.3) {
-      this.fill.setFillStyle(0xff4444);
-      this.outer.setStrokeStyle(1, 0xff5555, 0.9);
-    } else if (percent <= 0.6) {
-      this.fill.setFillStyle(0xe0a83b);
-      this.outer.setStrokeStyle(1, 0xc99a3a, 0.9);
-    } else {
-      this.fill.setFillStyle(0x44cc44);
-      this.outer.setStrokeStyle(1, 0x555d66, 0.9);
+    const targetWidth = this.innerWidth * (currentHP / maxHP);
+
+    if (this.lastMaxHP !== maxHP) {
+      this.drawHealthDivisions(maxHP);
+      this.lastMaxHP = maxHP;
+
+      this.stopDamageAnimation();
+      this.setDamageTrailWidth(targetWidth);
+    } else if (this.lastHP !== null && currentHP < this.lastHP) {
+      const previousWidth = Math.max(this.damageState.width, this.innerWidth * (this.lastHP / maxHP));
+
+      this.animateDamage(previousWidth, targetWidth);
+    } else if (this.lastHP !== null && currentHP > this.lastHP) {
+      this.stopDamageAnimation();
+      this.setDamageTrailWidth(targetWidth);
     }
 
-    // --------------------------------------------------
-    // TEXT
-    // --------------------------------------------------
+    this.fill.setSize(targetWidth, this.innerHeight);
+    this.fill.setFillStyle(0x43c83e);
 
-    this.labelText.setText("HP:");
-    this.valueText.setText(`${player.health.hp}/${player.health.maxHP}`);
+    // Keep the trail at least as wide as the current fill.
+    if (!this.damageTween && !this.damageTimer) {
+      this.setDamageTrailWidth(targetWidth);
+    }
 
-    this.resetUIPosition();
+    const level = Number.isFinite(player.level) ? player.level : 23;
+
+    if (this.lastLevel !== level) {
+      this.levelText.setText(String(level));
+      this.lastLevel = level;
+    }
+
+    this.lastHP = currentHP;
+
+    const totalWidth = this.levelSize + this.barWidth;
+
+    // Keep subpixel camera-follow positioning; don't round independently.
+    this.container.setPosition(player.x - totalWidth / 2, player.y - this.playerYOffset);
+
+    this.container.setDepth(Math.max(1000, (player.depth || 0) + 10));
   }
 
   resetUIPosition() {
-    const hotbarUI = this.scene.hotbarUI;
+    this.update();
+  }
 
-    if (!hotbarUI) {
-      return;
-    }
+  destroy() {
+    this.stopDamageAnimation();
+    this.container?.destroy(true);
 
-    const centerX = this.scene.scale.width / 2;
-
-    const hotbarY = hotbarUI.getY();
-
-    const gap = hotbarUI.isMobile ? 2 : 6;
-
-    const y = hotbarY + hotbarUI.getDockHeight() / 2 + this.barHeight / 2 + gap;
-
-    // ---------------------------------------------
-    // HEALTH BAR
-    // ---------------------------------------------
-
-    this.shadow.setPosition(centerX, y + 2);
-
-    this.outer.setPosition(centerX, y);
-
-    this.background.setPosition(centerX, y);
-
-    this.fill.setPosition(centerX - this.barWidth / 2, y);
-
-    this.highlight.setPosition(centerX - this.barWidth / 2, y - this.barHeight / 2 + 5);
-
-    // ---------------------------------------------
-    // HEALTH TEXT
-    // ---------------------------------------------
-
-    const sidePadding = hotbarUI.isMobile ? 8 : 12;
-
-    const labelX = centerX - this.barWidth / 2 - sidePadding - this.labelText.width / 2;
-
-    const valueX = centerX + this.barWidth / 2 + sidePadding + this.valueText.width / 2;
-
-    this.labelText.setPosition(labelX, y);
-
-    this.valueText.setPosition(valueX, y);
+    this.container = null;
   }
 }

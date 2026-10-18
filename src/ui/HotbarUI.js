@@ -465,7 +465,7 @@ export default class HotbarUI {
   }
 
   getY() {
-    return this.scene.scale.height - (this.isMobile ? 70 : 100);
+    return this.scene.scale.height - (this.isMobile ? 60 : 90);
   }
 
   createResourceCost() {

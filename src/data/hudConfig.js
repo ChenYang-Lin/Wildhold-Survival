@@ -8,9 +8,6 @@ export const HUD_CONFIG = {
     arrowWidth: 40,
     arrowHeight: 40,
 
-    healthWidth: 390,
-    healthHeight: 12,
-
     panelPadding: 10,
     viewportPadding: 8,
     actionGap: 12,
@@ -26,9 +23,6 @@ export const HUD_CONFIG = {
     slotSpacing: 5,
     arrowWidth: 34,
     arrowHeight: 34,
-
-    healthWidth: 200,
-    healthHeight: 10,
 
     panelPadding: 8,
     viewportPadding: 6,
