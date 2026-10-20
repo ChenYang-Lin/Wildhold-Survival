@@ -80,32 +80,74 @@ export default class HealthUI {
     if (!Number.isFinite(maxHP) || maxHP <= 0) return;
 
     const top = -this.innerHeight / 2;
-    const middle = 0;
+    const middle = 0; // 50% height marker (for 10-HP ticks)
     const bottom = this.innerHeight / 2;
 
-    for (let hp = 10; hp < maxHP; hp += 10) {
-      const x = Math.round(this.fillLeft + (hp / maxHP) * this.innerWidth);
+    // Calculate a precise 75% height line starting from the top down
+    const threeQuarterHeight = top + this.innerHeight * 0.75;
 
-      const isThousand = hp % 1000 === 0;
-      const isHundred = hp % 100 === 0;
+    // ==========================================
+    // PHASE 1: LOW HEALTH MODE (Below 400 HP)
+    // ==========================================
+    if (maxHP < 400) {
+      // 10-HP Ticks: Drawn as Half-Ticks (top to middle)
+      this.divisions.lineStyle(1, 0x000000, 0.4);
+      for (let hp = 10; hp < maxHP; hp += 10) {
+        if (hp % 100 === 0) continue; // Skip 100 marks so they can be full ticks
 
-      if (isThousand) {
-        this.divisions.lineStyle(2, 0x101217, 1);
-        this.divisions.beginPath();
-        this.divisions.moveTo(x, top);
-        this.divisions.lineTo(x, bottom);
-        this.divisions.strokePath();
-      } else if (isHundred && maxHP < 4000) {
-        this.divisions.lineStyle(1, 0x101217, 1);
-        this.divisions.beginPath();
-        this.divisions.moveTo(x, top);
-        this.divisions.lineTo(x, bottom);
-        this.divisions.strokePath();
-      } else if (!isHundred && maxHP < 400) {
-        this.divisions.lineStyle(1, 0x27302a, 1);
+        const x = Math.round(this.fillLeft + (hp / maxHP) * this.innerWidth);
         this.divisions.beginPath();
         this.divisions.moveTo(x, top);
         this.divisions.lineTo(x, middle);
+        this.divisions.strokePath();
+      }
+
+      // 100-HP Ticks: Always Full-Ticks here because maxHP is below 1000
+      this.divisions.lineStyle(1, 0x000000, 0.8);
+      for (let hp = 100; hp < maxHP; hp += 100) {
+        const x = Math.round(this.fillLeft + (hp / maxHP) * this.innerWidth);
+        this.divisions.beginPath();
+        this.divisions.moveTo(x, top);
+        this.divisions.lineTo(x, bottom);
+        this.divisions.strokePath();
+      }
+    }
+    // ==========================================
+    // PHASE 2: HIGH HEALTH MODE (400 HP and Above)
+    // ==========================================
+    else {
+      // 10-HP ticks are completely removed starting at 400 HP.
+
+      // 100-HP Ticks: Only drawn if BELOW 4000 HP.
+      if (maxHP < 4000) {
+        this.divisions.lineStyle(1, 0x000000, 0.6);
+        for (let hp = 100; hp < maxHP; hp += 100) {
+          if (hp % 1000 === 0) continue; // Skip 1000 marks so they can be thick whole ticks
+
+          const x = Math.round(this.fillLeft + (hp / maxHP) * this.innerWidth);
+          this.divisions.beginPath();
+          this.divisions.moveTo(x, top);
+
+          // 🌟 CONDITIONAL HEIGHT CONFIGURATION:
+          // If maxHP is over 1000, drop the 100-HP tick down to 75% height.
+          // Otherwise (between 400 and 1000), keep it as a full-height tick.
+          if (maxHP > 1000) {
+            this.divisions.lineTo(x, threeQuarterHeight);
+          } else {
+            this.divisions.lineTo(x, bottom);
+          }
+
+          this.divisions.strokePath();
+        }
+      }
+
+      // 1000-HP Ticks: Always drawn as Thick Whole-Ticks (top to bottom)
+      this.divisions.lineStyle(2, 0x000000, 1.0);
+      for (let hp = 1000; hp < maxHP; hp += 1000) {
+        const x = Math.round(this.fillLeft + (hp / maxHP) * this.innerWidth);
+        this.divisions.beginPath();
+        this.divisions.moveTo(x, top);
+        this.divisions.lineTo(x, bottom);
         this.divisions.strokePath();
       }
     }

@@ -7,8 +7,8 @@ export default class StaminaUI {
     this.radius = isMobile ? 24 : 28;
     this.arcWidth = isMobile ? 5 : 6;
 
-    this.offsetX = isMobile ? 18 : 22;
-    this.offsetY = isMobile ? -8 : -10;
+    this.offsetX = isMobile ? 24 : 24;
+    this.offsetY = isMobile ? -0 : -0;
 
     this.backgroundColor = 0x24292e;
     this.fillColor = 0xf2c230;
@@ -26,32 +26,6 @@ export default class StaminaUI {
     this.visible = false;
 
     this.setVisible(false);
-  }
-
-  update() {
-    const player = this.scene.player;
-
-    if (!player || !player.stats || !player.body) {
-      return;
-    }
-
-    const percent = Phaser.Math.Clamp(player.stats.staminaPercent, 0, 1);
-
-    // Hide stamina bar when completely full.
-    if (percent >= 1) {
-      this.setVisible(false);
-      return;
-    }
-
-    this.setVisible(true);
-
-    const x = player.body.right + this.offsetX;
-    const y = player.body.center.y + this.offsetY;
-
-    this.background.setPosition(x, y);
-    this.fill.setPosition(x, y);
-
-    this.draw(percent);
   }
 
   draw(percent) {
@@ -112,5 +86,35 @@ export default class StaminaUI {
   destroy() {
     this.background.destroy();
     this.fill.destroy();
+  }
+
+  update() {
+    const player = this.scene.player;
+
+    if (!player || !player.stats || !player.body) {
+      return;
+    }
+
+    const percent = Phaser.Math.Clamp(player.stats.staminaPercent, 0, 1);
+
+    // Hide stamina bar when completely full.
+    if (percent >= 1) {
+      this.setVisible(false);
+      return;
+    }
+
+    this.setVisible(true);
+
+    // Fixing the jittering issue
+    const roundedRight = Math.round(player.x + player.body.width / 2);
+    const roundedCenterY = player.y;
+
+    const finalX = roundedRight + this.offsetX;
+    const finalY = roundedCenterY + this.offsetY;
+
+    this.background.setPosition(finalX, finalY);
+    this.fill.setPosition(finalX, finalY);
+
+    this.draw(percent);
   }
 }

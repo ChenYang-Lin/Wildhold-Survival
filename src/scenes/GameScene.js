@@ -98,14 +98,26 @@ export default class GameScene extends Phaser.Scene {
       this.questSystem.start();
     });
 
-    // For the HealthUI jittering bug.
+    // For fixing the HealthUI and staminaUI jittering bug.
+    // Using Math.round() to fix the healthbar jittering bug; make sure rounding doesn't slow down the player's speed
+    this.playerRemainderX = 0;
+    this.playerRemainderY = 0;
     this.events.on("postupdate", () => {
-      // Round the player position right before rendering
-      this.player.x = Math.round(this.player.x);
-      this.player.y = Math.round(this.player.y);
+      // 1. Add back the sub-pixel decimal fraction that cut off from the previous frame
+      const totalX = this.player.x + this.playerRemainderX;
+      const totalY = this.player.y + this.playerRemainderY;
 
-      // Update the health bar position to match
+      // 2. Round the position perfectly to a whole number so the health bar and player never shake
+      this.player.x = Math.round(totalX);
+      this.player.y = Math.round(totalY);
+
+      // 3. Save the exact decimal fraction that was lost in this frame's rounding step
+      this.playerRemainderX = totalX - this.player.x;
+      this.playerRemainderY = totalY - this.player.y;
+
+      // 4. Position the health bar and stamina bar perfectly over the rounded player
       this.healthUI.updateScreenPosition();
+      this.staminaUI.update();
     });
 
     this.miniMapUI = new MiniMapUI(this);
@@ -126,14 +138,6 @@ export default class GameScene extends Phaser.Scene {
 
     this.input.keyboard.on("keydown-P", (e) => {
       this.pathfindingManager.toggleDebugTileBlock();
-    });
-
-    console.log({
-      container: this.healthUI.container.vertexRoundMode,
-      frame: this.healthUI.frame.vertexRoundMode,
-      fill: this.healthUI.fill.vertexRoundMode,
-      background: this.healthUI.background.vertexRoundMode,
-      levelText: this.healthUI.levelText.vertexRoundMode,
     });
   }
 

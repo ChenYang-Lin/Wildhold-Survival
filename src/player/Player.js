@@ -19,7 +19,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(20, 16);
     this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
 
-    this.health = new HealthComponent(this, 3900);
+    this.health = new HealthComponent(this, 350);
     this.movement = new MovementComponent(this);
     this.stats = new StatsComponent(this, {
       speed: 100,

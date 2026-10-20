@@ -7,10 +7,9 @@ const config = {
 
   backgroundColor: "#2d2d2d",
 
-  render: {
-    pixelArt: true,
-    antialias: false,
-  },
+  pixelArt: true,
+  antialias: false,
+  roundPixels: true,
 
   scale: {
     mode: Phaser.Scale.RESIZE,
