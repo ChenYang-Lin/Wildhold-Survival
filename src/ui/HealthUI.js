@@ -84,7 +84,7 @@ export default class HealthUI {
     const bottom = this.innerHeight / 2;
 
     for (let hp = 10; hp < maxHP; hp += 10) {
-      const x = this.fillLeft + (hp / maxHP) * this.innerWidth;
+      const x = Math.round(this.fillLeft + (hp / maxHP) * this.innerWidth);
 
       const isThousand = hp % 1000 === 0;
       const isHundred = hp % 100 === 0;
@@ -148,6 +148,16 @@ export default class HealthUI {
     });
   }
 
+  updateScreenPosition() {
+    const player = this.scene.player;
+    if (!player || !this.container) return;
+
+    const totalWidth = this.levelSize + this.barWidth;
+
+    // Positions the container cleanly using the rounded player values
+    this.container.setPosition(player.x - totalWidth / 2, player.y - this.playerYOffset);
+  }
+
   update() {
     const player = this.scene.player;
 
@@ -193,12 +203,7 @@ export default class HealthUI {
 
     this.lastHP = currentHP;
 
-    const totalWidth = this.levelSize + this.barWidth;
-
-    // Keep subpixel camera-follow positioning; don't round independently.
-    this.container.setPosition(player.x - totalWidth / 2, player.y - this.playerYOffset);
-
-    this.container.setDepth(Math.max(1000, (player.depth || 0) + 10));
+    this.container.setDepth(1000);
   }
 
   resetUIPosition() {
