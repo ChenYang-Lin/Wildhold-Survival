@@ -77,8 +77,10 @@ export default class InputController {
 
     // POINTER DOWN ON SCREEN
     this.scene.input.on("pointerdown", (pointer) => {
+      // Ignore clicks on existing UI.
       if (this.isOverUI(pointer)) return;
 
+      // Handle building placement if placement mode is active.
       if (this.scene.placementSystem?.isPlacing) {
         this.placementPointerId = pointer.id;
 
@@ -91,7 +93,12 @@ export default class InputController {
         return;
       }
 
-      // Joystick
+      // Building selection / card dismissal
+      if (this.scene.buildingInteractionSystem?.handlePointerDown(pointer)) {
+        return;
+      }
+
+      // Joystick - Handle joystick input and aiming.
       if (pointer.x < this.scene.scale.width * 0.4 && this.joyPointerId === null && this.isActionAllowed("player.move")) {
         this.joyPointerId = pointer.id;
         this.joystickActive = true;
@@ -196,8 +203,10 @@ export default class InputController {
 
     // click = placement movement, attack, or dash
     this.scene.input.on("pointerdown", (pointer) => {
+      // Ignore clicks on existing UI.
       if (this.isOverUI(pointer)) return;
 
+      // Handle building placement if placement mode is active.
       if (this.scene.placementSystem?.isPlacing) {
         this.placementPointerId = pointer.id;
 
@@ -207,6 +216,11 @@ export default class InputController {
         // For Placing System, move the preview building to dragged place.
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
+        return;
+      }
+
+      // Building selection / card dismissal
+      if (this.scene.buildingInteractionSystem?.handlePointerDown(pointer)) {
         return;
       }
 

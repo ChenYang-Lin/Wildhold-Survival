@@ -12,6 +12,7 @@ import WaveManager from "../systems/WaveManager.js";
 import InputController from "../input/InputController.js";
 import ActionSystem from "../systems/ActionSystem.js";
 import BuildingManager from "../systems/BuildingManager.js";
+import BuildingInteractionSystem from "../systems/BuildingInteractionSystem.js";
 import CombatSystem from "../systems/CombatSystem.js";
 import DamageTextSystem from "../systems/DamageTextSystem.js";
 import SpellEffectSystem from "../systems/SpellEffectSystem.js";
@@ -154,6 +155,7 @@ export default class GameScene extends Phaser.Scene {
     this.inputController = new InputController(this);
     this.actionSystem = new ActionSystem(this, this.player, this.inputController); // prettier-ignore
     this.buildingManager = new BuildingManager(this);
+    this.buildingInteractionSystem = new BuildingInteractionSystem(this);
     this.placementSystem = new PlacementSystem(this);
     this.lightingSystem = new LightingSystem(this);
     this.combatSystem = new CombatSystem(this);

@@ -3,82 +3,82 @@ export default class QuestSystem {
     this.scene = scene;
 
     this.quests = [
-      {
-        id: "explore",
-        title: "Explore Your Surroundings",
-        objectives: [
-          {
-            id: "reach_tree",
-            type: "reach_destination",
-            text: "Reach the highlighted tile next to the nearest tree",
-            target: 1,
-            progress: 0,
-          },
-        ],
-      },
-      {
-        id: "gather_wood",
-        title: "Gather Wood",
-        objectives: [
-          {
-            id: "collect_wood",
-            type: "collect",
-            text: "Gather 10 Wood",
-            target: 10,
-            progress: 0,
-            requirements: { item: "wood" },
-          },
-        ],
-      },
-      {
-        id: "gather_supplies",
-        title: "Gather Building Supplies",
-        objectives: [
-          {
-            id: "collect_wood",
-            type: "collect",
-            text: "Gather 10 Wood",
-            target: 10,
-            progress: 0,
-            requirements: { item: "wood" },
-          },
-          {
-            id: "collect_stone",
-            type: "collect",
-            text: "Gather 5 Stone",
-            target: 5,
-            progress: 0,
-            requirements: { item: "stone" },
-          },
-        ],
-      },
-      {
-        id: "build_wall",
-        title: "Build Your First Wall",
-        objectives: [
-          {
-            id: "build_first_wall",
-            type: "build",
-            text: "Build 1 Wall",
-            target: 1,
-            progress: 0,
-            requirements: { building: "wall" },
-          },
-        ],
-      },
-      {
-        id: "kill_enemy",
-        title: "Defeat Your First Enemy",
-        objectives: [
-          {
-            id: "kill_first_enemy",
-            type: "kill",
-            text: "Defeat the enemy",
-            target: 1,
-            progress: 0,
-          },
-        ],
-      },
+      // {
+      //   id: "explore",
+      //   title: "Explore Your Surroundings",
+      //   objectives: [
+      //     {
+      //       id: "reach_tree",
+      //       type: "reach_destination",
+      //       text: "Reach the highlighted tile next to the nearest tree",
+      //       target: 1,
+      //       progress: 0,
+      //     },
+      //   ],
+      // },
+      // {
+      //   id: "gather_wood",
+      //   title: "Gather Wood",
+      //   objectives: [
+      //     {
+      //       id: "collect_wood",
+      //       type: "collect",
+      //       text: "Gather 10 Wood",
+      //       target: 10,
+      //       progress: 0,
+      //       requirements: { item: "wood" },
+      //     },
+      //   ],
+      // },
+      // {
+      //   id: "gather_supplies",
+      //   title: "Gather Building Supplies",
+      //   objectives: [
+      //     {
+      //       id: "collect_wood",
+      //       type: "collect",
+      //       text: "Gather 10 Wood",
+      //       target: 10,
+      //       progress: 0,
+      //       requirements: { item: "wood" },
+      //     },
+      //     {
+      //       id: "collect_stone",
+      //       type: "collect",
+      //       text: "Gather 5 Stone",
+      //       target: 5,
+      //       progress: 0,
+      //       requirements: { item: "stone" },
+      //     },
+      //   ],
+      // },
+      // {
+      //   id: "build_wall",
+      //   title: "Build Your First Wall",
+      //   objectives: [
+      //     {
+      //       id: "build_first_wall",
+      //       type: "build",
+      //       text: "Build 1 Wall",
+      //       target: 1,
+      //       progress: 0,
+      //       requirements: { building: "wall" },
+      //     },
+      //   ],
+      // },
+      // {
+      //   id: "kill_enemy",
+      //   title: "Defeat Your First Enemy",
+      //   objectives: [
+      //     {
+      //       id: "kill_first_enemy",
+      //       type: "kill",
+      //       text: "Defeat the enemy",
+      //       target: 1,
+      //       progress: 0,
+      //     },
+      //   ],
+      // },
       {
         id: "protect_tent",
         title: "Protect the Tent",
