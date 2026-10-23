@@ -1,3 +1,4 @@
+import { BUILDINGS } from "../data/buildings.js";
 import { POTIONS } from "../data/potions.js";
 
 export default class ActionSystem {
@@ -70,6 +71,38 @@ export default class ActionSystem {
     }
 
     return false;
+  }
+
+  repairBuilding(building) {
+    if (!building?.active || !building.body) return false;
+
+    // Don't charge for a building that needs no repair.
+    if (building.hp >= building.maxHP) {
+      console.log("Building is already at full health");
+      return false;
+    }
+
+    const buildingData = BUILDINGS[building.texture.key];
+
+    if (!buildingData?.repairCost) {
+      console.warn("Repair cost is not configured for this building");
+      return false;
+    }
+
+    const repairRecipe = {
+      cost: buildingData.repairCost,
+    };
+
+    if (!this.canAfford(repairRecipe)) {
+      console.log("Not enough resources to repair");
+      return false;
+    }
+
+    this.payCost(repairRecipe);
+
+    building.setHP(building.maxHP);
+
+    return true;
   }
 
   update() {}

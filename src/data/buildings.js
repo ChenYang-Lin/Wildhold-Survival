@@ -20,6 +20,10 @@ export const BUILDINGS = {
     cost: {
       wood: 2,
     },
+
+    repairCost: {
+      wood: 1,
+    },
   },
 
   tower: {
@@ -43,6 +47,11 @@ export const BUILDINGS = {
     cost: {
       wood: 5,
       stone: 3,
+    },
+
+    repairCost: {
+      wood: 2,
+      stone: 1,
     },
   },
 };

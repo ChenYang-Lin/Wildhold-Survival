@@ -86,7 +86,6 @@ export default class InventorySystem {
   }
 
   hasResource(id, amount) {
-    console.log(this.inventory);
     const item = this.inventory.find((i) => i?.id === id);
 
     if (!item) return false;

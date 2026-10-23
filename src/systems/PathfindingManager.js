@@ -55,7 +55,7 @@ export default class PathfindingManager {
       if (current.gridX === endGridX && current.gridY === endGridY) {
         const path = this.reconstructPath(current);
 
-        // this.drawDebugPath(path);
+        this.drawDebugPath(path);
 
         return path;
       }

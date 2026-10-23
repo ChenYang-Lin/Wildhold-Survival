@@ -5,9 +5,11 @@ export default class BuildingInteractionSystem {
     this.scene = scene;
     this.selectedBuilding = null;
 
-    this.card = new BuildingInfoCard(scene, () => {
-      this.close();
-    });
+    this.card = new BuildingInfoCard(
+      scene,
+      () => this.close(),
+      (building) => this.scene.actionSystem.repairBuilding(building),
+    );
 
     this.scene.events.on("postupdate", this.update, this);
     this.scene.events.once("shutdown", this.destroy, this);
@@ -39,28 +41,44 @@ export default class BuildingInteractionSystem {
   }
 
   handlePointerDown(pointer) {
-    // Handle clicks inside the card before world interactions.
-    if (this.card.containsScreenPoint(pointer.x, pointer.y)) {
-      if (this.card.containsCloseButtonPoint(pointer.x, pointer.y)) {
-        this.close();
+    if (!this.card.container.visible) {
+      const building = this.getBuildingAtWorld(pointer.worldX, pointer.worldY);
+
+      if (building) {
+        this.select(building);
+        return true;
       }
 
-      return true;
+      if (this.selectedBuilding) {
+        this.close();
+        return true;
+      }
+
+      return false;
     }
 
-    const building = this.getBuildingAtWorld(pointer.worldX, pointer.worldY);
-
-    if (building) {
-      this.select(building);
-      return true;
-    }
-
-    if (this.selectedBuilding) {
+    // Handle the close button.
+    if (this.card.containsCloseButtonPoint(pointer.x, pointer.y)) {
       this.close();
       return true;
     }
 
-    return false;
+    // Handle the repair button.
+    if (this.card.containsRepairButtonPoint(pointer.x, pointer.y)) {
+      if (this.selectedBuilding?.active) {
+        this.card.onRepair?.(this.selectedBuilding);
+      }
+      return true;
+    }
+
+    // Ignore clicks elsewhere on the card.
+    if (this.card.containsScreenPoint(pointer.x, pointer.y)) {
+      return true;
+    }
+
+    // Clicking outside closes the card.
+    this.close();
+    return true;
   }
 
   select(building) {

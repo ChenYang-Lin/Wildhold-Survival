@@ -50,7 +50,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.cameraMode = "FOLLOW_PLAYER";
 
-    this.DEBUG_MODE = true;
+    this.DEBUG_MODE = false;
   }
 
   preload() {
@@ -311,46 +311,6 @@ export default class GameScene extends Phaser.Scene {
     this.handlePlayerCamera();
 
     this.player.update(delta);
-
-    if (this.DEBUG_MODE && this.player.body) {
-      const body = this.player.body;
-      const camera = this.cameras.main;
-
-      if (!this._lastMovementDebug) {
-        this._lastMovementDebug = {
-          x: body.center.x,
-          y: body.center.y,
-          cameraX: camera.midPoint.x,
-          cameraY: camera.midPoint.y,
-        };
-      }
-
-      const previous = this._lastMovementDebug;
-      const dx = body.center.x - previous.x;
-      const dy = body.center.y - previous.y;
-      const cameraDx = camera.midPoint.x - previous.cameraX;
-      const cameraDy = camera.midPoint.y - previous.cameraY;
-
-      if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
-        console.log({
-          playerDelta: {
-            x: Number(dx.toFixed(3)),
-            y: Number(dy.toFixed(3)),
-          },
-          cameraDelta: {
-            x: Number(cameraDx.toFixed(3)),
-            y: Number(cameraDy.toFixed(3)),
-          },
-        });
-      }
-
-      this._lastMovementDebug = {
-        x: body.center.x,
-        y: body.center.y,
-        cameraX: camera.midPoint.x,
-        cameraY: camera.midPoint.y,
-      };
-    }
 
     this.questSystem.update();
 

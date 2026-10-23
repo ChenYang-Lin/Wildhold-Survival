@@ -1,10 +1,11 @@
 export default class BuildingInfoCard {
-  constructor(scene, onClose) {
+  constructor(scene, onClose, onRepair) {
     this.scene = scene;
     this.onClose = onClose;
+    this.onRepair = onRepair;
 
     this.width = 220;
-    this.height = 132;
+    this.height = 166;
     this.padding = 12;
 
     this.building = null;
@@ -36,10 +37,8 @@ export default class BuildingInfoCard {
     this.healthBarBackground = scene.add.rectangle(barX, barY, barWidth, 8, 0x484848).setOrigin(0, 0.5);
     this.healthBar = scene.add.rectangle(barX, barY, barWidth, 8, 0x55cc66).setOrigin(0, 0.5);
 
-    this.closeButton = scene.add.rectangle(199, 20, 30, 28, 0x454b53).setInteractive({ useHandCursor: true });
-
-    // Used by InputController.isOverUI().
-    this.closeButton.isUI = true;
+    // Close Button
+    this.closeButton = scene.add.rectangle(199, 20, 30, 28, 0x454b53);
 
     this.closeText = scene.add
       .text(199, 20, "X", {
@@ -49,9 +48,16 @@ export default class BuildingInfoCard {
       })
       .setOrigin(0.5);
 
-    this.closeButton.on("pointerdown", () => {
-      this.onClose();
-    });
+    // Repair button
+    this.repairButton = scene.add.rectangle(110, 140, 100, 28, 0x3b7d3b).setStrokeStyle(1, 0x8fd18f);
+
+    this.repairText = scene.add
+      .text(110, 140, "REPAIR", {
+        fontSize: "12px",
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
 
     this.container.add([
       this.background,
@@ -62,6 +68,8 @@ export default class BuildingInfoCard {
       this.healthBar,
       this.closeButton,
       this.closeText,
+      this.repairButton,
+      this.repairText,
     ]);
   }
 
@@ -90,6 +98,15 @@ export default class BuildingInfoCard {
     const buttonY = this.container.y + 20;
 
     return screenX >= buttonX - 15 && screenX <= buttonX + 15 && screenY >= buttonY - 14 && screenY <= buttonY + 14;
+  }
+
+  containsRepairButtonPoint(screenX, screenY) {
+    if (!this.container.visible) return false;
+
+    const buttonX = this.container.x + 110;
+    const buttonY = this.container.y + 140;
+
+    return screenX >= buttonX - 50 && screenX <= buttonX + 50 && screenY >= buttonY - 14 && screenY <= buttonY + 14;
   }
 
   refresh() {
