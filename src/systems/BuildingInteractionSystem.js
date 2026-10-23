@@ -1,9 +1,18 @@
 import BuildingInfoCard from "../ui/BuildingInfoCard.js";
+import { BUILDINGS } from "../data/buildings.js";
 
 export default class BuildingInteractionSystem {
   constructor(scene) {
     this.scene = scene;
     this.selectedBuilding = null;
+
+    // Building Move function properties
+    this.movingBuilding = null;
+    this.mode = "normal";
+    this.movePreview = null;
+    this.moveGridX = 0;
+    this.moveGridY = 0;
+    this.isMoveValid = false;
 
     this.rangeIndicator = scene.add.graphics().setDepth(15000);
 
@@ -11,6 +20,8 @@ export default class BuildingInteractionSystem {
       scene,
       () => this.close(),
       (building) => this.scene.actionSystem.repairBuilding(building),
+      (building) => this.scene.actionSystem.upgradeBuilding(building),
+      (building) => this.startMovingBuilding(building),
     );
 
     this.scene.events.on("postupdate", this.update, this);
@@ -73,6 +84,24 @@ export default class BuildingInteractionSystem {
       return true;
     }
 
+    // Handle the upgrade button.
+    if (this.card.containsUpgradeButtonPoint(pointer.x, pointer.y)) {
+      if (this.selectedBuilding?.active && this.card.canUpgrade) {
+        this.card.onUpgrade?.(this.selectedBuilding);
+      }
+
+      return true;
+    }
+
+    // Handle the move button.
+    if (this.card.containsMoveButtonPoint(pointer.x, pointer.y)) {
+      if (this.selectedBuilding?.active) {
+        this.card.onMove?.(this.selectedBuilding);
+      }
+
+      return true;
+    }
+
     // Ignore clicks elsewhere on the card.
     if (this.card.containsScreenPoint(pointer.x, pointer.y)) {
       return true;
@@ -89,6 +118,12 @@ export default class BuildingInteractionSystem {
     // Clicking empty ground closes the card.
     this.close();
     return true;
+  }
+
+  handlePointerMove(pointer) {
+    if (this.mode !== "moving") return;
+
+    this.updateMovePreview(pointer.worldX, pointer.worldY);
   }
 
   select(building) {
@@ -124,6 +159,16 @@ export default class BuildingInteractionSystem {
     // Visible outline.
     graphics.lineStyle(2, 0x66ccff, 0.8);
     graphics.strokeCircle(x, y, radius);
+  }
+
+  startMovingBuilding(building) {
+    if (!building?.active) return;
+
+    const started = this.scene.placementSystem?.startMoving(building);
+
+    if (!started) return;
+
+    this.card.hide();
   }
 
   update() {

@@ -13,6 +13,8 @@ export default class PlacementSystem {
     this.buildButton = null;
     this.cancelButton = null;
 
+    this.movingBuilding = null;
+
     this.gridX = 0;
     this.gridY = 0;
     this.isValid = false;
@@ -20,6 +22,10 @@ export default class PlacementSystem {
 
   get isPlacing() {
     return this.mode === "placing";
+  }
+
+  get isMoving() {
+    return this.mode === "moving";
   }
 
   start(itemId) {
@@ -51,11 +57,41 @@ export default class PlacementSystem {
     return true;
   }
 
+  startMoving(building) {
+    if (!building?.active || !building.body) return false;
+
+    // Don't start another moving session while one is already active.
+    if (this.mode !== "normal") return false;
+
+    const recipe = BUILDINGS[building.texture.key];
+
+    if (!recipe) return false;
+
+    this.mode = "moving";
+    this.movingBuilding = building;
+
+    // Hide the original building while its preview is active.
+    building.setVisible(false);
+    building.weapon?.setVisible(false);
+
+    this.itemId = building.texture.key;
+    this.recipe = recipe;
+
+    const { gridX, gridY } = this.getGridPositionFromCenter(building.x, building.y);
+
+    this.createPreview(gridX, gridY);
+    this.createControls();
+
+    // Moving must ignore the building's own occupied tiles.
+    this.updatePlacement(gridX, gridY);
+
+    return true;
+  }
+
   moveToWorldPosition(x, y) {
-    if (!this.isPlacing) return;
+    if (!this.isPlacing && !this.isMoving) return;
 
     const position = this.getGridPositionFromCenter(x, y);
-
     this.updatePlacement(position.gridX, position.gridY);
   }
 
@@ -98,7 +134,7 @@ export default class PlacementSystem {
     this.preview.on("pointerdown", (pointer, localX, localY, event) => {
       event.stopPropagation();
 
-      if (!this.isPlacing) return;
+      if (!this.isPlacing && !this.isMoving) return;
 
       const gridX = Math.floor(pointer.worldX / 32);
       const gridY = Math.floor(pointer.worldY / 32);
@@ -107,19 +143,19 @@ export default class PlacementSystem {
     });
 
     this.preview.on("drag", (pointer) => {
-      if (!this.isPlacing) return;
+      if (!this.isPlacing && !this.isMoving) return;
 
       this.moveToWorldPosition(pointer.worldX, pointer.worldY);
     });
 
     this.preview.on("dragstart", () => {
-      if (!this.isPlacing) return;
+      if (!this.isPlacing && !this.isMoving) return;
 
       this.preview.setAlpha(0.7);
     });
 
     this.preview.on("dragend", () => {
-      if (!this.isPlacing) return;
+      if (!this.isPlacing && !this.isMoving) return;
 
       this.preview.setAlpha(0.55);
 
@@ -144,7 +180,7 @@ export default class PlacementSystem {
     this.buildButton.isUI = true;
 
     this.buildButtonText = this.scene.add
-      .text(0, 0, "BUILD", {
+      .text(0, 0, this.isMoving ? "MOVE" : "BUILD", {
         fontFamily: "Arial",
         fontSize: "11px",
         fontStyle: "bold",
@@ -176,11 +212,13 @@ export default class PlacementSystem {
     this.buildButton.on("pointerdown", (pointer, localX, localY, event) => {
       event.stopPropagation();
 
-      if (!this.isPlacing) return;
+      if (!this.isPlacing && !this.isMoving) return;
       if (!this.isValid) return;
 
-      if (!this.scene.tutorialSystem?.isActionAllowed("placement.build")) {
-        return;
+      if (this.isPlacing) {
+        if (!this.scene.tutorialSystem?.isActionAllowed("placement.build")) {
+          return;
+        }
       }
 
       this.confirm();
@@ -189,10 +227,12 @@ export default class PlacementSystem {
     this.cancelButton.on("pointerdown", (pointer, localX, localY, event) => {
       event.stopPropagation();
 
-      if (!this.isPlacing) return;
+      if (!this.isPlacing && !this.isMoving) return;
 
-      if (!this.scene.tutorialSystem?.isActionAllowed("placement.cancel")) {
-        return;
+      if (this.isPlacing) {
+        if (!this.scene.tutorialSystem?.isActionAllowed("placement.cancel")) {
+          return;
+        }
       }
 
       this.cancel();
@@ -209,7 +249,9 @@ export default class PlacementSystem {
     this.gridX = gridX;
     this.gridY = gridY;
 
-    this.isValid = this.scene.buildingManager.canPlace(this.recipe.id, this.gridX, this.gridY);
+    const ignoreBuilding = this.isMoving ? this.movingBuilding : null;
+
+    this.isValid = this.scene.buildingManager.canPlace(this.recipe.id, this.gridX, this.gridY, ignoreBuilding);
 
     this.updatePreviewVisual();
     this.updateControls();
@@ -243,10 +285,31 @@ export default class PlacementSystem {
   }
 
   confirm() {
-    if (!this.isPlacing) return;
+    if (!this.isPlacing && !this.isMoving) return;
     if (!this.isValid) return;
 
-    // Check permission before placing the building.
+    // Moving an existing building.
+    if (this.isMoving) {
+      const building = this.movingBuilding;
+
+      const moved = this.scene.buildingManager.moveBuilding(building, this.gridX, this.gridY);
+
+      if (!moved) {
+        this.updatePlacement(this.gridX, this.gridY);
+        return;
+      }
+
+      building.setVisible(true);
+      building.weapon?.setVisible(true);
+
+      this.finish();
+
+      this.scene.buildingInteractionSystem?.close();
+
+      return;
+    }
+
+    // Placing a new building.
     if (!this.scene.tutorialSystem?.isActionAllowed("placement.build")) {
       return;
     }
@@ -259,18 +322,31 @@ export default class PlacementSystem {
     }
 
     this.scene.actionSystem.payCost(this.recipe);
-
     this.scene.tutorialSystem?.handleAction("placement.build");
 
     this.finish();
   }
 
   cancel() {
-    if (!this.isPlacing) return;
+    if (!this.isPlacing && !this.isMoving) return;
+
+    const wasPlacing = this.isPlacing;
+    const wasMoving = this.isMoving;
+
+    if (wasMoving && this.movingBuilding) {
+      this.movingBuilding.setVisible(true);
+      this.movingBuilding.weapon?.setVisible(true);
+    }
 
     this.finish();
 
-    this.scene.tutorialSystem?.onPlacementCancelled();
+    if (wasPlacing) {
+      this.scene.tutorialSystem?.onPlacementCancelled();
+    }
+
+    if (wasMoving) {
+      this.scene.buildingInteractionSystem?.close();
+    }
   }
 
   finish() {
@@ -292,6 +368,7 @@ export default class PlacementSystem {
 
     this.itemId = null;
     this.recipe = null;
+    this.movingBuilding = null;
 
     this.isValid = false;
 
@@ -299,7 +376,7 @@ export default class PlacementSystem {
   }
 
   update() {
-    if (!this.isPlacing) return;
+    if (!this.isPlacing && !this.isMoving) return;
 
     this.updateControls();
   }

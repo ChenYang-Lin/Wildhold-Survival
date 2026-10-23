@@ -140,6 +140,10 @@ export default class GameScene extends Phaser.Scene {
     this.input.keyboard.on("keydown-P", (e) => {
       this.pathfindingManager.toggleDebugTileBlock();
     });
+
+    this.input.keyboard.on("keydown-O", () => {
+      this.buildingManager.testMoveBuilding();
+    });
   }
 
   createEntities() {

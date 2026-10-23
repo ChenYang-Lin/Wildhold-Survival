@@ -1,11 +1,17 @@
+import { BUILDINGS } from "../data/buildings.js";
+
 export default class BuildingInfoCard {
-  constructor(scene, onClose, onRepair) {
+  constructor(scene, onClose, onRepair, onUpgrade, onMove) {
     this.scene = scene;
     this.onClose = onClose;
     this.onRepair = onRepair;
+    this.onUpgrade = onUpgrade;
+    this.onMove = onMove;
+
+    this.canUpgrade = false;
 
     this.width = 270;
-    this.height = 240;
+    this.height = 260;
     this.padding = 12;
 
     this.building = null;
@@ -65,15 +71,43 @@ export default class BuildingInfoCard {
       .setOrigin(0.5);
 
     // Repair button
-    this.repairButton = scene.add.rectangle(135, 200, 100, 28, 0x3b7d3b).setStrokeStyle(1, 0x8fd18f);
+    this.repairButton = scene.add.rectangle(50, 225, 72, 30, 0x3b7d3b).setStrokeStyle(1, 0x8fd18f);
 
     this.repairText = scene.add
-      .text(135, 200, "REPAIR", {
-        fontSize: "12px",
+      .text(50, 225, "REPAIR", {
+        fontSize: "11px",
         color: "#ffffff",
         fontStyle: "bold",
       })
       .setOrigin(0.5);
+
+    // Upgrade button
+    this.upgradeButton = scene.add.rectangle(135, 225, 82, 30, 0x8a6d35).setStrokeStyle(1, 0xd6b66e);
+
+    this.upgradeText = scene.add
+      .text(135, 225, "UPGRADE", {
+        fontSize: "10px",
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    // Move button
+    this.moveButton = scene.add.rectangle(220, 225, 72, 30, 0x356b8a).setStrokeStyle(1, 0x8fc9ed);
+
+    this.moveText = scene.add
+      .text(220, 225, "MOVE", {
+        fontSize: "11px",
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    // Upgrade cost
+    this.upgradeCostText = scene.add.text(12, 162, "", {
+      fontSize: "11px",
+      color: "#d0d0d0",
+    });
 
     this.container.add([
       this.background,
@@ -84,11 +118,16 @@ export default class BuildingInfoCard {
       this.healthBar,
       this.closeButton,
       this.closeText,
-      this.repairButton,
-      this.repairText,
       this.damageText,
       this.attackSpeedText,
       this.rangeText,
+      this.repairButton,
+      this.repairText,
+      this.upgradeButton,
+      this.upgradeText,
+      this.moveButton,
+      this.moveText,
+      this.upgradeCostText,
     ]);
   }
 
@@ -111,21 +150,29 @@ export default class BuildingInfoCard {
   }
 
   containsCloseButtonPoint(screenX, screenY) {
-    if (!this.container.visible) return false;
-
-    const buttonX = this.container.x + 249;
-    const buttonY = this.container.y + 20;
-
-    return screenX >= buttonX - 15 && screenX <= buttonX + 15 && screenY >= buttonY - 14 && screenY <= buttonY + 14;
+    return this.containsButtonPoint(this.closeButton, screenX, screenY);
   }
 
   containsRepairButtonPoint(screenX, screenY) {
-    if (!this.container.visible) return false;
+    return this.containsButtonPoint(this.repairButton, screenX, screenY);
+  }
 
-    const buttonX = this.container.x + 135;
-    const buttonY = this.container.y + 200;
+  containsUpgradeButtonPoint(screenX, screenY) {
+    return this.containsButtonPoint(this.upgradeButton, screenX, screenY);
+  }
 
-    return screenX >= buttonX - 50 && screenX <= buttonX + 50 && screenY >= buttonY - 14 && screenY <= buttonY + 14;
+  containsMoveButtonPoint(screenX, screenY) {
+    return this.containsButtonPoint(this.moveButton, screenX, screenY);
+  }
+
+  containsButtonPoint(button, screenX, screenY) {
+    if (!this.container.visible || !button?.visible) {
+      return false;
+    }
+
+    const bounds = button.getBounds();
+
+    return bounds.contains(screenX, screenY);
   }
 
   refresh() {
@@ -148,6 +195,7 @@ export default class BuildingInfoCard {
     this.levelText.setText(`Level ${building.level ?? 1}`);
     this.healthText.setText(`Health: ${building.hp} / ${building.maxHP}`);
 
+    // Health Bar
     const ratio = building.maxHP > 0 ? building.hp / building.maxHP : 0;
 
     const barWidth = this.width - 24;
@@ -161,6 +209,7 @@ export default class BuildingInfoCard {
       this.healthBar.setFillStyle(0x55cc66);
     }
 
+    // Combat Stats
     const hasCombatStats = Number.isFinite(building.damage) && Number.isFinite(building.fireRate) && building.fireRate > 0;
 
     if (hasCombatStats) {
@@ -171,6 +220,38 @@ export default class BuildingInfoCard {
     } else {
       this.damageText.setText("");
       this.attackSpeedText.setText("");
+    }
+
+    // Upgrade Cost and Button
+    const buildingData = BUILDINGS[building.texture.key];
+    const maxLevel = buildingData?.maxLevel ?? 1;
+
+    this.canUpgrade = building.level < maxLevel && Boolean(buildingData?.upgrades?.[building.level + 1]);
+
+    if (this.canUpgrade) {
+      const nextLevel = building.level + 1;
+      const upgrade = buildingData.upgrades[nextLevel];
+
+      const costText = Object.entries(upgrade.cost)
+        .map(([resource, amount]) => {
+          const name = resource.charAt(0).toUpperCase() + resource.slice(1);
+          return `${amount} ${name}`;
+        })
+        .join(", ");
+
+      this.upgradeText.setText("UPGRADE");
+      this.upgradeCostText.setText(`Upgrade cost: ${costText}`);
+
+      this.upgradeButton.setFillStyle(0x8a6d35);
+      this.upgradeButton.setStrokeStyle(1, 0xd6b66e);
+      this.upgradeText.setColor("#ffffff");
+    } else {
+      this.upgradeText.setText("MAX");
+      this.upgradeCostText.setText("Maximum level reached");
+
+      this.upgradeButton.setFillStyle(0x454b53);
+      this.upgradeButton.setStrokeStyle(1, 0x666666);
+      this.upgradeText.setColor("#aaaaaa");
     }
   }
 

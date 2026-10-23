@@ -13,7 +13,7 @@ export default class Tower extends Building {
     this.setDepth(this.body.center.y);
 
     // Add Weapon to the Tower
-    this.weapon = this.scene.add.sprite(this.body.center.x, this.body.center.y - 36, "tower", "tower_1_lv1_weapon_0").setDepth(this.depth + 1); // prettier-ignore
+    this.weapon = this.scene.add.sprite(this.x, this.y, "tower", "tower_1_lv1_weapon_0").setDepth(this.depth + 1);
 
     this.range = 200;
     this.damage = 1;
@@ -120,6 +120,12 @@ export default class Tower extends Building {
   }
 
   update() {
+    super.update();
+    this.weapon.setPosition(this.x, this.y);
+
+    this.setDepth(this.body.bottom);
+    this.weapon.setDepth(this.body.bottom + 1);
+
     const target = this.findTarget();
 
     if (!target) return;

@@ -5,9 +5,10 @@ export default class Building extends Phaser.Physics.Arcade.Sprite {
     this.scene = scene;
 
     this.scene.add.existing(this);
-    this.scene.physics.add.existing(this, true);
-    this.setImmovable(true);
+    this.scene.physics.add.existing(this, false);
+    this.body.setImmovable(true);
 
+    this.level = 1;
     this.maxHP = 10;
     this.hp = this.maxHP;
 
@@ -91,5 +92,14 @@ export default class Building extends Phaser.Physics.Arcade.Sprite {
     }
 
     this.scene.buildingManager.removeBuilding(this);
+  }
+
+  update() {
+    console.log("updating");
+    this.setDepth(this.body.bottom);
+
+    if (this.hp < this.maxHP) {
+      this.drawHealthBar();
+    }
   }
 }

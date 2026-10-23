@@ -80,8 +80,8 @@ export default class InputController {
       // Ignore clicks on existing UI.
       if (this.isOverUI(pointer)) return;
 
-      // Handle building placement if placement mode is active.
-      if (this.scene.placementSystem?.isPlacing) {
+      // Handle building moving if placement mode or moving mode is active.
+      if (this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) {
         this.placementPointerId = pointer.id;
 
         this.state.aimWorldX = pointer.worldX;
@@ -115,7 +115,7 @@ export default class InputController {
       this.state.aimWorldX = pointer.worldX;
       this.state.aimWorldY = pointer.worldY;
 
-      if (this.scene.placementSystem?.isPlacing && pointer.id === this.placementPointerId) {
+      if ((this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) && pointer.id === this.placementPointerId) {
         // For Placing System, move the preview building to dragged place.
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
@@ -194,7 +194,7 @@ export default class InputController {
       this.state.aimWorldY = pointer.worldY;
 
       // For Placing System, move the preview building to dragged place.
-      if (this.scene.placementSystem?.isPlacing && pointer.id === this.placementPointerId) {
+      if ((this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) && pointer.id === this.placementPointerId) {
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
         return;
@@ -206,8 +206,8 @@ export default class InputController {
       // Ignore clicks on existing UI.
       if (this.isOverUI(pointer)) return;
 
-      // Handle building placement if placement mode is active.
-      if (this.scene.placementSystem?.isPlacing) {
+      // Handle building moving if placement mode or moving mode is active.
+      if (this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) {
         this.placementPointerId = pointer.id;
 
         this.state.aimWorldX = pointer.worldX;

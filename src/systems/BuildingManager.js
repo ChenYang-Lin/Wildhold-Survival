@@ -6,7 +6,7 @@ export default class BuildingManager {
   constructor(scene) {
     this.scene = scene;
 
-    this.buildings = this.scene.physics.add.staticGroup();
+    this.buildings = this.scene.physics.add.group();
 
     this.tileSize = 32;
   }
@@ -28,22 +28,25 @@ export default class BuildingManager {
     return nearestTower;
   }
 
-  canPlace(type, gridX, gridY) {
-    const b = BUILDINGS[type];
+  canPlace(type, gridX, gridY, ignoreBuilding = null) {
+    const buildingData = BUILDINGS[type];
 
-    for (let x = 0; x < b.width; x++) {
-      for (let y = 0; y < b.height; y++) {
-        const checkX = gridX + x + (b.footprintOffsetX || 0);
-        const checkY = gridY + y + (b.footprintOffsetY || 0);
+    if (!buildingData) return false;
+
+    for (let x = 0; x < buildingData.width; x++) {
+      for (let y = 0; y < buildingData.height; y++) {
+        const checkX = gridX + x + (buildingData.footprintOffsetX || 0);
+        const checkY = gridY + y + (buildingData.footprintOffsetY || 0);
 
         const bounds = this.scene.mapManager.getWorldBounds();
-        const mapWidthTiles = bounds.width / 32;
-        const mapHeightTiles = bounds.height / 32;
-        if (checkX < 0 || checkY < 0) return false;
+        const mapWidthTiles = bounds.width / this.tileSize;
+        const mapHeightTiles = bounds.height / this.tileSize;
 
-        if (checkX >= mapWidthTiles || checkY >= mapHeightTiles) return false;
+        if (checkX < 0 || checkY < 0 || checkX >= mapWidthTiles || checkY >= mapHeightTiles) {
+          return false;
+        }
 
-        if (this.tileBlocked(checkX, checkY)) {
+        if (this.tileBlocked(checkX, checkY, ignoreBuilding)) {
           return false;
         }
       }
@@ -52,12 +55,76 @@ export default class BuildingManager {
     return true;
   }
 
-  tileBlocked(gridX, gridY) {
-    if (this.scene.mapManager.isTileBlocked(gridX, gridY)) return true;
+  tileBlocked(gridX, gridY, ignoreBuilding = null) {
+    const mapManager = this.scene.mapManager;
+
+    // Terrain collision must always block placement.
+    if (mapManager.isTileCollidable(gridX, gridY)) {
+      return true;
+    }
+
+    // Ignore only the moving building's current occupied tiles.
+    const isOccupiedByOtherBuilding = this.buildings.getChildren().some((building) => {
+      if (!building.active || building === ignoreBuilding) {
+        return false;
+      }
+
+      return building.occupiedTiles.some((tile) => tile.gridX === gridX && tile.gridY === gridY);
+    });
+
+    if (isOccupiedByOtherBuilding) return true;
+
     if (this.hasEnemy(gridX, gridY)) return true;
     if (this.hasPlayer(gridX, gridY)) return true;
 
     return false;
+  }
+
+  moveBuilding(building, gridX, gridY) {
+    if (!building?.active || !building.body) return false;
+
+    const type = building.texture.key;
+
+    if (!this.canPlace(type, gridX, gridY, building)) {
+      return false;
+    }
+
+    const buildingData = BUILDINGS[type];
+
+    // Calculate the destination using the same positioning logic
+    // used when the building was originally placed.
+    const position = this.getBuildingWorldPosition(buildingData, gridX, gridY);
+
+    // Free the building's old occupied tiles.
+    for (const tile of building.occupiedTiles) {
+      this.scene.mapManager.freeTile(tile.gridX, tile.gridY);
+    }
+
+    // Move the existing object
+    building.setPosition(position.x, position.y);
+    building.body.reset(position.x, position.y);
+    building.setDepth(building.body.bottom);
+
+    // Record and occupy the new tiles.
+    building.occupiedTiles = [];
+
+    for (let x = 0; x < buildingData.width; x++) {
+      for (let y = 0; y < buildingData.height; y++) {
+        const occupiedX = gridX + x + (buildingData.footprintOffsetX || 0);
+        const occupiedY = gridY + y + (buildingData.footprintOffsetY || 0);
+
+        this.scene.mapManager.occupyTile(occupiedX, occupiedY);
+
+        building.occupiedTiles.push({
+          gridX: occupiedX,
+          gridY: occupiedY,
+        });
+      }
+    }
+
+    building.drawHealthBar();
+
+    return true;
   }
 
   hasEnemy(gridX, gridY) {
@@ -105,11 +172,12 @@ export default class BuildingManager {
 
     if (type === "wall") {
       obj = new Wall(this.scene, worldX, worldY);
-      this.buildings.add(obj);
     } else if (type === "tower") {
       obj = new Tower(this.scene, worldX, worldY);
-      this.buildings.add(obj);
     }
+
+    this.buildings.add(obj);
+    obj.body.setImmovable(true);
 
     obj.occupiedTiles = [];
     // mark occupied tiles

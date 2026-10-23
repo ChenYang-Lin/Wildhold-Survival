@@ -24,6 +24,19 @@ export const BUILDINGS = {
     repairCost: {
       wood: 1,
     },
+
+    maxLevel: 3,
+
+    upgrades: {
+      2: {
+        cost: { wood: 4 },
+        maxHP: 20,
+      },
+      3: {
+        cost: { wood: 8 },
+        maxHP: 30,
+      },
+    },
   },
 
   tower: {
@@ -52,6 +65,23 @@ export const BUILDINGS = {
     repairCost: {
       wood: 2,
       stone: 1,
+    },
+
+    maxLevel: 3,
+
+    upgrades: {
+      2: {
+        cost: { wood: 8, stone: 5 },
+        maxHP: 15,
+        damage: 2,
+        range: 240,
+      },
+      3: {
+        cost: { wood: 12, stone: 8 },
+        maxHP: 20,
+        damage: 3,
+        range: 280,
+      },
     },
   },
 };

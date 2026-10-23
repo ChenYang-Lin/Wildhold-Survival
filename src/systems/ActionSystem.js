@@ -105,5 +105,53 @@ export default class ActionSystem {
     return true;
   }
 
+  upgradeBuilding(building) {
+    if (!building?.active || !building.body) return false;
+
+    const buildingData = BUILDINGS[building.texture.key];
+
+    if (!buildingData?.upgrades) return false;
+
+    if (building.level >= buildingData.maxLevel) {
+      console.log("Building is already at maximum level");
+      return false;
+    }
+
+    const nextLevel = building.level + 1;
+    const upgrade = buildingData.upgrades[nextLevel];
+
+    if (!upgrade) {
+      console.warn(`Upgrade data missing for level ${nextLevel}`);
+      return false;
+    }
+
+    const recipe = { cost: upgrade.cost };
+
+    if (!this.canAfford(recipe)) {
+      console.log("Not enough resources to upgrade");
+      return false;
+    }
+
+    // Pay only after all validation succeeds.
+    this.payCost(recipe);
+
+    building.level = nextLevel;
+    building.maxHP = upgrade.maxHP;
+
+    // Apply stats specific to buildings that support them.
+    if (Number.isFinite(upgrade.damage)) {
+      building.damage = upgrade.damage;
+    }
+
+    if (Number.isFinite(upgrade.range)) {
+      building.range = upgrade.range;
+    }
+
+    // Restore health after upgrading.
+    building.setHP(building.maxHP);
+
+    return true;
+  }
+
   update() {}
 }
