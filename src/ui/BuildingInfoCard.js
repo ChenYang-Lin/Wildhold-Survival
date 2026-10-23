@@ -4,8 +4,8 @@ export default class BuildingInfoCard {
     this.onClose = onClose;
     this.onRepair = onRepair;
 
-    this.width = 220;
-    this.height = 166;
+    this.width = 270;
+    this.height = 240;
     this.padding = 12;
 
     this.building = null;
@@ -21,9 +21,25 @@ export default class BuildingInfoCard {
       fontStyle: "bold",
     });
 
+    // Stats
     this.levelText = scene.add.text(12, 37, "", {
       fontSize: "13px",
       color: "#d0d0d0",
+    });
+
+    this.damageText = scene.add.text(12, 110, "", {
+      fontSize: "12px",
+      color: "#ffffff",
+    });
+
+    this.attackSpeedText = scene.add.text(12, 130, "", {
+      fontSize: "12px",
+      color: "#ffffff",
+    });
+
+    this.rangeText = scene.add.text(12, 150, "", {
+      fontSize: "12px",
+      color: "#ffffff",
     });
 
     this.healthText = scene.add.text(12, 59, "", {
@@ -38,10 +54,10 @@ export default class BuildingInfoCard {
     this.healthBar = scene.add.rectangle(barX, barY, barWidth, 8, 0x55cc66).setOrigin(0, 0.5);
 
     // Close Button
-    this.closeButton = scene.add.rectangle(199, 20, 30, 28, 0x454b53);
+    this.closeButton = scene.add.rectangle(249, 20, 30, 28, 0x454b53);
 
     this.closeText = scene.add
-      .text(199, 20, "X", {
+      .text(249, 20, "X", {
         fontSize: "15px",
         color: "#ffffff",
         fontStyle: "bold",
@@ -49,10 +65,10 @@ export default class BuildingInfoCard {
       .setOrigin(0.5);
 
     // Repair button
-    this.repairButton = scene.add.rectangle(110, 140, 100, 28, 0x3b7d3b).setStrokeStyle(1, 0x8fd18f);
+    this.repairButton = scene.add.rectangle(135, 200, 100, 28, 0x3b7d3b).setStrokeStyle(1, 0x8fd18f);
 
     this.repairText = scene.add
-      .text(110, 140, "REPAIR", {
+      .text(135, 200, "REPAIR", {
         fontSize: "12px",
         color: "#ffffff",
         fontStyle: "bold",
@@ -70,6 +86,9 @@ export default class BuildingInfoCard {
       this.closeText,
       this.repairButton,
       this.repairText,
+      this.damageText,
+      this.attackSpeedText,
+      this.rangeText,
     ]);
   }
 
@@ -94,7 +113,7 @@ export default class BuildingInfoCard {
   containsCloseButtonPoint(screenX, screenY) {
     if (!this.container.visible) return false;
 
-    const buttonX = this.container.x + 199;
+    const buttonX = this.container.x + 249;
     const buttonY = this.container.y + 20;
 
     return screenX >= buttonX - 15 && screenX <= buttonX + 15 && screenY >= buttonY - 14 && screenY <= buttonY + 14;
@@ -103,8 +122,8 @@ export default class BuildingInfoCard {
   containsRepairButtonPoint(screenX, screenY) {
     if (!this.container.visible) return false;
 
-    const buttonX = this.container.x + 110;
-    const buttonY = this.container.y + 140;
+    const buttonX = this.container.x + 135;
+    const buttonY = this.container.y + 200;
 
     return screenX >= buttonX - 50 && screenX <= buttonX + 50 && screenY >= buttonY - 14 && screenY <= buttonY + 14;
   }
@@ -140,6 +159,18 @@ export default class BuildingInfoCard {
       this.healthBar.setFillStyle(0xe5b84b);
     } else {
       this.healthBar.setFillStyle(0x55cc66);
+    }
+
+    const hasCombatStats = Number.isFinite(building.damage) && Number.isFinite(building.fireRate) && building.fireRate > 0;
+
+    if (hasCombatStats) {
+      const attacksPerSecond = 1000 / building.fireRate;
+
+      this.damageText.setText(`Attack damage: ${building.damage}`);
+      this.attackSpeedText.setText(`Attack speed: ${attacksPerSecond.toFixed(2)} shots/sec`);
+    } else {
+      this.damageText.setText("");
+      this.attackSpeedText.setText("");
     }
   }
 

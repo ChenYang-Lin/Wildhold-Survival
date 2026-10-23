@@ -5,6 +5,8 @@ export default class BuildingInteractionSystem {
     this.scene = scene;
     this.selectedBuilding = null;
 
+    this.rangeIndicator = scene.add.graphics().setDepth(15000);
+
     this.card = new BuildingInfoCard(
       scene,
       () => this.close(),
@@ -76,7 +78,15 @@ export default class BuildingInteractionSystem {
       return true;
     }
 
-    // Clicking outside closes the card.
+    // Clicking another building switches the selection.
+    const building = this.getBuildingAtWorld(pointer.worldX, pointer.worldY);
+
+    if (building) {
+      this.select(building);
+      return true;
+    }
+
+    // Clicking empty ground closes the card.
     this.close();
     return true;
   }
@@ -91,6 +101,29 @@ export default class BuildingInteractionSystem {
   close() {
     this.selectedBuilding = null;
     this.card.hide();
+    this.rangeIndicator.clear();
+  }
+
+  updateRangeIndicator() {
+    const graphics = this.rangeIndicator;
+    graphics.clear();
+
+    const building = this.selectedBuilding;
+
+    if (!this.card.container.visible || !building?.active || !building.body || !Number.isFinite(building.range) || building.range <= 0) {
+      return;
+    }
+
+    const { x, y } = building.body.center;
+    const radius = building.range;
+
+    // Subtle transparent fill.
+    graphics.fillStyle(0x66ccff, 0.08);
+    graphics.fillCircle(x, y, radius);
+
+    // Visible outline.
+    graphics.lineStyle(2, 0x66ccff, 0.8);
+    graphics.strokeCircle(x, y, radius);
   }
 
   update() {
@@ -100,10 +133,13 @@ export default class BuildingInteractionSystem {
     }
 
     this.card.update();
+    this.updateRangeIndicator();
   }
 
   destroy() {
     this.scene.events.off("postupdate", this.update, this);
+
+    this.rangeIndicator.destroy();
     this.card.destroy();
   }
 }
