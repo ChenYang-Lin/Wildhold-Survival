@@ -10,6 +10,8 @@ export default class DayNightSystem {
 
     this.dayDuration = 15000;
     this.nightDuration = 60000;
+    // this.dayDuration = 10000;
+    // this.nightDuration = 10000;
 
     this.dayNightText = scene.add.text(250, 20, "", { fontSize: "18px", color: "#ffffff" }).setScrollFactor(0).setDepth(10000); // prettier-ignore
   }
@@ -26,6 +28,9 @@ export default class DayNightSystem {
 
   startNight() {
     this.isNight = true;
+
+    this.scene.buildingInteractionSystem?.disableManagement();
+
     this.scene.hotbarUI.refresh();
 
     this.timer = this.nightDuration;

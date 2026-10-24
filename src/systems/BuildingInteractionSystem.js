@@ -29,6 +29,11 @@ export default class BuildingInteractionSystem {
   }
 
   getBuildingAtWorld(worldX, worldY) {
+    // guard
+    if (this.scene.placementSystem?.isMoving) {
+      return null;
+    }
+
     const manager = this.scene.buildingManager;
     if (!manager) return null;
 
@@ -54,6 +59,12 @@ export default class BuildingInteractionSystem {
   }
 
   handlePointerDown(pointer) {
+    // Disable Building interaction during nights
+    if (this.scene.dayNightSystem?.isNight) {
+      this.disableManagement();
+      return false;
+    }
+
     if (!this.card.container.visible) {
       const building = this.getBuildingAtWorld(pointer.worldX, pointer.worldY);
 
@@ -124,6 +135,15 @@ export default class BuildingInteractionSystem {
     if (this.mode !== "moving") return;
 
     this.updateMovePreview(pointer.worldX, pointer.worldY);
+  }
+
+  disableManagement() {
+    // Cancel an active move and restore the original building.
+    if (this.scene.placementSystem?.isMoving) {
+      this.scene.placementSystem.cancel();
+    }
+
+    this.close();
   }
 
   select(building) {

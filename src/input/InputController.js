@@ -78,6 +78,11 @@ export default class InputController {
     // POINTER DOWN ON SCREEN
     this.scene.input.on("pointerdown", (pointer) => {
       // Ignore clicks on existing UI.
+      if (this.isOverBuildingInfoCard(pointer)) {
+        this.scene.buildingInteractionSystem.handlePointerDown(pointer);
+        return;
+      }
+
       if (this.isOverUI(pointer)) return;
 
       // Handle building moving if placement mode or moving mode is active.
@@ -204,6 +209,11 @@ export default class InputController {
     // click = placement movement, attack, or dash
     this.scene.input.on("pointerdown", (pointer) => {
       // Ignore clicks on existing UI.
+      if (this.isOverBuildingInfoCard(pointer)) {
+        this.scene.buildingInteractionSystem.handlePointerDown(pointer);
+        return;
+      }
+
       if (this.isOverUI(pointer)) return;
 
       // Handle building moving if placement mode or moving mode is active.
@@ -263,6 +273,12 @@ export default class InputController {
 
   isActionAllowed(actionId) {
     return this.scene.tutorialSystem?.isActionAllowed(actionId) ?? true;
+  }
+
+  isOverBuildingInfoCard(pointer) {
+    const card = this.scene.buildingInteractionSystem?.card;
+
+    return card?.containsScreenPoint(pointer.x, pointer.y) ?? false;
   }
 
   resetUIPosition() {

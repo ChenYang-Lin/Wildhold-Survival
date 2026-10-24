@@ -217,9 +217,11 @@ export default class BuildingInfoCard {
 
       this.damageText.setText(`Attack damage: ${building.damage}`);
       this.attackSpeedText.setText(`Attack speed: ${attacksPerSecond.toFixed(2)} shots/sec`);
+      this.rangeText.setText(`Range: ${building.range}`);
     } else {
       this.damageText.setText("");
       this.attackSpeedText.setText("");
+      this.rangeText.setText("");
     }
 
     // Upgrade Cost and Button

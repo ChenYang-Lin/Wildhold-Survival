@@ -95,7 +95,6 @@ export default class Building extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
-    console.log("updating");
     this.setDepth(this.body.bottom);
 
     if (this.hp < this.maxHP) {
