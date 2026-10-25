@@ -28,7 +28,7 @@ export default class PlacementSystem {
     return this.mode === "moving";
   }
 
-  start(itemId) {
+  start(itemId, initialPosition = null) {
     const recipe = BUILDINGS[itemId];
 
     if (!recipe) return false;
@@ -47,7 +47,7 @@ export default class PlacementSystem {
     this.itemId = itemId;
     this.recipe = recipe;
 
-    const position = this.getInitialPosition();
+    const position = initialPosition ?? this.getInitialPosition();
 
     this.createPreview(position.gridX, position.gridY);
     this.createControls();
@@ -239,6 +239,50 @@ export default class PlacementSystem {
     });
   }
 
+  findNearestValidPosition(itemId, originGridX, originGridY) {
+    const bounds = this.scene.mapManager.getWorldBounds();
+    const mapWidth = bounds.width / this.scene.buildingManager.tileSize;
+    const mapHeight = bounds.height / this.scene.buildingManager.tileSize;
+
+    const maxRadius = Math.max(mapWidth, mapHeight);
+
+    for (let radius = 0; radius <= maxRadius; radius++) {
+      const candidates = [];
+
+      for (let dx = -radius; dx <= radius; dx++) {
+        for (let dy = -radius; dy <= radius; dy++) {
+          // Only check the perimeter of this radius.
+          if (Math.max(Math.abs(dx), Math.abs(dy)) !== radius) {
+            continue;
+          }
+
+          const gridX = originGridX + dx;
+          const gridY = originGridY + dy;
+
+          candidates.push({
+            gridX,
+            gridY,
+            distance: dx * dx + dy * dy,
+          });
+        }
+      }
+
+      // Check closer positions first within this radius.
+      candidates.sort((a, b) => a.distance - b.distance);
+
+      for (const position of candidates) {
+        if (this.scene.buildingManager.canPlace(itemId, position.gridX, position.gridY)) {
+          return {
+            gridX: position.gridX,
+            gridY: position.gridY,
+          };
+        }
+      }
+    }
+
+    return null;
+  }
+
   updatePlacement(gridX, gridY) {
     if (!this.preview) return;
 
@@ -303,14 +347,15 @@ export default class PlacementSystem {
       building.weapon?.setVisible(true);
 
       this.finish();
-
       this.scene.buildingInteractionSystem?.close();
 
       return;
     }
 
     // Placing a new building.
-    if (!this.scene.tutorialSystem?.isActionAllowed("placement.build")) {
+    const tutorial = this.scene.tutorialSystem;
+
+    if (!tutorial?.isActionAllowed("placement.build")) {
       return;
     }
 
@@ -321,10 +366,28 @@ export default class PlacementSystem {
       return;
     }
 
+    const itemId = this.itemId;
+    const recipe = this.recipe;
+
+    this.scene.actionSystem.payCost(recipe);
+    const placedGridX = this.gridX;
+    const placedGridY = this.gridY;
+
     this.scene.actionSystem.payCost(this.recipe);
-    this.scene.tutorialSystem?.handleAction("placement.build");
+    tutorial?.handleAction("placement.build");
+
+    // Find the next valid position while the newly placed building
+    // is already registered with BuildingManager.
+    const nextPosition = this.findNearestValidPosition(itemId, placedGridX, placedGridY);
 
     this.finish();
+
+    // Don't restart placement if the tutorial has moved to another step.
+    const tutorialAllowsRepeat = !tutorial?.active || tutorial.isActionAllowed("placement.build");
+
+    if (tutorialAllowsRepeat && nextPosition && this.scene.actionSystem.canAfford(BUILDINGS[itemId])) {
+      this.start(itemId, nextPosition);
+    }
   }
 
   cancel() {
