@@ -142,17 +142,23 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(0, 0);
   }
 
-  takeDamage(amount) {
+  takeDamage(amount, options = {}) {
+    if (!this.active) return;
     if (this.aiState === this.STATE_DEAD) return;
 
-    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff4444"); // prettier-ignore
+    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff4444");
 
     this.health.takeDamage(amount);
     this.healthBar.update();
 
     if (this.health.isDead) {
       this.enterDead();
+      return;
     }
+
+    const { direction = null, force = 140, flinchDuration = 200 } = options;
+
+    this.enterFlinch(flinchDuration, direction, force);
   }
 
   attack() {
@@ -288,10 +294,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.aiState = this.STATE_FLINCH;
     this.flinchTimer = duration;
 
-    this.combat.cancelAttack?.();
-    this.cancelSpecialAction?.();
-
     if (direction) {
+      this.combat.cancelAttack?.();
+      this.cancelSpecialAction?.();
+
       let x = 0;
       let y = 0;
 
@@ -308,6 +314,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         case "right":
           x = 1;
           break;
+        default:
+          // Invalid direction: don't apply knockback.
+          direction = null;
       }
 
       this.setVelocity(x * force, y * force);

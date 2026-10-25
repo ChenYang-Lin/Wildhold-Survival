@@ -206,11 +206,11 @@ export default class AttackComponent {
 
       const damage = this.owner.stats.damage * attack.damageMultiplier;
 
-      enemy.takeDamage(damage);
-
-      if (attack.flinch) {
-        enemy.enterFlinch(attack.flinch.duration, this.owner.movement.facing, attack.flinch.force);
-      }
+      enemy.takeDamage(damage, {
+        direction: this.owner.movement.facing,
+        force: attack.flinch?.force ?? 140,
+        flinchDuration: attack.flinch?.duration ?? 200,
+      });
     });
 
     // Tree
