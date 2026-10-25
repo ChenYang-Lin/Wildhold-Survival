@@ -34,6 +34,14 @@ export default class EnemyAIComponent {
     return this.currentTarget;
   }
 
+  isWaypointBlocked(gridX, gridY) {
+    if (this.scene.buildingManager.getBuildingAtGrid(gridX, gridY)?.texture.key === "spike") {
+      return false;
+    }
+
+    return this.scene.mapManager.isTileBlocked(gridX, gridY);
+  }
+
   setTargetMode(mode) {
     this.targetMode = mode;
 
@@ -115,7 +123,7 @@ export default class EnemyAIComponent {
       if (this.scene.mapManager.isTileOccupied(tile.gridX, tile.gridY)) {
         const building = this.scene.buildingManager.getBuildingAtGrid(tile.gridX, tile.gridY);
 
-        if (building) {
+        if (building && building.texture.key !== "spike") {
           this.currentTarget = building;
           this.obstacleTile = tile;
 
@@ -194,7 +202,7 @@ export default class EnemyAIComponent {
       return;
     }
 
-    if (this.scene.mapManager.isTileBlocked(waypoint.gridX, waypoint.gridY)) {
+    if (this.isWaypointBlocked(waypoint.gridX, waypoint.gridY)) {
       this.path.length = 0;
       this.playerPathTarget = null;
       this.owner.stopMoving();
@@ -261,7 +269,7 @@ export default class EnemyAIComponent {
       return;
     }
 
-    if (this.scene.mapManager.isTileBlocked(waypoint.gridX, waypoint.gridY)) {
+    if (this.isWaypointBlocked(waypoint.gridX, waypoint.gridY)) {
       this.path.length = 0;
       this.playerPathTarget = null;
       this.owner.stopMoving();

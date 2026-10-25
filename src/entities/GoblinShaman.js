@@ -98,6 +98,7 @@ export default class GoblinShaman extends Enemy {
 
     // Buildings
     this.scene.physics.add.overlap(hitbox, this.scene.buildingManager.buildings, (_, building) => {
+      if (building.texture.key === "spike") return;
       if (hitTargets.has(building)) return;
 
       hitTargets.add(building);

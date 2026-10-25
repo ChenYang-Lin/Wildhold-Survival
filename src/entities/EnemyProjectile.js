@@ -32,6 +32,7 @@ export default class EnemyProjectile extends Phaser.Physics.Arcade.Sprite {
     });
 
     this.scene.physics.add.overlap(this, this.scene.buildingManager.buildings, (_, building) => {
+      if (building.texture.key === "spike") return;
       building.takeDamage(this.damage, this);
       this.die();
     });

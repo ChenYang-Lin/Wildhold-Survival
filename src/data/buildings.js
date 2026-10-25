@@ -84,4 +84,36 @@ export const BUILDINGS = {
       },
     },
   },
+
+  spike: {
+    id: "spike",
+    name: "Spike",
+    texture: "spike",
+    icon: "spike",
+
+    width: 1,
+    height: 1,
+
+    spriteWidth: 32,
+    spriteHeight: 32,
+
+    footprintWidth: 32,
+    footprintHeight: 32,
+
+    footprintOffsetX: 0,
+    footprintOffsetY: 0,
+
+    cost: {
+      wood: 2,
+      stone: 1,
+    },
+
+    repairCost: {
+      wood: 1,
+    },
+
+    maxLevel: 1,
+
+    upgrades: {},
+  },
 };

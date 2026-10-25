@@ -102,17 +102,18 @@ export default class PathfindingManager {
       for (let gridX = 0; gridX < width; gridX++) {
         let walkable = !this.scene.mapManager.isTileBlocked(gridX, gridY);
 
-        switch (type) {
-          case "enemy":
-            walkable = !this.scene.mapManager.isTileBlocked(gridX, gridY);
-            break;
+        if (type === "enemy") {
+          const building = this.scene.buildingManager.getBuildingAtGrid(gridX, gridY);
 
-          case "ignoreBuildings":
-            walkable = !this.scene.mapManager.isTileCollidable(gridX, gridY);
-            break;
+          const isSpike = building?.texture.key === "spike";
+
+          walkable = isSpike || !this.scene.mapManager.isTileBlocked(gridX, gridY);
+        } else if (type === "ignoreBuildings") {
+          walkable = !this.scene.mapManager.isTileCollidable(gridX, gridY);
         }
+
         grid[gridY][gridX] = {
-          walkable: walkable,
+          walkable,
           node: this.createNode(gridX, gridY),
         };
       }

@@ -63,6 +63,7 @@ export default class GameScene extends Phaser.Scene {
     Tower.preload(this);
     this.load.atlas("tree", "assets/tree.png", "assets/tree_atlas.json");
     this.load.image("wall", "assets/wall.png");
+    this.load.image("spike", "assets/spike.png");
     this.load.image("wood", "assets/wood.png");
     this.load.image("rock", "assets/rock.png");
     this.load.image("stone", "assets/stone.png");
@@ -199,11 +200,17 @@ export default class GameScene extends Phaser.Scene {
   setupCollisions() {
     this.physics.add.collider(this.player, this.combatSystem.enemies);
     this.physics.add.collider(this.player, this.campfire);
-    this.physics.add.collider(this.player, this.buildingManager.buildings);
+    this.physics.add.collider(this.player, this.buildingManager.buildings, null, (player, building) => building.texture.key !== "spike");
     this.physics.add.collider(this.player, this.trees);
     this.physics.add.collider(this.player, this.rocks);
-    this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings,); // prettier-ignore
     this.physics.add.collider(this.combatSystem.enemies, this.campfire);
+
+    this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings, null, (enemy, building) => building.texture.key !== "spike");
+    this.physics.add.overlap(this.combatSystem.enemies, this.buildingManager.buildings, (enemy, building) => {
+      if (building.texture.key === "spike") {
+        building.damageEnemy(enemy);
+      }
+    });
 
     this.physics.add.collider(this.combatSystem.enemies, this.trees);
     this.physics.add.overlap(this.projectiles, this.combatSystem.getEnemies(), (projectile, enemy) => {

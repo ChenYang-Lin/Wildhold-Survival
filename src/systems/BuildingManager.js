@@ -1,4 +1,5 @@
 import { BUILDINGS } from "../data/buildings.js";
+import Spike from "../entities/Spike.js";
 import Tower from "../entities/Tower.js";
 import Wall from "../entities/Wall.js";
 
@@ -122,7 +123,9 @@ export default class BuildingManager {
       }
     }
 
-    building.drawHealthBar();
+    if (building.drawHealthBar) {
+      building.drawHealthBar();
+    }
 
     return true;
   }
@@ -174,6 +177,8 @@ export default class BuildingManager {
       obj = new Wall(this.scene, worldX, worldY);
     } else if (type === "tower") {
       obj = new Tower(this.scene, worldX, worldY);
+    } else if (type === "spike") {
+      obj = new Spike(this.scene, worldX, worldY);
     }
 
     this.buildings.add(obj);
