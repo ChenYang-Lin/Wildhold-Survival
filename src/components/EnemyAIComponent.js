@@ -112,7 +112,7 @@ export default class EnemyAIComponent {
     }
 
     if (!this.targetNode) {
-      return this.scene.campfire;
+      return this.scene.base;
     }
 
     return null;

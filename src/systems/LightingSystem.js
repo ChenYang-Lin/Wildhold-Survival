@@ -17,23 +17,17 @@ export default class LightingSystem {
     this.visionRadius = 1000;
     this.campfireRadius = 350;
 
-    this.darknessRT = this.scene.add
-      .renderTexture(0, 0, cam.width, cam.height)
-      .setOrigin(0)
-      .setScrollFactor(0)
-      .setDepth(9998);
+    this.darknessRT = this.scene.add.renderTexture(0, 0, cam.width, cam.height).setOrigin(0).setScrollFactor(0).setDepth(9998);
 
     this.createCampfireTexture();
     this.createCampfireGlowTexture();
     this.createPlayerTexture();
 
     this.playerLightStamp = this.scene.add.image(0, 0, "player-light");
-    this.campfireLightStamp = this.scene.add.image(0, 0, "campfire-light");
-    this.campfireGlow = this.scene.add.image(0, 0, "campfire-glow").setDepth(9999); // prettier-ignore
-
     this.playerLightStamp.setVisible(false);
-    this.campfireLightStamp.setVisible(false);
-    this.campfireGlow.setVisible(false);
+
+    this.campfireLightStamp = this.scene.add.image(0, 0, "campfire-light").setVisible(false);
+    this.campfireGlows = new Map();
 
     // resize
     this.scene.scale.on("resize", (gameSize) => {
@@ -44,11 +38,7 @@ export default class LightingSystem {
   resize(width, height) {
     this.darknessRT.destroy();
 
-    this.darknessRT = this.scene.add
-      .renderTexture(0, 0, width, height)
-      .setOrigin(0)
-      .setScrollFactor(0)
-      .setDepth(9998);
+    this.darknessRT = this.scene.add.renderTexture(0, 0, width, height).setOrigin(0).setScrollFactor(0).setDepth(9998);
   }
 
   createCampfireTexture() {
@@ -58,22 +48,11 @@ export default class LightingSystem {
     const size = 512;
     const radius = size / 2;
 
-    const texture = this.scene.textures.createCanvas(
-      "campfire-light",
-      size,
-      size,
-    );
+    const texture = this.scene.textures.createCanvas("campfire-light", size, size);
 
     const ctx = texture.context;
 
-    const gradient = ctx.createRadialGradient(
-      radius,
-      radius,
-      0,
-      radius,
-      radius,
-      radius,
-    );
+    const gradient = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
 
     gradient.addColorStop(0.0, "rgba(255,255,255,1.0)");
     gradient.addColorStop(0.15, "rgba(255,255,255,1.0)");
@@ -95,22 +74,11 @@ export default class LightingSystem {
     const size = 512;
     const radius = size / 2;
 
-    const texture = this.scene.textures.createCanvas(
-      "campfire-glow",
-      size,
-      size,
-    );
+    const texture = this.scene.textures.createCanvas("campfire-glow", size, size);
 
     const ctx = texture.context;
 
-    const gradient = ctx.createRadialGradient(
-      radius,
-      radius,
-      0,
-      radius,
-      radius,
-      radius,
-    );
+    const gradient = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
     gradient.addColorStop(0.0, "rgba(255,180,50,1)");
     gradient.addColorStop(0.5, "rgba(255,120,0,0.7)");
     gradient.addColorStop(1.0, "rgba(255,80,0,0)");
@@ -128,22 +96,11 @@ export default class LightingSystem {
     const size = 512;
     const radius = size / 2;
 
-    const texture = this.scene.textures.createCanvas(
-      "player-light",
-      size,
-      size,
-    );
+    const texture = this.scene.textures.createCanvas("player-light", size, size);
 
     const ctx = texture.context;
 
-    const gradient = ctx.createRadialGradient(
-      radius,
-      radius,
-      0,
-      radius,
-      radius,
-      radius,
-    );
+    const gradient = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
 
     gradient.addColorStop(0.0, "rgba(255,255,255,0.30)");
     gradient.addColorStop(0.4, "rgba(255,255,255,0.22)");
@@ -156,6 +113,27 @@ export default class LightingSystem {
     texture.refresh();
   }
 
+  syncCampfireGlows(campfires) {
+    const activeCampfireIds = new Set(campfires);
+
+    // Remove glows belonging to destroyed campfires.
+    for (const [campfire, glow] of this.campfireGlows) {
+      if (!campfire.active || !activeCampfireIds.has(campfire)) {
+        glow.destroy();
+        this.campfireGlows.delete(campfire);
+      }
+    }
+
+    // Create a glow for each newly placed campfire.
+    for (const campfire of campfires) {
+      if (this.campfireGlows.has(campfire)) continue;
+
+      const glow = this.scene.add.image(campfire.body.center.x, campfire.body.center.y, "campfire-glow").setDepth(9999).setVisible(false);
+
+      this.campfireGlows.set(campfire, glow);
+    }
+  }
+
   update() {
     const cam = this.scene.cameras.main;
 
@@ -166,39 +144,38 @@ export default class LightingSystem {
     const scale = (this.visionRadius * 2) / this.lightSize;
     this.playerLightStamp.setScale(scale);
 
-    this.darknessRT.erase(
-      this.playerLightStamp,
-      this.scene.player.body.center.x - cam.scrollX,
-      this.scene.player.body.center.y - cam.scrollY,
-    );
+    this.darknessRT.erase(this.playerLightStamp, this.scene.player.body.center.x - cam.scrollX, this.scene.player.body.center.y - cam.scrollY);
 
-    // Campfire vision
+    // Campfire vision and glow
     this.flickerTime ??= 0;
     this.flickerTime += 0.05;
 
-    const campfireRadius = this.campfireRadius + Phaser.Math.Between(-8, 8);
-    const campfireScale = (campfireRadius * 2) / this.lightSize;
+    const campfires = this.scene.buildingManager.getCampfires().filter((campfire) => campfire.active && campfire.body);
 
-    this.campfireLightStamp.setScale(campfireScale);
+    this.syncCampfireGlows(campfires);
 
-    this.darknessRT.erase(
-      this.campfireLightStamp,
-      this.scene.campfire.body.center.x - cam.scrollX,
-      this.scene.campfire.body.center.y - cam.scrollY,
-    );
+    for (const campfire of campfires) {
+      const x = campfire.body.center.x;
+      const y = campfire.body.center.y;
 
-    // Campfire glow effect (orangle color)
-    this.campfireGlow.setPosition(
-      this.scene.campfire.body.center.x,
-      this.scene.campfire.body.center.y,
-    );
+      // Each campfire reveals the area around itself.
+      const radius = campfire.visionRadius ?? this.campfireRadius;
+      const flickerRadius = radius + Phaser.Math.Between(-8, 8);
+      const scale = (flickerRadius * 2) / this.lightSize;
 
-    this.campfireGlow.setVisible(this.scene.dayNightSystem.isNight);
+      this.darknessRT.erase(this.campfireLightStamp.setScale(scale), x - cam.scrollX, y - cam.scrollY);
 
-    const glowScale = (this.campfireRadius * 2.2) / this.lightSize;
-    this.campfireGlow.setScale(glowScale);
-    this.campfireGlow.setAlpha(
-      this.glowAlpha + Math.sin(this.flickerTime) * 0.05,
-    );
+      // Each campfire has its own glow.
+      const glow = this.campfireGlows.get(campfire);
+
+      glow.setPosition(x, y);
+
+      const isNight = this.scene.dayNightSystem.isNight;
+      glow.setVisible(isNight);
+
+      glow.setScale((radius * 1.5) / this.lightSize);
+      const flicker = Math.sin(this.flickerTime) * 0.02;
+      glow.setAlpha(0.25 + flicker);
+    }
   }
 }

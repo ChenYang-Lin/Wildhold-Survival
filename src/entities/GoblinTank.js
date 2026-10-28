@@ -84,12 +84,12 @@ export default class GoblinTank extends Enemy {
       building.takeDamage(damage, this);
     });
 
-    // Campfire
-    this.scene.physics.add.overlap(hitbox, this.scene.campfire, (_, campfire) => {
-      if (hitTargets.has(campfire)) return;
+    // base
+    this.scene.physics.add.overlap(hitbox, this.scene.base, (_, base) => {
+      if (hitTargets.has(base)) return;
 
-      hitTargets.add(campfire);
-      campfire.takeDamage(damage, this);
+      hitTargets.add(base);
+      base.takeDamage(damage, this);
     });
 
     // Destroy hitbox

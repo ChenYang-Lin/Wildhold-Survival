@@ -10,7 +10,7 @@ export default class Campfire extends Phaser.Physics.Arcade.Sprite {
 
     this.setOrigin(0.5, 0.5);
     this.body.setSize(32, 32);
-    this.body.setOffset(16, 32); // 64 x 64, 0 + 16, 32 + 0
+    this.body.setOffset(0, 32); // 64 x 64, 0 + 16, 32 + 0
 
     this.hp = 20;
     this.maxHP = this.hp;
@@ -70,7 +70,6 @@ export default class Campfire extends Phaser.Physics.Arcade.Sprite {
   update() {
     const t = this.scene.time.now * 0.01;
 
-    this.visionRadius =
-      this.baseVisionRadius + Math.sin(t) * 8 + Math.sin(t * 1.7) * 5;
+    this.visionRadius = this.baseVisionRadius + Math.sin(t) * 8 + Math.sin(t * 1.7) * 5;
   }
 }

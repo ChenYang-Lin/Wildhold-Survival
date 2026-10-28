@@ -37,8 +37,8 @@ export default class EnemyProjectile extends Phaser.Physics.Arcade.Sprite {
       this.die();
     });
 
-    this.scene.physics.add.overlap(this, this.scene.campfire, (_, campfire) => {
-      campfire.takeDamage(this.damage, this);
+    this.scene.physics.add.overlap(this, this.scene.base, (_, base) => {
+      base.takeDamage(this.damage, this);
       this.die();
     });
   }

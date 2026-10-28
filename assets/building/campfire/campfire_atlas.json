@@ -1,9 +1,9 @@
 {
     "frames": [
         {
-            "filename": "campfire_idle_1",
+            "filename": "campfire_idle_0",
             "frame": {
-                "w": 64,
+                "w": 32,
                 "h": 64,
                 "x": 0,
                 "y": 0
@@ -16,7 +16,20 @@
         {
             "filename": "campfire_idle_2",
             "frame": {
-                "w": 64,
+                "w": 32,
+                "h": 64,
+                "x": 32,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "campfire_idle_1",
+            "frame": {
+                "w": 32,
                 "h": 64,
                 "x": 64,
                 "y": 0
@@ -27,9 +40,9 @@
             }
         },
         {
-            "filename": "campfire_idle_0",
+            "filename": "campfire_idle_3",
             "frame": {
-                "w": 64,
+                "w": 32,
                 "h": 64,
                 "x": 0,
                 "y": 64
@@ -40,25 +53,12 @@
             }
         },
         {
-            "filename": "campfire_idle_3",
-            "frame": {
-                "w": 64,
-                "h": 64,
-                "x": 64,
-                "y": 64
-            },
-            "anchor": {
-                "x": 0.5,
-                "y": 0.5
-            }
-        },
-        {
             "filename": "campfire_idle_4",
             "frame": {
-                "w": 64,
+                "w": 32,
                 "h": 64,
-                "x": 128,
-                "y": 0
+                "x": 32,
+                "y": 64
             },
             "anchor": {
                 "x": 0.5,
@@ -68,9 +68,9 @@
         {
             "filename": "campfire_idle_5",
             "frame": {
-                "w": 64,
+                "w": 32,
                 "h": 64,
-                "x": 128,
+                "x": 64,
                 "y": 64
             },
             "anchor": {

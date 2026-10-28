@@ -11,7 +11,7 @@ export default class HotbarSystem {
       return ["healthPotion", "staminaPotion"];
     }
 
-    return ["wall", "tower", "spike"];
+    return ["wall", "tower", "campfire", "spike"];
   }
 
   getItemData(itemId) {

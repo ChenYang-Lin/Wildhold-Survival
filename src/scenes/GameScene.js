@@ -1,6 +1,5 @@
 // Entities
 import Archer from "../entities/Archer.js";
-import Campfire from "../entities/Campfire.js";
 import Tower from "../entities/Tower.js";
 import Goblin from "../entities/Goblin.js";
 import GoblinTank from "../entities/GoblinTank.js";
@@ -43,6 +42,7 @@ import PlacementSystem from "../systems/PlacementSystem.js";
 import MiniMapUI from "../ui/MiniMapUI.js";
 import ObjectiveUI from "../ui/ObjectiveUI.js";
 import TutorialSystem from "../systems/TutorialSystem.js";
+import Base from "../entities/Base.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -59,9 +59,11 @@ export default class GameScene extends Phaser.Scene {
     GoblinTank.preload(this);
     GoblinShaman.preload(this);
     Archer.preload(this);
-    Campfire.preload(this);
     Tower.preload(this);
+    this.load.atlas("campfire", "assets/building/campfire/campfire.png", "assets/building/campfire/campfire_atlas.json");
+    this.load.animation("campfire_anim", "assets/building/campfire/campfire_anim.json");
     this.load.atlas("tree", "assets/tree.png", "assets/tree_atlas.json");
+    this.load.image("base", "assets/base.png");
     this.load.image("wall", "assets/wall.png");
     this.load.image("spike", "assets/spike.png");
     this.load.image("wood", "assets/wood.png");
@@ -151,8 +153,8 @@ export default class GameScene extends Phaser.Scene {
     this.player = new Player(this, 32, 32);
     // this.player.moveToGrid(45, 46);
     this.player.moveToGrid(45, 20);
-    this.campfire = new Campfire(this, 32, 32);
-    this.campfire.moveToGrid(45, 47);
+    this.base = new Base(this, 32, 32);
+    this.base.moveToGrid(45, 47);
   }
 
   createSystems() {
@@ -199,11 +201,11 @@ export default class GameScene extends Phaser.Scene {
 
   setupCollisions() {
     this.physics.add.collider(this.player, this.combatSystem.enemies);
-    this.physics.add.collider(this.player, this.campfire);
+    this.physics.add.collider(this.player, this.base);
     this.physics.add.collider(this.player, this.buildingManager.buildings, null, (player, building) => building.texture.key !== "spike");
     this.physics.add.collider(this.player, this.trees);
     this.physics.add.collider(this.player, this.rocks);
-    this.physics.add.collider(this.combatSystem.enemies, this.campfire);
+    this.physics.add.collider(this.combatSystem.enemies, this.base);
 
     this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings, null, (enemy, building) => building.texture.key !== "spike");
     this.physics.add.overlap(this.combatSystem.enemies, this.buildingManager.buildings, (enemy, building) => {
@@ -335,7 +337,7 @@ export default class GameScene extends Phaser.Scene {
     this.staminaUI.update();
 
     this.dayNightSystem.update(delta);
-    this.campfire.update();
+    this.base.update();
 
     this.inputController.endFrame();
 

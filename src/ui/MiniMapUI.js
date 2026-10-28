@@ -111,7 +111,7 @@ export default class MiniMapUI {
       scene.lightingSystem.darknessRT,
       scene.lightingSystem.playerLightStamp,
       scene.lightingSystem.campfireLightStamp,
-      scene.lightingSystem.campfireGlow,
+      scene.lightingSystem.campfireGlows,
     ]);
 
     // Create the player marker AFTER the minimap ignore list.

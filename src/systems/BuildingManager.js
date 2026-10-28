@@ -1,4 +1,5 @@
 import { BUILDINGS } from "../data/buildings.js";
+import Campfire from "../entities/Campfire.js";
 import Spike from "../entities/Spike.js";
 import Tower from "../entities/Tower.js";
 import Wall from "../entities/Wall.js";
@@ -10,6 +11,10 @@ export default class BuildingManager {
     this.buildings = this.scene.physics.add.group();
 
     this.tileSize = 32;
+  }
+
+  getCampfires() {
+    return this.buildings.getChildren().filter((building) => building instanceof Campfire);
   }
 
   getNearestTower(x, y, maxDistance) {
@@ -179,6 +184,8 @@ export default class BuildingManager {
       obj = new Tower(this.scene, worldX, worldY);
     } else if (type === "spike") {
       obj = new Spike(this.scene, worldX, worldY);
+    } else if (type === "campfire") {
+      obj = new Campfire(this.scene, worldX, worldY);
     }
 
     this.buildings.add(obj);
