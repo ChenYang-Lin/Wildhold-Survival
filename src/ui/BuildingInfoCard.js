@@ -193,21 +193,13 @@ export default class BuildingInfoCard {
 
     this.title.setText(name);
     this.levelText.setText(`Level ${building.level ?? 1}`);
-    this.healthText.setText(`Health: ${building.hp} / ${building.maxHP}`);
+    this.healthText.setText(`Health: ${building.hp || 0} / ${building.maxHP || 0}`);
 
     // Health Bar
     const ratio = building.maxHP > 0 ? building.hp / building.maxHP : 0;
 
     const barWidth = this.width - 24;
     this.healthBar.width = barWidth * Phaser.Math.Clamp(ratio, 0, 1);
-
-    if (ratio <= 0.3) {
-      this.healthBar.setFillStyle(0xe05252);
-    } else if (ratio <= 0.6) {
-      this.healthBar.setFillStyle(0xe5b84b);
-    } else {
-      this.healthBar.setFillStyle(0x55cc66);
-    }
 
     // Combat Stats
     const hasCombatStats = Number.isFinite(building.damage) && Number.isFinite(building.fireRate) && building.fireRate > 0;
@@ -224,10 +216,23 @@ export default class BuildingInfoCard {
       this.rangeText.setText("");
     }
 
-    // Upgrade Cost and Button
+    // Buttons
     const buildingData = BUILDINGS[building.texture.key];
     const maxLevel = buildingData?.maxLevel ?? 1;
 
+    // Repair
+    this.canRepair = this.building.maxHP > 0;
+    if (this.canRepair) {
+      this.repairButton.setFillStyle(0x3b7d3b);
+      this.repairButton.setStrokeStyle(1, 0x8fd18f);
+      this.repairText.setColor("#ffffff");
+    } else {
+      this.repairButton.setFillStyle(0x454b53);
+      this.repairButton.setStrokeStyle(1, 0x666666);
+      this.repairText.setColor("#aaaaaa");
+    }
+
+    // Upgrade
     this.canUpgrade = building.level < maxLevel && Boolean(buildingData?.upgrades?.[building.level + 1]);
 
     if (this.canUpgrade) {

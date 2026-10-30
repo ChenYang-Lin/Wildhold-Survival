@@ -83,7 +83,10 @@ export default class InputController {
         return;
       }
 
-      if (this.isOverUI(pointer)) return;
+      if (this.isOverUI(pointer)) {
+        this.scene.buildingInteractionSystem?.close();
+        return;
+      }
 
       // Handle building moving if placement mode or moving mode is active.
       if (this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) {
@@ -214,7 +217,10 @@ export default class InputController {
         return;
       }
 
-      if (this.isOverUI(pointer)) return;
+      if (this.isOverUI(pointer)) {
+        this.scene.buildingInteractionSystem?.close();
+        return;
+      }
 
       // Handle building moving if placement mode or moving mode is active.
       if (this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) {

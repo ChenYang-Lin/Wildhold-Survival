@@ -74,7 +74,7 @@ export default class ActionSystem {
   }
 
   repairBuilding(building) {
-    if (!building?.active || !building.body) return false;
+    if (!building?.active || !building.body || !building.maxHP > 0) return false;
 
     // Don't charge for a building that needs no repair.
     if (building.hp >= building.maxHP) {

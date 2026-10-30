@@ -1,0 +1,228 @@
+{
+    "anims": [
+        {
+            "key": "survivor_shoot_right",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_00"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_01"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_02"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_03"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_04"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_05"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_06"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_07"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_08"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_09"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_10"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_right_11"
+                }
+            ]
+        },
+        {
+            "key": "survivor_shoot_left",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_00"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_01"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_02"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_03"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_04"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_05"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_06"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_07"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_08"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_09"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_10"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_left_11"
+                }
+            ]
+        },
+        {
+            "key": "survivor_shoot_down",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_00"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_01"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_02"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_03"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_04"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_05"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_06"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_07"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_08"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_09"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_10"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_down_11"
+                }
+            ]
+        },
+        {
+            "key": "survivor_shoot_up",
+            "type": "frames",
+            "repeat": 0,
+            "frameRate": 12,
+            "frames": [
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_00"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_01"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_02"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_03"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_04"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_05"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_06"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_07"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_08"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_09"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_10"
+                },
+                {
+                    "key": "survivor_shoot",
+                    "frame": "survivor_shoot_up_11"
+                }
+            ]
+        }
+    ]
+}
