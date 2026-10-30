@@ -95,7 +95,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   update(delta) {
     if (!this.active) return;
 
-    this.setDepth(this.body.center.y);
+    this.setDepth(this.body.bottom);
 
     const input = this.scene.inputController.state;
 

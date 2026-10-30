@@ -18,7 +18,7 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
     this.stage = TREE_STAGE.MATURE;
     this.setStage(TREE_STAGE.MATURE);
 
-    this.setDepth(this.body.center.y);
+    this.setDepth(this.body.bottom);
   }
 
   setGridPosition(gridX, gridY) {

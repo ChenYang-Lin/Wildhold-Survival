@@ -30,6 +30,10 @@ export default class Spike extends Phaser.Physics.Arcade.Sprite {
     this.enemyDamageTimers.set(enemy, now + this.damageInterval);
   }
 
+  update() {
+    this.setDepth(1);
+  }
+
   destroy(fromScene) {
     this.enemyDamageTimers.clear();
     super.destroy(fromScene);

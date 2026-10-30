@@ -505,7 +505,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
-    this.setDepth(this.body.center.y);
+    this.setDepth(this.body.bottom);
     this.healthBar.update();
     this.castBar?.update(delta);
   }
