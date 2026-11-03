@@ -73,7 +73,7 @@ export default class Tree extends Phaser.Physics.Arcade.Sprite {
 
     this.hp -= amount;
 
-    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ffff44"); // prettier-ignore
+    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, this.depth, amount, "#ffff44"); // prettier-ignore
 
     if (this.hp <= 0) {
       this.die();

@@ -62,6 +62,8 @@ export default class AttackComponent {
     const attackSpeed = this.owner.stats.attackSpeed;
     const duration = 1000 / attackSpeed;
 
+    this.currentAttackDuration = duration;
+
     const hitDelay = duration * attack.hitTimeRatio;
 
     this.playAttackAnimation(attack, duration);
@@ -204,12 +206,19 @@ export default class AttackComponent {
 
       hitEnemies.add(enemy);
 
-      const damage = this.owner.stats.damage * attack.damageMultiplier;
+      const isCritical = Math.random() < this.owner.stats.critChance;
+
+      let damage = this.owner.stats.damage * attack.damageMultiplier;
+
+      if (isCritical) {
+        damage *= this.owner.stats.critDamage;
+      }
 
       enemy.takeDamage(damage, {
         direction: this.owner.movement.facing,
         force: attack.flinch?.force ?? 140,
         flinchDuration: attack.flinch?.duration ?? 200,
+        isCritical,
       });
     });
 
@@ -308,8 +317,7 @@ export default class AttackComponent {
 
     this.attackTimer -= delta;
 
-    const attackSpeed = this.owner.stats.attackSpeed;
-    const duration = 1000 / attackSpeed;
+    const duration = this.currentAttackDuration;
 
     const comboWindowStart = duration * (this.currentAttack.comboWindowStartRatio ?? 0.5);
 

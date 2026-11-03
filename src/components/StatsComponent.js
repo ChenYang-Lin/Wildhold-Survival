@@ -10,6 +10,9 @@ export default class StatsComponent {
       attackCooldown: baseStats.attackCooldown ?? 1000,
       attackSpeed: baseStats.attackSpeed ?? 1,
 
+      critChance: baseStats.critChance ?? 0,
+      critDamage: baseStats.critDamage ?? 1.5,
+
       maxStamina: baseStats.maxStamina ?? 100,
       staminaDrainRate: baseStats.staminaDrainRate ?? 20,
       staminaRegenRate: baseStats.staminaRegenRate ?? 20,
@@ -27,12 +30,24 @@ export default class StatsComponent {
     this.activeBuffs = new Map();
   }
 
-  get speed() {
-    return this.current.speed;
+  get attackSpeed() {
+    return this.current.attackSpeed;
   }
 
   get damage() {
     return this.current.damage;
+  }
+
+  get critChance() {
+    return this.current.critChance;
+  }
+
+  get critDamage() {
+    return this.current.critDamage;
+  }
+
+  get speed() {
+    return this.current.speed;
   }
 
   get stamina() {
@@ -49,10 +64,6 @@ export default class StatsComponent {
 
   get staminaRegenRate() {
     return this.current.staminaRegenRate;
-  }
-
-  get attackSpeed() {
-    return this.current.attackSpeed;
   }
 
   updateStaminaRegen(delta) {
@@ -140,6 +151,18 @@ export default class StatsComponent {
       ...this.base,
     };
 
+    // Apply equipped weapon bonuses.
+    const weapon = this.owner.scene.equipmentSystem?.getEquippedWeapon();
+
+    if (weapon?.bonuses) {
+      for (const [stat, value] of Object.entries(weapon.bonuses)) {
+        if (stat in this.current) {
+          this.current[stat] += value;
+        }
+      }
+    }
+
+    // Apply temporary buffs.
     for (const entry of this.activeBuffs.values()) {
       const buff = entry.buff;
 

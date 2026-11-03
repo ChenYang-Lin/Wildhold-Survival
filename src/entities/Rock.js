@@ -21,7 +21,7 @@ export default class Rock extends Phaser.Physics.Arcade.Sprite {
   takeDamage(amount) {
     this.hp -= amount;
 
-    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ffff44"); // prettier-ignore
+    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, this.depth, amount, "#ffff44"); // prettier-ignore
 
     if (this.hp <= 0) {
       this.die();

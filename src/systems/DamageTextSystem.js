@@ -5,11 +5,10 @@ export default class DamageTextSystem {
     this.scene = scene;
   }
 
-  showDamage(x, y, amount, color = "#ffffff") {
-    let depth = y;
+  showDamage(x, y, depth, amount, color = "#ffffff", isCritical = false) {
     x += Phaser.Math.Between(-8, 8);
     y += Phaser.Math.Between(-5, 5);
 
-    new FloatingText(this.scene, x, y, amount.toString(), color, depth);
+    new FloatingText(this.scene, x, y, amount.toString(), color, depth, isCritical);
   }
 }

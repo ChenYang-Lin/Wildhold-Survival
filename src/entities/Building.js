@@ -65,7 +65,7 @@ export default class Building extends Phaser.Physics.Arcade.Sprite {
 
     this.setHP(this.hp - amount);
 
-    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff8844"); // prettier-ignore
+    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, this.depth, amount, "#ff8844"); // prettier-ignore
 
     // Damage flash
     this.setTint(0xff4444);

@@ -44,6 +44,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     scene.load.atlas("survivor_attack", "assets/player/survivor_attack.png", "assets/player/survivor_attack_atlas.json");
     scene.load.animation("survivor_attack_anim", "assets/player/survivor_attack_anim.json");
+
+    scene.load.atlas("survivor_shoot", "assets/player/survivor_shoot.png", "assets/player/survivor_shoot_atlas.json");
+    scene.load.animation("survivor_shoot_anim", "assets/player/survivor_shoot_anim.json");
   }
 
   moveToPosition(x, y) {
@@ -65,7 +68,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   takeDamage(amount, source) {
     this.health.takeDamage(amount);
 
-    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff0000"); // prettier-ignore
+    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, this.depth, amount, "#ff0000"); // prettier-ignore
 
     // visual feedback
     this.setTint(0xff0000);

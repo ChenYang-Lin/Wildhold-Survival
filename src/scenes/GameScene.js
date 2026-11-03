@@ -43,6 +43,7 @@ import MiniMapUI from "../ui/MiniMapUI.js";
 import ObjectiveUI from "../ui/ObjectiveUI.js";
 import TutorialSystem from "../systems/TutorialSystem.js";
 import Base from "../entities/Base.js";
+import EquipmentWindow from "../ui/windows/EquipmentWindow.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -90,11 +91,13 @@ export default class GameScene extends Phaser.Scene {
     this.mapManager = new MapManager(this);
     this.mapManager.load();
 
+    this.createData();
     this.createEntities();
     this.createSystems();
-    this.createUI();
-    this.createData();
 
+    this.player.stats.refreshStats();
+
+    this.createUI();
     this.createWorld();
 
     // Wait for the first physics update before reading the player's body position.
@@ -190,6 +193,8 @@ export default class GameScene extends Phaser.Scene {
 
     this.gameOverUI = new GameOverUI(this);
     this.overlayMessageUI = new OverlayMessageUI(this);
+
+    this.equipmentWindow = new EquipmentWindow(this);
 
     this.inputController.resetUIPosition();
   }

@@ -1,7 +1,7 @@
 export default class FloatingText extends Phaser.GameObjects.Text {
-  constructor(scene, x, y, text, color = "#ffffff", depth) {
+  constructor(scene, x, y, text, color = "#ffffff", depth, isCritical = false) {
     super(scene, x, y, text, {
-      fontSize: "16px",
+      fontSize: isCritical ? "24px" : "16px",
       color,
       stroke: "#000000",
       strokeThickness: 3,
@@ -11,7 +11,7 @@ export default class FloatingText extends Phaser.GameObjects.Text {
 
     scene.add.existing(this);
 
-    this.setDepth(y + 1);
+    this.setDepth(depth + 1);
 
     scene.tweens.add({
       targets: this,

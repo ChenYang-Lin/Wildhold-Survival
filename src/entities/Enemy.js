@@ -146,7 +146,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (!this.active) return;
     if (this.aiState === this.STATE_DEAD) return;
 
-    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, amount, "#ff4444");
+    const { isCritical = false } = options;
+
+    this.scene.damageTextSystem.showDamage(this.body.center.x, this.body.center.y, this.depth, amount, isCritical ? "#ffd700" : "#ff4444", isCritical);
 
     this.health.takeDamage(amount);
     this.healthBar.update();
