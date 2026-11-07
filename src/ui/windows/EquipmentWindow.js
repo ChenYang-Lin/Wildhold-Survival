@@ -1,70 +1,98 @@
-import CharacterEquipmentPanel from "../components/CharacterEquipmentPanel.js";
 import BaseWindow from "./BaseWindow.js";
+import CharacterEquipmentPanel from "../components/CharacterEquipmentPanel.js";
+import EquipmentInventoryPanel from "../components/EquipmentInventoryPanel.js";
+import EquipmentDetailsPanel from "../components/EquipmentDetailsPanel.js";
 
 export default class EquipmentWindow extends BaseWindow {
   constructor(scene) {
-    super(scene, "Character Equipment");
+    super(scene, "Character Equipment", EquipmentWindow.createHTML());
 
-    this.characterEquipmentPanel = new CharacterEquipmentPanel(scene, this);
+    this.element.classList.add("equipment-window");
+    this.inventoryPanel = this.element.querySelector(".inventory-panel");
+    this.infoPanel = this.element.querySelector(".info-panel");
 
-    this.inventoryPanel = scene.add.rectangle(0, 0, 100, 100, 0x353535, 1);
-
-    this.infoPanel = scene.add.rectangle(0, 0, 100, 100, 0x353535, 1);
-
-    this.add([this.inventoryPanel, this.infoPanel]);
-
-    this.inventoryTitle = scene.add.text(0, 0, "Inventory", {
-      fontSize: "18px",
-      color: "#ffffff",
+    this.characterEquipmentPanel = new CharacterEquipmentPanel(scene, this.element.querySelector(".character-panel"), (type, itemId) => {
+      if (itemId) {
+        this.equipmentDetailsPanel.showItem(itemId);
+      } else {
+        this.equipmentDetailsPanel.showEmptySlot(type);
+      }
     });
 
-    this.infoTitle = scene.add.text(0, 0, "Item Details", {
-      fontSize: "18px",
-      color: "#ffffff",
+    this.equipmentInventoryPanel = new EquipmentInventoryPanel(scene, this.inventoryPanel, (itemId, category) => {
+      if (itemId) {
+        this.equipmentDetailsPanel.showItem(itemId);
+      } else if (category) {
+        this.equipmentDetailsPanel.showEmptySlot(category);
+      }
     });
 
-    this.add([this.inventoryTitle, this.infoTitle]);
+    this.equipmentDetailsPanel = new EquipmentDetailsPanel(scene, this.infoPanel, () => {
+      this.characterEquipmentPanel.refreshStats();
+      this.characterEquipmentPanel.refreshEquipment();
+      this.equipmentInventoryPanel.refresh();
+    });
 
-    this.initializeLayout();
+    this.inventoryPanel.querySelector("h3").textContent = "Inventory";
+    this.infoPanel.querySelector("h3").textContent = "Item Details";
+
+    this.initialize();
   }
 
-  updateLayout() {
-    super.updateLayout();
+  static createHTML() {
+    return `
+      <header class="equipment-header">
+        <h2>Character Equipment</h2>
+        <button class="close-button" type="button" aria-label="Close">×</button>
+      </header>
 
-    const padding = 15;
-    const gap = 10;
+      <main class="equipment-content">
+        <section class="equipment-panel character-panel"></section>
 
-    // Available space inside the window
-    const contentWidth = this.panelWidth - padding * 2 - gap * 2;
-    const contentHeight = this.panelHeight - 80;
+        <section class="equipment-panel inventory-panel">
+          <h3>Inventory</h3>
+        </section>
 
-    // Column proportions
-    const characterWidth = contentWidth * 0.35;
-    const inventoryWidth = contentWidth * 0.4;
-    const infoWidth = contentWidth * 0.25;
+        <section class="equipment-panel info-panel">
+          <h3>Item Details</h3>
+        </section>
+      </main>
+    `;
+  }
 
-    const contentX = -this.panelWidth / 2 + padding;
-    const contentY = -this.panelHeight / 2 + 65;
+  initialize() {
+    this.hide();
 
-    // Calculate column positions
-    const characterX = contentX + characterWidth / 2;
-    const inventoryX = contentX + characterWidth + gap + inventoryWidth / 2;
+    // Press I to toggle the equipment window.
+    this.toggleKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
 
-    const infoX = contentX + characterWidth + gap + inventoryWidth + gap + infoWidth / 2;
+    this.toggleKey.on("down", this.toggle, this);
 
-    // Position and resize panel backgrounds
-    this.inventoryPanel.setPosition(inventoryX, contentY + contentHeight / 2);
-    this.inventoryPanel.setSize(inventoryWidth, contentHeight);
+    // Close button.
+    this.onCloseClick = () => this.hide();
 
-    this.infoPanel.setPosition(infoX, contentY + contentHeight / 2);
-    this.infoPanel.setSize(infoWidth, contentHeight);
+    this.element.querySelector(".close-button").addEventListener("click", this.onCloseClick);
 
-    // Position titles
+    this.characterEquipmentPanel.refreshCharacterPreview();
+    this.characterEquipmentPanel.refreshStats();
+    this.characterEquipmentPanel.refreshEquipment();
+  }
 
-    this.inventoryTitle.setPosition(inventoryX - inventoryWidth / 2 + 10, contentY + 10);
+  toggle() {
+    if (this.visible) {
+      this.hide();
+    } else {
+      this.show();
+    }
+  }
 
-    this.infoTitle.setPosition(infoX - infoWidth / 2 + 10, contentY + 10);
+  destroy() {
+    if (this.destroyed) return;
 
-    this.characterEquipmentPanel.updateLayout(characterX, contentY + contentHeight / 2, characterWidth, contentHeight);
+    this.toggleKey?.off("down", this.toggle, this);
+
+    this.element?.querySelector(".close-button")?.removeEventListener("click", this.onCloseClick);
+
+    super.destroy();
   }
 }

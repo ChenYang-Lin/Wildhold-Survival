@@ -71,6 +71,9 @@ export default class HealthUI {
     // update the health UI after the physics step: solves the health bar jittering issue.
     this.scene.events.on(Phaser.Scenes.Events.POST_UPDATE, this.update, this);
 
+    //
+    this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
+
     this.update();
   }
 
@@ -253,10 +256,24 @@ export default class HealthUI {
   }
 
   destroy() {
+    if (this.destroyed) return;
+    this.destroyed = true;
+
     this.scene.events.off(Phaser.Scenes.Events.POST_UPDATE, this.update, this);
 
+    this.scene.events.off(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
+
     this.stopDamageAnimation();
+
     this.container?.destroy(true);
     this.container = null;
+
+    this.fill = null;
+    this.damageTrail = null;
+    this.divisions = null;
+    this.levelText = null;
+    this.levelBackground = null;
+    this.frame = null;
+    this.background = null;
   }
 }

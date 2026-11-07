@@ -1,3 +1,5 @@
+import { EQUIPMENT } from "../data/equipment.js";
+
 export default class StatsComponent {
   constructor(owner, baseStats = {}) {
     this.owner = owner;
@@ -10,6 +12,8 @@ export default class StatsComponent {
       attackCooldown: baseStats.attackCooldown ?? 1000,
       attackSpeed: baseStats.attackSpeed ?? 1,
 
+      maxHealth: baseStats.maxHealth ?? 100,
+
       critChance: baseStats.critChance ?? 0,
       critDamage: baseStats.critDamage ?? 1.5,
 
@@ -19,6 +23,10 @@ export default class StatsComponent {
     };
 
     this.current = {
+      ...this.base,
+    };
+
+    this.equipment = {
       ...this.base,
     };
 
@@ -146,35 +154,90 @@ export default class StatsComponent {
     this.refreshStats();
   }
 
+  destroy() {
+    for (const entry of this.activeBuffs.values()) {
+      entry.timer?.remove();
+      entry.aura?.destroy();
+    }
+
+    this.activeBuffs.clear();
+  }
+
   refreshStats() {
-    this.current = {
-      ...this.base,
-    };
+    // Reset equipment-adjusted stats to the player's base stats.
+    this.equipment = { ...this.base };
 
-    // Apply equipped weapon bonuses.
-    const weapon = this.owner.scene.equipmentSystem?.getEquippedWeapon();
+    const equipmentSystem = this.owner.scene?.equipmentSystem;
+    const equippedItems = equipmentSystem?.getEquippedItems() || {};
 
-    if (weapon?.bonuses) {
-      for (const [stat, value] of Object.entries(weapon.bonuses)) {
-        if (stat in this.current) {
-          this.current[stat] += value;
+    // Multipliers start at 1, meaning no change.
+    let attackSpeedMultiplier = 1;
+    let movementSpeedMultiplier = 1;
+
+    // Collect bonuses from every equipped item.
+    for (const itemId of Object.values(equippedItems)) {
+      if (!itemId) continue;
+
+      const item = EQUIPMENT[itemId];
+
+      if (!item?.bonuses) continue;
+
+      for (const [stat, value] of Object.entries(item.bonuses)) {
+        switch (stat) {
+          case "attackSpeedMultiplier":
+            attackSpeedMultiplier *= value;
+            break;
+
+          case "movementSpeedMultiplier":
+            movementSpeedMultiplier *= value;
+            break;
+
+          case "damage":
+          case "maxHealth":
+          case "critChance":
+          case "critDamage":
+            this.equipment[stat] += value;
+            break;
+
+          default:
+            console.warn(`Unknown equipment bonus: ${stat}`);
         }
       }
     }
 
-    // Apply temporary buffs.
+    // Apply percentage-based bonuses.
+    this.equipment.attackSpeed *= attackSpeedMultiplier;
+    this.equipment.speed *= movementSpeedMultiplier;
+
+    // Prevent critical chance from exceeding 100%.
+    this.equipment.critChance = Math.min(1, Math.max(0, this.equipment.critChance));
+
+    // Start current stats with equipment-adjusted stats.
+    this.current = { ...this.equipment };
+
+    // Apply temporary buffs after equipment bonuses.
     for (const entry of this.activeBuffs.values()) {
       const buff = entry.buff;
 
       switch (buff.operation) {
         case "multiply":
-          this.current[buff.stat] *= buff.value;
+          if (buff.stat in this.current) {
+            this.current[buff.stat] *= buff.value;
+          }
           break;
 
         case "add":
-          this.current[buff.stat] += buff.value;
+          if (buff.stat in this.current) {
+            this.current[buff.stat] += buff.value;
+          }
           break;
       }
     }
+
+    // Convert attack speed into the cooldown used by attack systems.
+    this.current.attackCooldown = this.base.attackCooldown / this.current.attackSpeed;
+
+    // Keep current stamina within its maximum.
+    this.currentStamina = Math.min(this.currentStamina, this.current.maxStamina);
   }
 }

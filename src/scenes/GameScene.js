@@ -72,8 +72,8 @@ export default class GameScene extends Phaser.Scene {
     this.load.image("stone", "assets/stone.png");
     this.load.image("health_potion", "assets/potion_2.png");
     this.load.image("stamina_potion", "assets/potion_3.png");
-    this.load.image("woodenSwordIcon", "assets/weapon/woodenSword.png");
-    this.load.image("ironSwordIcon", "assets/weapon/ironSword.png");
+
+    this.load.atlas("equipment", "assets/equipment/equipment.png", "assets/equipment/equipment_atlas.json");
 
     this.load.image("arrow", "assets/arrow.png");
 
@@ -165,6 +165,7 @@ export default class GameScene extends Phaser.Scene {
     this.inputController = new InputController(this);
     this.actionSystem = new ActionSystem(this, this.player, this.inputController); // prettier-ignore
     this.buildingManager = new BuildingManager(this);
+
     this.buildingInteractionSystem = new BuildingInteractionSystem(this);
     this.placementSystem = new PlacementSystem(this);
     this.lightingSystem = new LightingSystem(this);
@@ -207,17 +208,17 @@ export default class GameScene extends Phaser.Scene {
   setupCollisions() {
     this.physics.add.collider(this.player, this.combatSystem.enemies);
     this.physics.add.collider(this.player, this.base);
-    this.physics.add.collider(this.player, this.buildingManager.buildings, null, (player, building) => building.texture.key !== "spike");
+    // this.physics.add.collider(this.player, this.buildingManager.buildings, null, (player, building) => building.texture.key !== "spike");
     this.physics.add.collider(this.player, this.trees);
     this.physics.add.collider(this.player, this.rocks);
     this.physics.add.collider(this.combatSystem.enemies, this.base);
 
-    this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings, null, (enemy, building) => building.texture.key !== "spike");
-    this.physics.add.overlap(this.combatSystem.enemies, this.buildingManager.buildings, (enemy, building) => {
-      if (building.texture.key === "spike") {
-        building.damageEnemy(enemy);
-      }
-    });
+    // this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings, null, (enemy, building) => building.texture.key !== "spike");
+    // this.physics.add.overlap(this.combatSystem.enemies, this.buildingManager.buildings, (enemy, building) => {
+    //   if (building.texture.key === "spike") {
+    //     building.damageEnemy(enemy);
+    //   }
+    // });
 
     this.physics.add.collider(this.combatSystem.enemies, this.trees);
     this.physics.add.overlap(this.projectiles, this.combatSystem.getEnemies(), (projectile, enemy) => {
@@ -358,7 +359,12 @@ export default class GameScene extends Phaser.Scene {
 
     // Restart game
     if (this.restartKey && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
-      this.scene.restart();
+      this.restartKey.enabled = false;
+
+      // 2. Safely trigger the restart on the next clock tick
+      this.time.delayedCall(0, () => {
+        this.scene.restart();
+      });
     }
   }
 }

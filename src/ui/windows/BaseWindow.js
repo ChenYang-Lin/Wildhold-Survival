@@ -1,50 +1,57 @@
-export default class BaseWindow extends Phaser.GameObjects.Container {
-  constructor(scene, title) {
-    super(scene, 0, 0);
-
+export default class BaseWindow {
+  constructor(scene, title, html) {
     this.scene = scene;
     this.title = title;
+    this.visible = false;
+    this.destroyed = false;
 
-    this.background = scene.add.rectangle(0, 0, 100, 100, 0x252525, 0.95);
-    this.background.setStrokeStyle(2, 0x888888);
+    // Create a normal HTML element.
+    this.element = document.createElement("div");
 
-    this.titleText = scene.add.text(0, 0, title, {
-      fontSize: "20px",
-      color: "#ffffff",
+    // Add the window content.
+    this.element.innerHTML = html;
+
+    // Position the window independently of Phaser.
+    Object.assign(this.element.style, {
+      position: "fixed",
+      left: "50%",
+      top: "50%",
+      transform: "translate(-50%, -50%)",
+      zIndex: "10000",
+      display: "none",
+      pointerEvents: "auto",
     });
 
-    this.add([this.background, this.titleText]);
+    // Add the window to the webpage.
+    document.body.appendChild(this.element);
 
-    this.setScrollFactor(0);
-    this.setDepth(1000);
-
-    scene.add.existing(this);
-
-    // Listen for screen resizing
-    this.scene.scale.on(Phaser.Scale.Events.RESIZE, this.updateLayout, this);
+    // Clean up when the Phaser scene shuts down.
+    this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
   }
 
-  initializeLayout() {
-    this.updateLayout();
+  setVisible(visible) {
+    if (this.destroyed) return;
+
+    this.visible = visible;
+    this.element.style.display = visible ? "flex" : "none";
   }
 
-  updateLayout() {
-    const screenWidth = this.scene.scale.width;
-    const screenHeight = this.scene.scale.height;
-
-    this.panelWidth = Math.min(screenWidth * 0.94, 1100);
-    this.panelHeight = Math.min(screenHeight * 0.9, 720);
-
-    this.setPosition(screenWidth / 2, screenHeight / 2);
-
-    this.background.setSize(this.panelWidth, this.panelHeight);
-
-    this.titleText.setPosition(-this.panelWidth / 2 + 20, -this.panelHeight / 2 + 15);
+  show() {
+    this.setVisible(true);
   }
 
-  destroy(fromScene) {
-    this.scene.scale.off(Phaser.Scale.Events.RESIZE, this.updateLayout, this);
+  hide() {
+    this.setVisible(false);
+  }
 
-    super.destroy(fromScene);
+  destroy() {
+    if (this.destroyed) return;
+
+    this.destroyed = true;
+
+    this.scene.events.off(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
+
+    this.element.remove();
+    this.element = null;
   }
 }

@@ -2,6 +2,8 @@ import GameScene from "./scenes/GameScene.js";
 
 const config = {
   type: Phaser.AUTO,
+  parent: "game-container",
+
   width: 800,
   height: 600,
 
@@ -23,11 +25,14 @@ const config = {
     default: "arcade",
     arcade: {
       debug: false,
-      // debug: true,
     },
+  },
+
+  dom: {
+    createContainer: true,
   },
 
   scene: [GameScene],
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);

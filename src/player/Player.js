@@ -8,7 +8,7 @@ import PlayerMovementFSM from "./fsm/PlayerMovementFSM.js";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
-    super(scene, x, y, "survivor", "survivor_idle_down");
+    super(scene, x, y, "survivor", "survivor_idle_down_0");
     this.scene = scene;
     // this.input = input;
 
@@ -19,7 +19,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.body.setSize(20, 16);
     this.body.setOffset(86, 112); // 192 x 192, 32 + 32 + 16 + 6, 32 + 32 + 16 + 16 + 32
 
-    this.health = new HealthComponent(this, 350);
+    this.health = new HealthComponent(this, 10);
     this.movement = new MovementComponent(this);
     this.stats = new StatsComponent(this, {
       speed: 100,

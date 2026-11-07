@@ -170,6 +170,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   die() {
     this.stopMoving();
 
+    this.stats.destroy();
+
     this.healthBar.destroy();
     this.destroy();
   }

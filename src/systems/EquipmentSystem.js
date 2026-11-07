@@ -1,43 +1,76 @@
-import { WEAPONS } from "../data/weapons.js";
+import { EQUIPMENT } from "../data/equipment.js";
 
 export default class EquipmentSystem {
   constructor(scene) {
     this.scene = scene;
 
-    // Temporary test ownership.
-    this.ownedWeapons = new Set(["woodenSword", "ironSword"]);
+    this.equippedItems = {
+      weapon: "wooden_sword",
+      helmet: null,
+      armor: null,
+      boots: null,
+    };
+  }
 
-    this.equippedWeapon = "woodenSword";
+  getEquippedItemId(category) {
+    return this.equippedItems[category] || null;
+  }
+
+  getEquippedItem(category) {
+    const itemId = this.getEquippedItemId(category);
+    return itemId ? EQUIPMENT[itemId] : null;
+  }
+
+  getEquippedItems() {
+    return { ...this.equippedItems };
+  }
+
+  equipItem(id) {
+    const item = EQUIPMENT[id];
+
+    if (!item) return false;
+
+    if (!this.scene.inventorySystem.ownsEquipment(id)) {
+      return false;
+    }
+
+    const category = item.category;
+
+    if (!(category in this.equippedItems)) {
+      console.warn(`Unsupported equipment category: ${category}`);
+      return false;
+    }
+
+    this.equippedItems[category] = id;
+
+    this.refreshEquipment();
+
+    return true;
+  }
+
+  refreshEquipment() {
+    this.scene.player.stats.refreshStats();
+
+    this.scene.equipmentWindow?.characterEquipmentPanel.refreshStats();
+    this.scene.equipmentWindow?.characterEquipmentPanel.refreshEquipment();
+    this.scene.equipmentWindow?.equipmentInventoryPanel.refresh();
+  }
+
+  // Temporary compatibility methods.
+
+  getEquippedWeaponId() {
+    return this.getEquippedItemId("weapon");
   }
 
   getEquippedWeapon() {
-    return WEAPONS[this.equippedWeapon];
-  }
-
-  getOwnedWeapons() {
-    return [...this.ownedWeapons].map((id) => WEAPONS[id]);
-  }
-
-  ownsWeapon(id) {
-    return this.ownedWeapons.has(id);
+    return this.getEquippedItem("weapon");
   }
 
   equipWeapon(id) {
-    if (!this.ownsWeapon(id)) return false;
-    if (!WEAPONS[id]) return false;
+    if (EQUIPMENT[id]?.category !== "weapon") {
+      return false;
+    }
 
-    this.equippedWeapon = id;
-
-    this.scene.player.stats.refreshStats();
-
-    return true;
-  }
-
-  unlockWeapon(id) {
-    if (!WEAPONS[id]) return false;
-
-    this.ownedWeapons.add(id);
-
-    return true;
+    return this.equipItem(id);
   }
 }

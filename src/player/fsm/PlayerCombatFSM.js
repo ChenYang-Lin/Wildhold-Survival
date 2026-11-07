@@ -1,5 +1,3 @@
-import { WEAPONS } from "../../data/weapons.js";
-
 export default class PlayerCombatFSM {
   constructor(owner) {
     this.owner = owner;

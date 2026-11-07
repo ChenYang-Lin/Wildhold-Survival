@@ -59,12 +59,14 @@ export default class MiniMapUI {
       this.scene.cameras.main.centerOn(worldPoint.x, worldPoint.y);
     });
 
-    this.scene.input.on("pointerup", (pointer) => {
+    this.onPointerUp = (pointer) => {
       if (pointer.id !== this.dragPointerId) return;
 
       this.isDragging = false;
       this.dragPointerId = null;
-    });
+    };
+
+    this.scene.input.on("pointerup", this.onPointerUp);
 
     // Button for recenter camera back to the player
     this.recenterButton = scene.add
@@ -239,6 +241,8 @@ export default class MiniMapUI {
   }
 
   destroy() {
+    this.scene.input.off("pointerup", this.onPointerUp);
+
     this.playerMarker?.destroy();
     this.baseMarker?.destroy();
     this.cameraViewport?.destroy();

@@ -2,6 +2,9 @@ export default class InventorySystem {
   constructor(scene) {
     this.scene = scene;
 
+    // Starter equipment for testing.
+    this.ownedEquipment = new Set(["wooden_sword", "steel_helmet", "steel_armor", "leather_boots"]);
+
     // this.inventory = [
     //   { id: "wood", type: "resource", amount: 0 },
     //   { id: "stone", type: "resource", amount: 0 },
@@ -69,6 +72,25 @@ export default class InventorySystem {
       }
     }
     return false;
+  }
+
+  ownsEquipment(id) {
+    return this.ownedEquipment.has(id);
+  }
+
+  addEquipment(id) {
+    if (this.ownedEquipment.has(id)) return false;
+
+    this.ownedEquipment.add(id);
+    return true;
+  }
+
+  removeEquipment(id) {
+    return this.ownedEquipment.delete(id);
+  }
+
+  getOwnedEquipment() {
+    return [...this.ownedEquipment];
   }
 
   updateInventoryUI() {
