@@ -96,6 +96,7 @@ export default class GameScene extends Phaser.Scene {
     this.createSystems();
 
     this.player.stats.refreshStats();
+    this.miniMapUI = new MiniMapUI(this);
 
     this.createUI();
     this.createWorld();
@@ -111,8 +112,6 @@ export default class GameScene extends Phaser.Scene {
     this.playerRemainderY = 0;
     this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.updatePlayerUIPosition, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
-
-    this.miniMapUI = new MiniMapUI(this);
 
     // Set boundry ----------------------------------------------------------------------------------------------------------
     const bounds = this.mapManager.getWorldBounds();
