@@ -4,6 +4,8 @@ import MovementButtonUI from "../ui/MovementButtonUI.js";
 
 export default class InputController {
   constructor(scene) {
+    console.log("INPUT 1: Constructor started");
+
     this.scene = scene;
     this.state = new InputState();
 
@@ -13,18 +15,23 @@ export default class InputController {
 
     this.state.isMobile = this.scene.sys.game.device.input.touch;
 
+    console.log("INPUT 2: Device detected", this.state.isMobile);
+
     if (this.state.isMobile) {
       this.setupMobile();
     } else {
       this.setupPC();
     }
-    // this.setupMobile();
-    // this.setupPC();
+
+    console.log("INPUT 3: Setup completed");
   }
 
   setupMobile() {
+    console.log("MOBILE 1");
     this.attackButtonUI = new AttackButtonUI(this.scene);
+    console.log("MOBILE 2: Attack button created");
     this.movementButtonUI = new MovementButtonUI(this.scene);
+    console.log("MOBILE 3: Movement button created");
 
     // JOYSTICK --------------------------------------------------------------------------------------------------------------------
     this.joystickActive = false;
@@ -41,6 +48,8 @@ export default class InputController {
       .circle(120, h - 120, 25, 0xffffff, 0.5)
       .setScrollFactor(0)
       .setDepth(10000);
+
+    console.log("MOBILE 4: Joystick created");
 
     // Attack Button
     this.attackButtonUI.button.on("pointerdown", (pointer) => {
@@ -174,13 +183,19 @@ export default class InputController {
       }
     });
 
+    console.log("MOBILE 5: Event handlers registered");
+
     // Screen resize
     this.scene.scale.on("resize", () => {
       this.resetUIPosition();
     });
 
+    console.log("MOBILE 6: Resize listener registered");
+
     // make sure every ui is at correct position
     this.resetUIPosition();
+
+    console.log("MOBILE 7: UI positions reset");
   }
 
   setupPC() {
