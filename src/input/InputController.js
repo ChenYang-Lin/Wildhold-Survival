@@ -4,18 +4,15 @@ import MovementButtonUI from "../ui/MovementButtonUI.js";
 
 export default class InputController {
   constructor(scene) {
-    console.log("INPUT 1: Constructor started");
-
     this.scene = scene;
     this.state = new InputState();
 
     this.placementPointerId = null;
+    this.destroyed = false;
 
     this.cursors = scene.input.keyboard.createCursorKeys();
 
-    this.state.isMobile = this.scene.sys.game.device.input.touch;
-
-    console.log("INPUT 2: Device detected", this.state.isMobile);
+    this.state.isMobile = scene.sys.game.device.input.touch;
 
     if (this.state.isMobile) {
       this.setupMobile();
@@ -23,17 +20,17 @@ export default class InputController {
       this.setupPC();
     }
 
-    console.log("INPUT 3: Setup completed");
+    // Clean up this controller when the scene shuts down or restarts.
+    this.onShutdown = () => this.destroy();
+
+    this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.onShutdown);
   }
 
   setupMobile() {
-    console.log("MOBILE 1");
     this.attackButtonUI = new AttackButtonUI(this.scene);
-    console.log("MOBILE 2: Attack button created");
     this.movementButtonUI = new MovementButtonUI(this.scene);
-    console.log("MOBILE 3: Movement button created");
 
-    // JOYSTICK --------------------------------------------------------------------------------------------------------------------
+    // Joystick
     this.joystickActive = false;
     this.joyPointerId = null;
 
@@ -49,45 +46,49 @@ export default class InputController {
       .setScrollFactor(0)
       .setDepth(10000);
 
-    console.log("MOBILE 4: Joystick created");
-
-    // Attack Button
-    this.attackButtonUI.button.on("pointerdown", (pointer) => {
-      if (!this.isActionAllowed("combat.attack")) return; // For tutorial, restrict player inputs during the tutorial;
+    // Attack button
+    this.onAttackButtonDown = (pointer) => {
+      if (!this.isActionAllowed("combat.attack")) return;
 
       this.state.attackPointerId = pointer.id;
       this.state.attackPressed = true;
       this.state.attackHeld = true;
-    });
+    };
 
-    this.attackButtonUI.button.on("pointerup", (pointer) => {
+    this.onAttackButtonUp = (pointer) => {
       if (pointer.id !== this.state.attackPointerId) return;
 
       this.state.attackHeld = false;
       this.state.attackReleased = true;
       this.state.attackPointerId = null;
-    });
+    };
 
-    // Dash/Sprint button
-    this.movementButtonUI.button.on("pointerdown", (pointer) => {
-      if (!this.isActionAllowed("player.dash")) return; // For tutorial, restrict player inputs during the tutorial;
+    this.attackButtonUI.button.on("pointerdown", this.onAttackButtonDown);
+
+    this.attackButtonUI.button.on("pointerup", this.onAttackButtonUp);
+
+    // Dash / sprint button
+    this.onMovementButtonDown = (pointer) => {
+      if (!this.isActionAllowed("player.dash")) return;
+
       this.state.movementPointerId = pointer.id;
-
       this.state.dashPressed = true;
       this.state.sprintHeld = true;
-    });
+    };
 
-    this.movementButtonUI.button.on("pointerup", (pointer) => {
+    this.onMovementButtonUp = (pointer) => {
       if (pointer.id !== this.state.movementPointerId) return;
 
       this.state.sprintHeld = false;
       this.state.movementPointerId = null;
-    });
+    };
 
-    // POINTER DOWN ON SCREEN
-    this.scene.input.on("pointerdown", (pointer) => {
-      console.log("Mobile pointerdown test");
-      // Ignore clicks on existing UI.
+    this.movementButtonUI.button.on("pointerdown", this.onMovementButtonDown);
+
+    this.movementButtonUI.button.on("pointerup", this.onMovementButtonUp);
+
+    // Screen pointer down
+    this.onPointerDown = (pointer) => {
       if (this.isOverBuildingInfoCard(pointer)) {
         this.scene.buildingInteractionSystem.handlePointerDown(pointer);
         return;
@@ -98,25 +99,22 @@ export default class InputController {
         return;
       }
 
-      // Handle building moving if placement mode or moving mode is active.
       if (this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) {
         this.placementPointerId = pointer.id;
 
         this.state.aimWorldX = pointer.worldX;
         this.state.aimWorldY = pointer.worldY;
 
-        // For Placing System, move the preview building to dragged place.
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
         return;
       }
 
-      // Building selection / card dismissal
       if (this.scene.buildingInteractionSystem?.handlePointerDown(pointer)) {
         return;
       }
 
-      // Joystick - Handle joystick input and aiming.
+      // Joystick activation
       if (pointer.x < this.scene.scale.width * 0.4 && this.joyPointerId === null && this.isActionAllowed("player.move")) {
         this.joyPointerId = pointer.id;
         this.joystickActive = true;
@@ -126,15 +124,14 @@ export default class InputController {
 
       this.state.aimWorldX = pointer.worldX;
       this.state.aimWorldY = pointer.worldY;
-    });
+    };
 
-    // POINTER MOVE (movement + aim)
-    this.scene.input.on("pointermove", (pointer) => {
+    // Screen pointer move
+    this.onPointerMove = (pointer) => {
       this.state.aimWorldX = pointer.worldX;
       this.state.aimWorldY = pointer.worldY;
 
       if ((this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) && pointer.id === this.placementPointerId) {
-        // For Placing System, move the preview building to dragged place.
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
         return;
@@ -143,7 +140,6 @@ export default class InputController {
       if (!this.joystickActive) return;
       if (pointer.id !== this.joyPointerId) return;
 
-      // JOYSTICK
       const dx = pointer.x - this.joyBase.x;
       const dy = pointer.y - this.joyBase.y;
 
@@ -156,7 +152,6 @@ export default class InputController {
 
       this.joyThumb.setPosition(this.joyBase.x + thumbX, this.joyBase.y + thumbY);
 
-      // normalized movement vector with dead zone (don't make character move instanly when joystick just move tiny bit)
       const deadzone = 14;
 
       if (distance < deadzone) {
@@ -164,16 +159,15 @@ export default class InputController {
       } else {
         this.state.moveVector.set(thumbX / 50, thumbY / 50);
       }
-    });
+    };
 
-    // POINTER UP (joystick release)
-    this.scene.input.on("pointerup", (pointer) => {
+    // Screen pointer up
+    this.onPointerUp = (pointer) => {
       if (pointer.id === this.placementPointerId) {
         this.scene.placementSystem?.notifyTutorialOfValidPosition();
         this.placementPointerId = null;
       }
 
-      // Joystick
       if (pointer.id === this.joyPointerId) {
         this.joystickActive = false;
         this.joyPointerId = null;
@@ -182,21 +176,13 @@ export default class InputController {
 
         this.state.moveVector.set(0, 0);
       }
-    });
+    };
 
-    console.log("MOBILE 5: Event handlers registered");
+    this.scene.input.on("pointerdown", this.onPointerDown);
+    this.scene.input.on("pointermove", this.onPointerMove);
+    this.scene.input.on("pointerup", this.onPointerUp);
 
-    // Screen resize
-    this.scene.scale.on("resize", () => {
-      this.resetUIPosition();
-    });
-
-    console.log("MOBILE 6: Resize listener registered");
-
-    // make sure every ui is at correct position
     this.resetUIPosition();
-
-    console.log("MOBILE 7: UI positions reset");
   }
 
   setupPC() {
@@ -209,26 +195,20 @@ export default class InputController {
       right: "D",
     });
 
-    // restart button
     this.restartKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
-    // mouse move
-    this.scene.input.on("pointermove", (pointer) => {
+    // Mouse move
+    this.onPointerMove = (pointer) => {
       this.state.aimWorldX = pointer.worldX;
       this.state.aimWorldY = pointer.worldY;
 
-      // For Placing System, move the preview building to dragged place.
       if ((this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) && pointer.id === this.placementPointerId) {
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
-
-        return;
       }
-    });
+    };
 
-    // click = placement movement, attack, or dash
-    this.scene.input.on("pointerdown", (pointer) => {
-      console.log("test click");
-      // Ignore clicks on existing UI.
+    // Mouse click
+    this.onPointerDown = (pointer) => {
       if (this.isOverBuildingInfoCard(pointer)) {
         this.scene.buildingInteractionSystem.handlePointerDown(pointer);
         return;
@@ -239,39 +219,34 @@ export default class InputController {
         return;
       }
 
-      // Handle building moving if placement mode or moving mode is active.
       if (this.scene.placementSystem?.isPlacing || this.scene.placementSystem?.isMoving) {
         this.placementPointerId = pointer.id;
 
         this.state.aimWorldX = pointer.worldX;
         this.state.aimWorldY = pointer.worldY;
 
-        // For Placing System, move the preview building to dragged place.
         this.scene.placementSystem.moveToWorldPosition(pointer.worldX, pointer.worldY);
 
         return;
       }
 
-      // Building selection / card dismissal
       if (this.scene.buildingInteractionSystem?.handlePointerDown(pointer)) {
         return;
       }
 
       if (pointer.button === 0 && this.isActionAllowed("combat.attack")) {
-        // Left click = attack
         this.state.attackPressed = true;
         this.state.attackHeld = true;
       }
 
       if (pointer.button === 2 && this.isActionAllowed("player.dash")) {
-        // Right click = dash + sprint
         this.state.dashPressed = true;
         this.state.sprintHeld = true;
       }
-    });
+    };
 
-    // pointer released
-    this.scene.input.on("pointerup", (pointer) => {
+    // Mouse release
+    this.onPointerUp = (pointer) => {
       if (pointer.id === this.placementPointerId) {
         this.scene.placementSystem?.notifyTutorialOfValidPosition();
         this.placementPointerId = null;
@@ -285,7 +260,11 @@ export default class InputController {
       if (pointer.button === 2) {
         this.state.sprintHeld = false;
       }
-    });
+    };
+
+    this.scene.input.on("pointermove", this.onPointerMove);
+    this.scene.input.on("pointerdown", this.onPointerDown);
+    this.scene.input.on("pointerup", this.onPointerUp);
   }
 
   isOverUI(pointer) {
@@ -305,42 +284,32 @@ export default class InputController {
   }
 
   resetUIPosition() {
-    console.log("RESET 1: Started");
-
     const w = this.scene.scale.width;
     const h = Math.min(this.scene.scale.height, window.innerHeight);
-    console.log("RESET 2: Dimensions calculated", w, h);
 
+    // Joystick
     this.joyBase?.setPosition(120, h - 100);
     this.joyThumb?.setPosition(120, h - 100);
-    console.log("RESET 3: Joystick positioned");
 
-    // this.scene.hotbarUI?.resetUIPosition();
-    // console.log("RESET 4: Hotbar positioned");
-
-    // this.scene.healthUI?.resetUIPosition();
-    // console.log("RESET 5: Health UI positioned");
-
-    // this.scene.miniMapUI?.resetUIPosition();
-    // console.log("RESET 6: Mini-map positioned");
-
+    // Attack button
     if (this.attackButtonUI) {
       this.attackButtonUI.button.setPosition(w - 150, h - 110);
+
       this.attackButtonUI.text.setPosition(w - 150, h - 110);
+
       this.attackButtonUI.highlightRing?.setPosition(w - 150, h - 110);
     }
-    console.log("RESET 7: Attack button positioned");
 
+    // Dash button
     if (this.movementButtonUI) {
       this.movementButtonUI.button.setPosition(w - 75, h - 45);
+
       this.movementButtonUI.text.setPosition(w - 75, h - 45);
     }
-    console.log("RESET 8: Completed");
   }
 
   endFrame() {
     this.state.dashPressed = false;
-
     this.state.attackPressed = false;
     this.state.attackReleased = false;
   }
@@ -350,17 +319,39 @@ export default class InputController {
       this.state.moveVector.set(0, 0);
 
       if (this.isActionAllowed("player.move")) {
-        // Keyboard Movement
-        if (this.cursors.left.isDown) this.state.moveVector.x = -1;
-        if (this.cursors.right.isDown) this.state.moveVector.x = 1;
-        if (this.cursors.up.isDown) this.state.moveVector.y = -1;
-        if (this.cursors.down.isDown) this.state.moveVector.y = 1;
+        // Cursor keys
+        if (this.cursors.left.isDown) {
+          this.state.moveVector.x = -1;
+        }
+
+        if (this.cursors.right.isDown) {
+          this.state.moveVector.x = 1;
+        }
+
+        if (this.cursors.up.isDown) {
+          this.state.moveVector.y = -1;
+        }
+
+        if (this.cursors.down.isDown) {
+          this.state.moveVector.y = 1;
+        }
 
         // WASD
-        if (this.keys.left.isDown) this.state.moveVector.x = -1;
-        if (this.keys.right.isDown) this.state.moveVector.x = 1;
-        if (this.keys.up.isDown) this.state.moveVector.y = -1;
-        if (this.keys.down.isDown) this.state.moveVector.y = 1;
+        if (this.keys.left.isDown) {
+          this.state.moveVector.x = -1;
+        }
+
+        if (this.keys.right.isDown) {
+          this.state.moveVector.x = 1;
+        }
+
+        if (this.keys.up.isDown) {
+          this.state.moveVector.y = -1;
+        }
+
+        if (this.keys.down.isDown) {
+          this.state.moveVector.y = 1;
+        }
       }
     }
 
@@ -368,5 +359,38 @@ export default class InputController {
     if (this.restartKey && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
       this.scene.scene.restart();
     }
+  }
+
+  destroy() {
+    if (this.destroyed) return;
+
+    this.destroyed = true;
+
+    // Remove scene input listeners
+    this.scene.input.off("pointerdown", this.onPointerDown);
+    this.scene.input.off("pointermove", this.onPointerMove);
+    this.scene.input.off("pointerup", this.onPointerUp);
+
+    // Remove button listeners
+    if (this.attackButtonUI?.button) {
+      this.attackButtonUI.button.off("pointerdown", this.onAttackButtonDown);
+
+      this.attackButtonUI.button.off("pointerup", this.onAttackButtonUp);
+    }
+
+    if (this.movementButtonUI?.button) {
+      this.movementButtonUI.button.off("pointerdown", this.onMovementButtonDown);
+
+      this.movementButtonUI.button.off("pointerup", this.onMovementButtonUp);
+    }
+
+    // Destroy joystick objects
+    this.joyBase?.destroy();
+    this.joyThumb?.destroy();
+
+    // Reset input state
+    this.joystickActive = false;
+    this.joyPointerId = null;
+    this.placementPointerId = null;
   }
 }

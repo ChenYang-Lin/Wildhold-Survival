@@ -90,59 +90,29 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.input.addPointer(4);
-    console.log("CREATE START");
 
     this.mapManager = new MapManager(this);
     this.mapManager.load();
 
     this.createData();
-    console.log("CREATE DATA");
     this.createEntities();
-    console.log("CREATE ENTITIES");
     this.createSystems();
-
-    console.log("SYSTEMS CREATED");
 
     this.player.stats.refreshStats();
     this.miniMapUI = new MiniMapUI(this);
 
-    console.log("MINIMAP CREATED");
-
     this.createUI();
-
-    console.log("UI CREATED");
 
     this.createWorld();
 
-    console.log("WORLD CREATED");
+    // Handle UI positioning when the screen resizes.
+    this.scale.on("resize", this.resetUIPositions, this);
 
     // Wait for the first physics update before reading the player's body position.
     this.events.once(Phaser.Scenes.Events.POST_UPDATE, () => {
       this.cameras.main.stopFollow();
       this.cameras.main.startFollow(this.player, false, 1, 1);
-      console.log("Player instance:", this.player);
-
-      console.log("Camera follow target:", this.cameras.main._follow);
-
       this.questSystem.start();
-
-      console.log(
-        "Camera after first update:",
-        JSON.stringify({
-          playerX: this.player.x,
-          playerY: this.player.y,
-          playerActive: this.player.active,
-          playerVisible: this.player.visible,
-          bodyX: this.player.body?.x,
-          bodyY: this.player.body?.y,
-          cameraX: this.cameras.main.scrollX,
-          cameraY: this.cameras.main.scrollY,
-          cameraWidth: this.cameras.main.width,
-          cameraHeight: this.cameras.main.height,
-          zoom: this.cameras.main.zoom,
-          following: this.cameras.main._follow ? "Yes" : "No",
-        }),
-      );
     });
 
     // For fixing the HealthUI and staminaUI jittering bug.
@@ -164,17 +134,15 @@ export default class GameScene extends Phaser.Scene {
 
     this.setupCollisions();
 
-    console.log("COLLISIONS CREATED");
-
     // const path = this.pathfindingManager.findPath(37, 29, 48, 38);
 
-    this.input.keyboard.on("keydown-P", (e) => {
-      this.pathfindingManager.toggleDebugTileBlock();
-    });
+    // this.input.keyboard.on("keydown-P", (e) => {
+    //   this.pathfindingManager.toggleDebugTileBlock();
+    // });
 
-    this.input.keyboard.on("keydown-O", () => {
-      this.buildingManager.testMoveBuilding();
-    });
+    // this.input.keyboard.on("keydown-O", () => {
+    //   this.buildingManager.testMoveBuilding();
+    // });
   }
 
   createEntities() {
@@ -186,69 +154,27 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createSystems() {
-    console.log("Creating InventorySystem");
     this.inventorySystem = new InventorySystem(this);
-    console.log("InventorySystem created");
-
     this.inputController = new InputController(this);
-    console.log("InputController created");
-
     this.actionSystem = new ActionSystem(this, this.player, this.inputController);
-    console.log("ActionSystem created");
-
     this.buildingManager = new BuildingManager(this);
-    console.log("BuildingManager created");
-
     this.buildingInteractionSystem = new BuildingInteractionSystem(this);
-    console.log("BuildingInteractionSystem created");
-
     this.placementSystem = new PlacementSystem(this);
-    console.log("PlacementSystem created");
-
     this.lightingSystem = new LightingSystem(this);
-    console.log("LightingSystem created");
-
     this.combatSystem = new CombatSystem(this);
-    console.log("CombatSystem created");
-
     this.damageTextSystem = new DamageTextSystem(this);
-    console.log("DamageTextSystem created");
-
     this.spellEffectSystem = new SpellEffectSystem(this);
-    console.log("SpellEffectSystem created");
-
     this.equipmentSystem = new EquipmentSystem(this);
-    console.log("EquipmentSystem created");
-
     this.hotbarSystem = new HotbarSystem(this);
-    console.log("HotbarSystem created");
-
     this.dayNightSystem = new DayNightSystem(this);
-    console.log("DayNightSystem created");
-
     this.resourceSystem = new ResourceSystem(this);
-    console.log("ResourceSystem created");
-
     this.questSystem = new QuestSystem(this);
-    console.log("QuestSystem created");
-
     this.tutorialSystem = new TutorialSystem(this);
-    console.log("TutorialSystem created");
-
     this.resourceManager = new ResourceManager(this);
-    console.log("ResourceManager created");
-
     this.waveManager = new WaveManager(this);
-    console.log("WaveManager created");
-
     this.gameStateManager = new GameStateManager(this);
-    console.log("GameStateManager created");
-
     this.navigationManager = new NavigationManager(this);
-    console.log("NavigationManager created");
-
     this.pathfindingManager = new PathfindingManager(this);
-    console.log("PathfindingManager created");
   }
 
   createUI() {
@@ -263,7 +189,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.equipmentWindow = new EquipmentWindow(this);
 
-    this.inputController.resetUIPosition();
+    this.resetUIPositions();
   }
 
   createData() {
@@ -306,6 +232,13 @@ export default class GameScene extends Phaser.Scene {
     this.trees = this.physics.add.staticGroup();
     this.rocks = this.physics.add.staticGroup();
     this.resourceManager.spawnInitialResources();
+  }
+
+  resetUIPositions() {
+    this.inputController?.resetUIPosition();
+    this.miniMapUI?.resetUIPosition();
+    this.healthUI?.resetUIPosition();
+    this.hotbarUI?.resetUIPosition();
   }
 
   getScreenWidth() {
@@ -394,6 +327,8 @@ export default class GameScene extends Phaser.Scene {
 
   cleanup() {
     this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.updatePlayerUIPosition, this);
+
+    this.scale.off("resize", this.resetUIPositions, this);
   }
 
   update(time, delta) {
