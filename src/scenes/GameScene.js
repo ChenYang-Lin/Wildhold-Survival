@@ -105,27 +105,29 @@ export default class GameScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.POST_UPDATE, () => {
       this.cameras.main.stopFollow();
       this.cameras.main.startFollow(this.player, false, 1, 1);
+      console.log("Player instance:", this.player);
+
+      console.log("Camera follow target:", this.cameras.main._follow);
 
       this.questSystem.start();
 
-      console.log("Camera after first update:", {
-        playerX: this.player.x,
-        playerY: this.player.y,
-        cameraX: this.cameras.main.scrollX,
-        cameraY: this.cameras.main.scrollY,
-        cameraWidth: this.cameras.main.width,
-        cameraHeight: this.cameras.main.height,
-        zoom: this.cameras.main.zoom,
-      });
-
-      console.log("Player:", {
-        x: this.player.x,
-        y: this.player.y,
-        active: this.player.active,
-        visible: this.player.visible,
-        bodyX: this.player.body?.x,
-        bodyY: this.player.body?.y,
-      });
+      console.log(
+        "Camera after first update:",
+        JSON.stringify({
+          playerX: this.player.x,
+          playerY: this.player.y,
+          playerActive: this.player.active,
+          playerVisible: this.player.visible,
+          bodyX: this.player.body?.x,
+          bodyY: this.player.body?.y,
+          cameraX: this.cameras.main.scrollX,
+          cameraY: this.cameras.main.scrollY,
+          cameraWidth: this.cameras.main.width,
+          cameraHeight: this.cameras.main.height,
+          zoom: this.cameras.main.zoom,
+          following: this.cameras.main._follow ? "Yes" : "No",
+        }),
+      );
     });
 
     // For fixing the HealthUI and staminaUI jittering bug.
