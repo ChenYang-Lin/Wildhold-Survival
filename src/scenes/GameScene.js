@@ -89,7 +89,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    console.log("CREATE START");
     this.input.addPointer(4);
+    console.log("CREATE START");
 
     this.mapManager = new MapManager(this);
     this.mapManager.load();
