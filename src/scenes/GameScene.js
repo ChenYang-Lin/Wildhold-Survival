@@ -89,7 +89,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    console.log("CREATE START");
     this.input.addPointer(4);
     console.log("CREATE START");
 
@@ -97,7 +96,9 @@ export default class GameScene extends Phaser.Scene {
     this.mapManager.load();
 
     this.createData();
+    console.log("CREATE DATA");
     this.createEntities();
+    console.log("CREATE ENTITIES");
     this.createSystems();
 
     console.log("SYSTEMS CREATED");
