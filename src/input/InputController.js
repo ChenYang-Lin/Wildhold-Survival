@@ -303,34 +303,37 @@ export default class InputController {
   }
 
   resetUIPosition() {
+    console.log("RESET 1: Started");
+
     const w = this.scene.scale.width;
     const h = Math.min(this.scene.scale.height, window.innerHeight);
+    console.log("RESET 2: Dimensions calculated", w, h);
 
-    // Joystick
     this.joyBase?.setPosition(120, h - 100);
     this.joyThumb?.setPosition(120, h - 100);
+    console.log("RESET 3: Joystick positioned");
 
-    // Hotbar
     this.scene.hotbarUI?.resetUIPosition();
+    console.log("RESET 4: Hotbar positioned");
 
-    // Player health
     this.scene.healthUI?.resetUIPosition();
+    console.log("RESET 5: Health UI positioned");
 
-    // Mini-map
     this.scene.miniMapUI?.resetUIPosition();
+    console.log("RESET 6: Mini-map positioned");
 
-    // Attack button - mobile only
     if (this.attackButtonUI) {
       this.attackButtonUI.button.setPosition(w - 150, h - 110);
       this.attackButtonUI.text.setPosition(w - 150, h - 110);
       this.attackButtonUI.highlightRing?.setPosition(w - 150, h - 110);
     }
+    console.log("RESET 7: Attack button positioned");
 
-    // Dash button - mobile only
     if (this.movementButtonUI) {
       this.movementButtonUI.button.setPosition(w - 75, h - 45);
       this.movementButtonUI.text.setPosition(w - 75, h - 45);
     }
+    console.log("RESET 8: Completed");
   }
 
   endFrame() {
