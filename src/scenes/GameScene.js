@@ -107,25 +107,8 @@ export default class GameScene extends Phaser.Scene {
 
     // For fixing the HealthUI and staminaUI jittering bug.
     // Using Math.round() to fix the healthbar jittering bug; make sure rounding doesn't slow down the player's speed
-    this.playerRemainderX = 0;
-    this.playerRemainderY = 0;
-    this.events.on("postupdate", () => {
-      // 1. Add back the sub-pixel decimal fraction that cut off from the previous frame
-      const totalX = this.player.x + this.playerRemainderX;
-      const totalY = this.player.y + this.playerRemainderY;
-
-      // 2. Round the position perfectly to a whole number so the health bar and player never shake
-      this.player.x = Math.round(totalX);
-      this.player.y = Math.round(totalY);
-
-      // 3. Save the exact decimal fraction that was lost in this frame's rounding step
-      this.playerRemainderX = totalX - this.player.x;
-      this.playerRemainderY = totalY - this.player.y;
-
-      // 4. Position the health bar and stamina bar perfectly over the rounded player
-      this.healthUI.updateScreenPosition();
-      this.staminaUI.update();
-    });
+    this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.updatePlayerUIPosition, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
 
     this.miniMapUI = new MiniMapUI(this);
 
@@ -143,13 +126,13 @@ export default class GameScene extends Phaser.Scene {
 
     // const path = this.pathfindingManager.findPath(37, 29, 48, 38);
 
-    this.input.keyboard.on("keydown-P", (e) => {
-      this.pathfindingManager.toggleDebugTileBlock();
-    });
+    // this.input.keyboard.on("keydown-P", (e) => {
+    //   this.pathfindingManager.toggleDebugTileBlock();
+    // });
 
-    this.input.keyboard.on("keydown-O", () => {
-      this.buildingManager.testMoveBuilding();
-    });
+    // this.input.keyboard.on("keydown-O", () => {
+    //   this.buildingManager.testMoveBuilding();
+    // });
   }
 
   createEntities() {
@@ -208,17 +191,17 @@ export default class GameScene extends Phaser.Scene {
   setupCollisions() {
     this.physics.add.collider(this.player, this.combatSystem.enemies);
     this.physics.add.collider(this.player, this.base);
-    // this.physics.add.collider(this.player, this.buildingManager.buildings, null, (player, building) => building.texture.key !== "spike");
+    this.physics.add.collider(this.player, this.buildingManager.buildings, null, (player, building) => building.texture.key !== "spike");
     this.physics.add.collider(this.player, this.trees);
     this.physics.add.collider(this.player, this.rocks);
     this.physics.add.collider(this.combatSystem.enemies, this.base);
 
-    // this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings, null, (enemy, building) => building.texture.key !== "spike");
-    // this.physics.add.overlap(this.combatSystem.enemies, this.buildingManager.buildings, (enemy, building) => {
-    //   if (building.texture.key === "spike") {
-    //     building.damageEnemy(enemy);
-    //   }
-    // });
+    this.physics.add.collider(this.combatSystem.enemies, this.buildingManager.buildings, null, (enemy, building) => building.texture.key !== "spike");
+    this.physics.add.overlap(this.combatSystem.enemies, this.buildingManager.buildings, (enemy, building) => {
+      if (building.texture.key === "spike") {
+        building.damageEnemy(enemy);
+      }
+    });
 
     this.physics.add.collider(this.combatSystem.enemies, this.trees);
     this.physics.add.overlap(this.projectiles, this.combatSystem.getEnemies(), (projectile, enemy) => {
@@ -312,6 +295,24 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
+  updatePlayerUIPosition() {
+    const totalX = this.player.x + this.playerRemainderX;
+    const totalY = this.player.y + this.playerRemainderY;
+
+    this.player.x = Math.round(totalX);
+    this.player.y = Math.round(totalY);
+
+    this.playerRemainderX = totalX - this.player.x;
+    this.playerRemainderY = totalY - this.player.y;
+
+    this.healthUI.updateScreenPosition();
+    this.staminaUI.update();
+  }
+
+  cleanup() {
+    this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.updatePlayerUIPosition, this);
+  }
+
   update(time, delta) {
     if (this.gameStateManager.isPaused()) {
       this.player.movement.stop();
@@ -358,13 +359,13 @@ export default class GameScene extends Phaser.Scene {
     this.lightingSystem.update();
 
     // Restart game
-    if (this.restartKey && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
-      this.restartKey.enabled = false;
+    // if (this.restartKey && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
+    //   this.restartKey.enabled = false;
 
-      // 2. Safely trigger the restart on the next clock tick
-      this.time.delayedCall(0, () => {
-        this.scene.restart();
-      });
-    }
+    //   // 2. Safely trigger the restart on the next clock tick
+    //   this.time.delayedCall(0, () => {
+    //     this.scene.restart();
+    //   });
+    // }
   }
 }
