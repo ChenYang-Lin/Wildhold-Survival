@@ -30,9 +30,14 @@ export default class LightingSystem {
     this.campfireGlows = new Map();
 
     // resize
-    this.scene.scale.on("resize", (gameSize) => {
+    this.onResize = (gameSize) => {
       this.resize(gameSize.width, gameSize.height);
-    });
+    };
+
+    this.scene.scale.on("resize", this.onResize);
+
+    // Clean up when this scene shuts down.
+    this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
   }
 
   resize(width, height) {
@@ -132,6 +137,24 @@ export default class LightingSystem {
 
       this.campfireGlows.set(campfire, glow);
     }
+  }
+
+  destroy() {
+    // Prevent cleanup from running more than once.
+    if (this.destroyed) return;
+    this.destroyed = true;
+
+    this.scene.scale.off("resize", this.onResize);
+
+    this.darknessRT?.destroy();
+    this.playerLightStamp?.destroy();
+    this.campfireLightStamp?.destroy();
+
+    for (const glow of this.campfireGlows.values()) {
+      glow.destroy();
+    }
+
+    this.campfireGlows.clear();
   }
 
   update() {

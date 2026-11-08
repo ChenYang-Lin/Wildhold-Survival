@@ -15,6 +15,8 @@ export default class MiniMapUI {
     this.create();
 
     this.resetUIPosition();
+
+    this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
   }
 
   create() {
@@ -241,21 +243,21 @@ export default class MiniMapUI {
   }
 
   destroy() {
+    if (this.destroyed) return;
+    this.destroyed = true;
+
     this.scene.input.off("pointerup", this.onPointerUp);
 
     this.playerMarker?.destroy();
     this.baseMarker?.destroy();
     this.cameraViewport?.destroy();
 
-    if (this.campMarkers) {
-      for (const marker of this.campMarkers) {
-        marker.destroy();
-      }
+    for (const marker of this.campMarkers ?? []) {
+      marker.destroy();
     }
 
     this.recenterButton?.destroy();
     this.recenterText?.destroy();
-
     this.panel?.destroy();
     this.border?.destroy();
 
