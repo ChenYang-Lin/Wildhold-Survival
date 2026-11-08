@@ -226,6 +226,7 @@ export default class InputController {
 
     // click = placement movement, attack, or dash
     this.scene.input.on("pointerdown", (pointer) => {
+      console.log("test click");
       // Ignore clicks on existing UI.
       if (this.isOverBuildingInfoCard(pointer)) {
         this.scene.buildingInteractionSystem.handlePointerDown(pointer);
