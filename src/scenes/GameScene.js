@@ -107,6 +107,8 @@ export default class GameScene extends Phaser.Scene {
 
     // For fixing the HealthUI and staminaUI jittering bug.
     // Using Math.round() to fix the healthbar jittering bug; make sure rounding doesn't slow down the player's speed
+    this.playerRemainderX = 0;
+    this.playerRemainderY = 0;
     this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.updatePlayerUIPosition, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
 
@@ -126,13 +128,13 @@ export default class GameScene extends Phaser.Scene {
 
     // const path = this.pathfindingManager.findPath(37, 29, 48, 38);
 
-    // this.input.keyboard.on("keydown-P", (e) => {
-    //   this.pathfindingManager.toggleDebugTileBlock();
-    // });
+    this.input.keyboard.on("keydown-P", (e) => {
+      this.pathfindingManager.toggleDebugTileBlock();
+    });
 
-    // this.input.keyboard.on("keydown-O", () => {
-    //   this.buildingManager.testMoveBuilding();
-    // });
+    this.input.keyboard.on("keydown-O", () => {
+      this.buildingManager.testMoveBuilding();
+    });
   }
 
   createEntities() {
@@ -359,13 +361,13 @@ export default class GameScene extends Phaser.Scene {
     this.lightingSystem.update();
 
     // Restart game
-    // if (this.restartKey && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
-    //   this.restartKey.enabled = false;
+    if (this.restartKey && Phaser.Input.Keyboard.JustDown(this.restartKey)) {
+      this.restartKey.enabled = false;
 
-    //   // 2. Safely trigger the restart on the next clock tick
-    //   this.time.delayedCall(0, () => {
-    //     this.scene.restart();
-    //   });
-    // }
+      // 2. Safely trigger the restart on the next clock tick
+      this.time.delayedCall(0, () => {
+        this.scene.restart();
+      });
+    }
   }
 }
