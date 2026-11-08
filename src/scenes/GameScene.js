@@ -186,28 +186,69 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createSystems() {
+    console.log("Creating InventorySystem");
     this.inventorySystem = new InventorySystem(this);
+    console.log("InventorySystem created");
+
     this.inputController = new InputController(this);
-    this.actionSystem = new ActionSystem(this, this.player, this.inputController); // prettier-ignore
+    console.log("InputController created");
+
+    this.actionSystem = new ActionSystem(this, this.player, this.inputController);
+    console.log("ActionSystem created");
+
     this.buildingManager = new BuildingManager(this);
+    console.log("BuildingManager created");
 
     this.buildingInteractionSystem = new BuildingInteractionSystem(this);
+    console.log("BuildingInteractionSystem created");
+
     this.placementSystem = new PlacementSystem(this);
+    console.log("PlacementSystem created");
+
     this.lightingSystem = new LightingSystem(this);
+    console.log("LightingSystem created");
+
     this.combatSystem = new CombatSystem(this);
+    console.log("CombatSystem created");
+
     this.damageTextSystem = new DamageTextSystem(this);
+    console.log("DamageTextSystem created");
+
     this.spellEffectSystem = new SpellEffectSystem(this);
+    console.log("SpellEffectSystem created");
+
     this.equipmentSystem = new EquipmentSystem(this);
+    console.log("EquipmentSystem created");
+
     this.hotbarSystem = new HotbarSystem(this);
+    console.log("HotbarSystem created");
+
     this.dayNightSystem = new DayNightSystem(this);
+    console.log("DayNightSystem created");
+
     this.resourceSystem = new ResourceSystem(this);
+    console.log("ResourceSystem created");
+
     this.questSystem = new QuestSystem(this);
+    console.log("QuestSystem created");
+
     this.tutorialSystem = new TutorialSystem(this);
+    console.log("TutorialSystem created");
+
     this.resourceManager = new ResourceManager(this);
+    console.log("ResourceManager created");
+
     this.waveManager = new WaveManager(this);
+    console.log("WaveManager created");
+
     this.gameStateManager = new GameStateManager(this);
+    console.log("GameStateManager created");
+
     this.navigationManager = new NavigationManager(this);
+    console.log("NavigationManager created");
+
     this.pathfindingManager = new PathfindingManager(this);
+    console.log("PathfindingManager created");
   }
 
   createUI() {
