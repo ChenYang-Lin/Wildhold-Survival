@@ -86,6 +86,7 @@ export default class InputController {
 
     // POINTER DOWN ON SCREEN
     this.scene.input.on("pointerdown", (pointer) => {
+      console.log("Mobile pointerdown test");
       // Ignore clicks on existing UI.
       if (this.isOverBuildingInfoCard(pointer)) {
         this.scene.buildingInteractionSystem.handlePointerDown(pointer);
