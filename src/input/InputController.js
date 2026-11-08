@@ -313,14 +313,14 @@ export default class InputController {
     this.joyThumb?.setPosition(120, h - 100);
     console.log("RESET 3: Joystick positioned");
 
-    this.scene.hotbarUI?.resetUIPosition();
-    console.log("RESET 4: Hotbar positioned");
+    // this.scene.hotbarUI?.resetUIPosition();
+    // console.log("RESET 4: Hotbar positioned");
 
-    this.scene.healthUI?.resetUIPosition();
-    console.log("RESET 5: Health UI positioned");
+    // this.scene.healthUI?.resetUIPosition();
+    // console.log("RESET 5: Health UI positioned");
 
-    this.scene.miniMapUI?.resetUIPosition();
-    console.log("RESET 6: Mini-map positioned");
+    // this.scene.miniMapUI?.resetUIPosition();
+    // console.log("RESET 6: Mini-map positioned");
 
     if (this.attackButtonUI) {
       this.attackButtonUI.button.setPosition(w - 150, h - 110);
