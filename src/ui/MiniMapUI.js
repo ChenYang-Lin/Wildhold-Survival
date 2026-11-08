@@ -261,9 +261,6 @@ export default class MiniMapUI {
     this.panel?.destroy();
     this.border?.destroy();
 
-    if (this.camera) {
-      this.camera.destroy();
-      this.camera = null;
-    }
+    this.camera = null;
   }
 }
