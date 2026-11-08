@@ -50,6 +50,9 @@ export default class GameScene extends Phaser.Scene {
     super("GameScene");
 
     this.cameraMode = "FOLLOW_PLAYER";
+    this.cameraReturnElapsed = 0;
+    this.cameraReturnStartX = 0;
+    this.cameraReturnStartY = 0;
 
     this.DEBUG_MODE = false;
   }
@@ -95,11 +98,20 @@ export default class GameScene extends Phaser.Scene {
     this.createEntities();
     this.createSystems();
 
+    console.log("SYSTEMS CREATED");
+
     this.player.stats.refreshStats();
     this.miniMapUI = new MiniMapUI(this);
 
+    console.log("MINIMAP CREATED");
+
     this.createUI();
+
+    console.log("UI CREATED");
+
     this.createWorld();
+
+    console.log("WORLD CREATED");
 
     // Wait for the first physics update before reading the player's body position.
     this.events.once(Phaser.Scenes.Events.POST_UPDATE, () => {
@@ -148,6 +160,8 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.roundPixels = true;
 
     this.setupCollisions();
+
+    console.log("COLLISIONS CREATED");
 
     // const path = this.pathfindingManager.findPath(37, 29, 48, 38);
 
