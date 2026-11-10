@@ -78,6 +78,11 @@ export default class EquipmentWindow extends BaseWindow {
     this.characterEquipmentPanel.refreshEquipment();
   }
 
+  show() {
+    this.scene.inventoryWindow?.hide();
+    super.show();
+  }
+
   toggle() {
     if (this.visible) {
       this.hide();

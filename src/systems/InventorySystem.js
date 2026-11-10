@@ -5,25 +5,19 @@ export default class InventorySystem {
     // Starter equipment for testing.
     this.ownedEquipment = new Set(["wooden_sword", "steel_helmet", "steel_armor", "leather_boots"]);
 
-    // this.inventory = [
-    //   { id: "wood", type: "resource", amount: 0 },
-    //   { id: "stone", type: "resource", amount: 0 },
-    //   { id: "apple", type: "resource", amount: 0 },
-    // ];
+    this.inventory = Array(20).fill(null);
 
-    this.inventory = [
-      { id: "wood", type: "resource", amount: 20 },
-      { id: "stone", type: "resource", amount: 20 },
-      { id: "apple", type: "resource", amount: 0 },
-    ];
+    this.inventory[0] = { id: "wood", type: "resource", amount: 20 };
+    this.inventory[1] = { id: "stone", type: "resource", amount: 20 };
+    this.inventory[2] = { id: "apple", type: "resource", amount: 0 };
 
-    this.inventoryText = this.scene.add
-      .text(scene.scale.width - 150, 20, "", {
-        fontSize: "16px",
-        fill: "#ffffff",
-      })
-      .setScrollFactor(0)
-      .setDepth(10000);
+    // this.inventoryText = this.scene.add
+    //   .text(scene.scale.width - 150, 20, "", {
+    //     fontSize: "16px",
+    //     fill: "#ffffff",
+    //   })
+    //   .setScrollFactor(0)
+    //   .setDepth(10000);
 
     this.updateInventoryUI();
   }
@@ -104,7 +98,7 @@ export default class InventorySystem {
       }
     });
 
-    this.inventoryText.setText(text);
+    // this.inventoryText.setText(text);
   }
 
   hasResource(id, amount) {

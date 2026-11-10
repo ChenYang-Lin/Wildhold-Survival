@@ -37,6 +37,7 @@ import OverlayMessageUI from "../ui/OverlayMessageUI.js";
 // Factories
 import BuffFactory from "../factories/BuffFactory.js";
 import AuraFactory from "../factories/AuraFactory.js";
+
 import StaminaUI from "../ui/StaminaUI.js";
 import PlacementSystem from "../systems/PlacementSystem.js";
 import MiniMapUI from "../ui/MiniMapUI.js";
@@ -44,6 +45,8 @@ import ObjectiveUI from "../ui/ObjectiveUI.js";
 import TutorialSystem from "../systems/TutorialSystem.js";
 import Base from "../entities/Base.js";
 import EquipmentWindow from "../ui/windows/EquipmentWindow.js";
+import InventoryWindow from "../ui/windows/InventoryWindow.js";
+import WindowButtonsUI from "../ui/hud/WindowButtonsUI.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -188,6 +191,9 @@ export default class GameScene extends Phaser.Scene {
     this.overlayMessageUI = new OverlayMessageUI(this);
 
     this.equipmentWindow = new EquipmentWindow(this);
+    this.inventoryWindow = new InventoryWindow(this);
+
+    this.windowButtonsUI = new WindowButtonsUI(this);
 
     this.resetUIPositions();
   }
@@ -239,6 +245,7 @@ export default class GameScene extends Phaser.Scene {
     this.miniMapUI?.resetUIPosition();
     this.healthUI?.resetUIPosition();
     this.hotbarUI?.resetUIPosition();
+    this.windowButtonsUI?.resetUIPosition();
   }
 
   getScreenWidth() {
