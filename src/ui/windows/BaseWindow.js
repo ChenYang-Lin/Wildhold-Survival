@@ -8,6 +8,18 @@ export default class BaseWindow {
     // Create a normal HTML element.
     this.element = document.createElement("div");
 
+    this.element.addEventListener("pointerdown", (event) => {
+      event.stopPropagation();
+    });
+
+    this.element.addEventListener("pointerup", (event) => {
+      event.stopPropagation();
+    });
+
+    this.element.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+
     // Add the window content.
     this.element.innerHTML = html;
 
@@ -31,6 +43,20 @@ export default class BaseWindow {
 
   setVisible(visible) {
     if (this.destroyed) return;
+
+    // Disable Phaser input while the HTML window is open.
+    if (visible && !this.visible) {
+      this.previousInputEnabled = this.scene.input.enabled;
+      this.scene.input.enabled = false;
+    }
+
+    // Restore the previous input state when the window closes.
+    if (!visible && this.visible) {
+      if (this.previousInputEnabled !== undefined) {
+        this.scene.input.enabled = this.previousInputEnabled;
+        this.previousInputEnabled = undefined;
+      }
+    }
 
     this.visible = visible;
     this.element.style.display = visible ? "flex" : "none";

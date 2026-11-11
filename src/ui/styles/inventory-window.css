@@ -87,6 +87,17 @@
   border-radius: 6px;
 }
 
+/* Explicitly assign each panel to its own grid column */
+.inventory-content > .inventory-slots-panel {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.inventory-content > .inventory-details-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
 .inventory-panel h3 {
   margin: 0 0 12px;
 
@@ -233,20 +244,49 @@
    Responsive Layout
 ============================== */
 
-@media (max-width: 560px) {
+.inventory-window,
+.inventory-window * {
+  box-sizing: border-box;
+}
+
+.inventory-content {
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (max-width: 800px) {
   .inventory-window {
     width: calc(100vw - 20px);
-    max-height: calc(100vh - 20px);
+    max-width: 480px;
+    max-height: calc(100dvh - 20px);
   }
 
   .inventory-content {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    width: 100%;
+    min-width: 0;
     gap: 10px;
     padding: 10px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .inventory-panel {
+    display: block;
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
   }
 
   .inventory-slot-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 6px;
+    width: 100%;
   }
 
   .inventory-details-content {
@@ -256,5 +296,42 @@
   .inventory-details-icon {
     width: 64px;
     height: 64px;
+  }
+}
+
+/* Short landscape screens, such as phones rotated sideways */
+@media (orientation: landscape) and (max-height: 500px) {
+  .inventory-window {
+    width: min(680px, calc(100vw - 20px));
+    max-height: calc(100dvh - 16px);
+  }
+
+  .inventory-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .inventory-panel {
+    width: auto;
+    min-width: 0;
+  }
+
+  .inventory-slot-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .inventory-details-content {
+    padding: 8px 4px;
+  }
+
+  .inventory-details-icon {
+    width: 56px;
+    height: 56px;
   }
 }

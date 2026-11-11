@@ -57,15 +57,18 @@ export default class WindowButtonsUI {
   resetUIPosition() {
     const width = this.scene.scale.width;
     const margin = 12;
+    const buttonWidth = 52;
+    const gap = 8;
 
-    const x = width - margin - 26;
+    const rightX = width - margin - buttonWidth / 2;
+    const leftX = rightX - buttonWidth - gap;
+    const y = 38;
 
-    // Stack the buttons vertically in the upper-right corner.
-    this.equipmentButton.button.setPosition(x, 38);
-    this.equipmentButton.text.setPosition(x, 38);
+    this.equipmentButton.button.setPosition(leftX, y);
+    this.equipmentButton.text.setPosition(leftX, y);
 
-    this.inventoryButton.button.setPosition(x, 92);
-    this.inventoryButton.text.setPosition(x, 92);
+    this.inventoryButton.button.setPosition(rightX, y);
+    this.inventoryButton.text.setPosition(rightX, y);
   }
 
   destroy() {

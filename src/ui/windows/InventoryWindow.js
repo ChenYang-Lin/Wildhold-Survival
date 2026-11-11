@@ -8,8 +8,8 @@ export default class InventoryWindow extends BaseWindow {
 
     this.element.classList.add("inventory-window");
 
-    this.slotsPanel = this.element.querySelector(".slots-panel");
-    this.detailsPanel = this.element.querySelector(".details-panel");
+    this.slotsPanel = this.element.querySelector(".inventory-slots-panel");
+    this.detailsPanel = this.element.querySelector(".inventory-details-panel");
 
     this.inventorySlotsPanel = new InventorySlotsPanel(scene, this.slotsPanel, (item) => {
       this.inventoryDetailsPanel.showItem(item);
@@ -28,11 +28,11 @@ export default class InventoryWindow extends BaseWindow {
       </header>
 
       <main class="inventory-content">
-        <section class="inventory-panel slots-panel">
+        <section class="inventory-panel inventory-slots-panel">
           <h3>Items</h3>
         </section>
 
-        <section class="inventory-panel details-panel">
+        <section class="inventory-panel inventory-details-panel">
           <h3>Item Details</h3>
         </section>
       </main>

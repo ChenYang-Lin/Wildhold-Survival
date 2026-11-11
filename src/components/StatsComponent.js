@@ -12,8 +12,6 @@ export default class StatsComponent {
       attackCooldown: baseStats.attackCooldown ?? 1000,
       attackSpeed: baseStats.attackSpeed ?? 1,
 
-      maxHealth: baseStats.maxHealth ?? 100,
-
       critChance: baseStats.critChance ?? 0,
       critDamage: baseStats.critDamage ?? 1.5,
 
@@ -173,6 +171,7 @@ export default class StatsComponent {
     // Multipliers start at 1, meaning no change.
     let attackSpeedMultiplier = 1;
     let movementSpeedMultiplier = 1;
+    let maxHealthBonus = 0;
 
     // Collect bonuses from every equipped item.
     for (const itemId of Object.values(equippedItems)) {
@@ -192,8 +191,11 @@ export default class StatsComponent {
             movementSpeedMultiplier *= value;
             break;
 
-          case "damage":
           case "maxHealth":
+            maxHealthBonus += value;
+            break;
+
+          case "damage":
           case "critChance":
           case "critDamage":
             this.equipment[stat] += value;
@@ -204,6 +206,8 @@ export default class StatsComponent {
         }
       }
     }
+
+    this.owner.health?.setMaxHP(this.owner.health.baseMaxHP + maxHealthBonus);
 
     // Apply percentage-based bonuses.
     this.equipment.attackSpeed *= attackSpeedMultiplier;
