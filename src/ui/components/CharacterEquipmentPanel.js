@@ -97,15 +97,14 @@ export default class CharacterEquipmentPanel {
 
   refreshStats() {
     const stats = this.scene.player?.stats?.equipment;
-    const health = this.scene.player?.health;
 
-    if (!stats || !health) {
+    if (!stats) {
       console.warn("Player stats are unavailable.");
       return;
     }
 
     for (const [key, element] of Object.entries(this.statElements)) {
-      const value = key === "maxHealth" ? health.maxHP : stats[key];
+      const value = stats[key];
 
       if (value === undefined) {
         element.textContent = "-";

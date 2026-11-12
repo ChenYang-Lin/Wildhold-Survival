@@ -18,15 +18,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.flinchTimer = 0;
 
     // Components
-    this.health = new HealthComponent(this, stats.maxHP ?? 3);
-    this.healthBar = new HealthBarComponent(this);
     this.combat = new CombatComponent(this, stats);
     this.ai = new EnemyAIComponent(this, campNode);
     this.stats = new StatsComponent(this, {
       speed: stats.speed,
       damage: stats.attackDamage,
+      maxHealth: stats.maxHP ?? 3,
       attackCooldown: stats.attackCooldown,
     });
+    this.health = new HealthComponent(this);
+    this.healthBar = new HealthBarComponent(this);
 
     // Spawn location
     this.spawnX = x;

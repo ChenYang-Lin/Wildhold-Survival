@@ -1,30 +1,11 @@
 export default class HealthComponent {
-  constructor(owner, maxHP) {
+  constructor(owner) {
     this.owner = owner;
-
-    this.baseMaxHP = maxHP;
-    this.maxHP = maxHP;
-    this.hp = maxHP;
+    this.hp = owner.stats.current.maxHealth;
   }
 
-  setMaxHP(maxHP) {
-    this.maxHP = Math.max(1, maxHP);
-
-    // Don't allow current health to exceed the new maximum.
-    this.hp = Math.min(this.hp, this.maxHP);
-  }
-
-  takeDamage(amount) {
-    this.hp -= amount;
-
-    if (this.hp <= 0) {
-      this.hp = 0;
-      if (this.owner.enterDead) this.owner.enterDead();
-    }
-  }
-
-  heal(amount) {
-    this.hp = Math.min(this.hp + amount, this.maxHP);
+  get maxHP() {
+    return this.owner.stats.current.maxHealth;
   }
 
   get percent() {
@@ -33,5 +14,21 @@ export default class HealthComponent {
 
   get isDead() {
     return this.hp <= 0;
+  }
+
+  takeDamage(amount) {
+    this.hp = Math.max(0, this.hp - amount);
+
+    if (this.isDead) {
+      this.owner.enterDead?.();
+    }
+  }
+
+  heal(amount) {
+    this.hp = Math.min(this.maxHP, this.hp + amount);
+  }
+
+  onMaxHealthChanged() {
+    this.hp = Math.min(this.hp, this.maxHP);
   }
 }
