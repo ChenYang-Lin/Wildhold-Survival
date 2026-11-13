@@ -48,6 +48,18 @@ export default class EquipmentSystem {
     return true;
   }
 
+  unequipItem(category) {
+    const itemId = this.equippedItems[category];
+
+    if (!itemId) return false;
+
+    this.equippedItems[category] = null;
+
+    this.refreshEquipment();
+
+    return true;
+  }
+
   refreshEquipment() {
     this.scene.player.stats.refreshStats();
 

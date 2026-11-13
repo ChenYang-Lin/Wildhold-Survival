@@ -37,7 +37,20 @@ export default class EquipmentDetailsPanel {
     this.equipButton.addEventListener("click", () => {
       if (!this.selectedItemId) return;
 
-      const success = this.scene.equipmentSystem.equipItem(this.selectedItemId);
+      const item = EQUIPMENT[this.selectedItemId];
+
+      if (!item) return;
+
+      const equipmentSystem = this.scene.equipmentSystem;
+      const equippedId = equipmentSystem.getEquippedItemId(item.category);
+
+      let success = false;
+
+      if (equippedId === this.selectedItemId) {
+        success = equipmentSystem.unequipItem(item.category);
+      } else {
+        success = equipmentSystem.equipItem(this.selectedItemId);
+      }
 
       if (success) {
         this.onEquip?.();
@@ -138,6 +151,7 @@ export default class EquipmentDetailsPanel {
     const item = EQUIPMENT[this.selectedItemId];
 
     if (!item) {
+      this.equipButton.textContent = "Equip";
       this.equipButton.disabled = true;
       return;
     }
@@ -146,7 +160,7 @@ export default class EquipmentDetailsPanel {
 
     const isEquipped = equippedId === this.selectedItemId;
 
-    this.equipButton.textContent = isEquipped ? "Equipped" : "Equip";
-    this.equipButton.disabled = isEquipped;
+    this.equipButton.textContent = isEquipped ? "Unequip" : "Equip";
+    this.equipButton.disabled = false;
   }
 }
