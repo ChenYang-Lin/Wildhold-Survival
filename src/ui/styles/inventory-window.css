@@ -1,93 +1,103 @@
-/* ==============================
+/* =========================================
    Inventory Window
-============================== */
+========================================= */
 
 .inventory-window {
-  width: min(680px, calc(100vw - 24px));
-  max-height: min(520px, calc(100vh - 24px));
+  width: min(94vw, 850px);
+  height: min(80dvh, 600px);
+
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 
-  background: #20252b;
-  border: 2px solid #59616a;
+  box-sizing: border-box;
+  padding: 15px;
+  gap: 15px;
+
+  color: #ffffff;
+  background: rgba(37, 37, 37, 0.97);
+  border: 2px solid #888888;
   border-radius: 8px;
 
-  color: #e8e8e8;
   font-family: Arial, sans-serif;
-
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.65),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  overflow: hidden;
 }
 
-/* Header */
+.inventory-window * {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   Header
+========================================= */
 
 .inventory-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  padding: 12px 16px;
-
-  background: #303840;
-  border-bottom: 2px solid #59616a;
+  flex-shrink: 0;
+  gap: 10px;
 }
 
 .inventory-header h2 {
   margin: 0;
-  color: #f0d18a;
   font-size: 20px;
-  font-weight: bold;
-  letter-spacing: 1px;
 }
 
 .inventory-header .close-button {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
 
-  border: 1px solid #69737d;
+  color: white;
+  background: #555555;
+  border: none;
   border-radius: 4px;
 
-  background: #414950;
-  color: #ffffff;
-
   font-size: 22px;
-  line-height: 1;
   cursor: pointer;
-
-  transition:
-    background 0.15s,
-    border-color 0.15s;
 }
 
 .inventory-header .close-button:hover {
-  background: #8b3d38;
-  border-color: #d16b60;
+  background: #777777;
 }
 
-/* Main content */
+/* =========================================
+   Main Content
+========================================= */
 
 .inventory-content {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(180px, 1fr);
-  gap: 12px;
+  grid-template-columns:
+    minmax(0, 1.7fr)
+    minmax(0, 1fr);
+  gap: 10px;
 
-  padding: 14px;
-  overflow-y: auto;
+  flex: 1;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .inventory-panel {
   min-width: 0;
-  padding: 12px;
+  min-height: 0;
 
-  background: #292f36;
-  border: 1px solid #4b555f;
-  border-radius: 6px;
+  padding: 10px;
+
+  background: #353535;
+  border-radius: 5px;
+
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
-/* Explicitly assign each panel to its own grid column */
+.inventory-panel h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+/* Explicit panel positioning */
+
 .inventory-content > .inventory-slots-panel {
   grid-column: 1;
   grid-row: 1;
@@ -98,74 +108,58 @@
   grid-row: 1;
 }
 
-.inventory-panel h3 {
-  margin: 0 0 12px;
-
-  color: #e8c77f;
-  font-size: 15px;
-  font-weight: bold;
-}
-
-/* ==============================
+/* =========================================
    Inventory Slots
-============================== */
+========================================= */
 
 .inventory-slot-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 64px));
+  justify-content: center;
   gap: 8px;
+  padding: 5px 0;
 }
 
 .inventory-slot {
   position: relative;
 
-  width: 100%;
-  aspect-ratio: 1;
-  min-width: 0;
-  padding: 4px;
-
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: #1d2329;
-  border: 1px solid #4d5862;
-  border-radius: 5px;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 1;
+
+  padding: 4px;
+
+  background: #292929;
+  border: 1px solid #555555;
+  border-radius: 6px;
 
   cursor: pointer;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    transform 0.15s;
 }
 
-.inventory-slot:hover {
-  background: #39434c;
-  border-color: #b9a16e;
-  transform: translateY(-2px);
+.inventory-slot:focus-visible {
+  outline: 2px solid #f5a742;
+  outline-offset: 2px;
 }
 
 .inventory-slot.selected {
-  background: #454034;
-  border: 2px solid #e0bd69;
-  box-shadow: 0 0 8px rgba(224, 189, 105, 0.3);
+  border: 2px solid #f0c75e;
+  background: #45402c;
 }
 
 .inventory-slot.empty {
-  background: #1a1f24;
-  border-color: #343c44;
+  background: #1c1c1c;
+  border-style: dashed;
   cursor: default;
-}
-
-.inventory-slot.empty:hover {
-  background: #1a1f24;
-  border-color: #343c44;
-  transform: none;
 }
 
 .inventory-slot-icon {
   width: 80%;
   height: 80%;
+
   object-fit: contain;
   image-rendering: pixelated;
   pointer-events: none;
@@ -184,39 +178,41 @@
   pointer-events: none;
 }
 
-/* ==============================
+/* =========================================
    Item Details
-============================== */
+========================================= */
 
 .inventory-details-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 
-  padding: 12px 4px;
+  padding: 12px;
 
-  color: #ffffff;
+  color: white;
   text-align: center;
 }
 
 .inventory-details-icon {
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
+  max-width: 100%;
+
   padding: 8px;
 
   object-fit: contain;
   image-rendering: pixelated;
 
-  background: #1c2228;
-  border: 1px solid #59616a;
+  background: #292929;
+  border: 1px solid #555555;
   border-radius: 6px;
 }
 
 .inventory-details-name {
   margin: 0;
 
-  color: #f0d18a;
+  color: #ffffff;
   font-size: 18px;
   font-weight: bold;
 }
@@ -226,70 +222,64 @@
   margin: 0;
   padding: 8px 0;
 
-  color: #c2c8ce;
+  color: #aaaaaa;
   font-size: 14px;
 
-  border-top: 1px solid #424b54;
+  border-top: 1px solid #555555;
 }
 
 .inventory-details-empty {
   margin: 20px 0;
 
-  color: #929ba4;
+  color: #aaaaaa;
   font-size: 14px;
   line-height: 1.5;
 }
 
-/* ==============================
-   Responsive Layout
-============================== */
+/* =========================================
+   Phone - Portrait
+========================================= */
 
-.inventory-window,
-.inventory-window * {
-  box-sizing: border-box;
-}
-
-.inventory-content {
-  min-width: 0;
-  min-height: 0;
-}
-
-@media (max-width: 800px) {
+@media (max-width: 600px) and (orientation: portrait) {
   .inventory-window {
-    width: calc(100vw - 20px);
-    max-width: 480px;
-    max-height: calc(100dvh - 20px);
+    width: 96vw;
+    height: 94dvh;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .inventory-header h2 {
+    font-size: 18px;
   }
 
   .inventory-content {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-
-    width: 100%;
-    min-width: 0;
     gap: 10px;
-    padding: 10px;
 
     overflow-x: hidden;
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .inventory-panel {
-    display: block;
-    flex: 0 0 auto;
+    flex-shrink: 0;
     width: 100%;
-    min-width: 0;
+    overflow: visible;
+  }
+
+  .inventory-panel h3 {
+    font-size: 16px;
   }
 
   .inventory-slot-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 56px));
+    justify-content: start;
     gap: 6px;
-    width: 100%;
   }
 
   .inventory-details-content {
+    gap: 8px;
     padding: 8px 4px;
   }
 
@@ -297,41 +287,70 @@
     width: 64px;
     height: 64px;
   }
+
+  .inventory-details-name {
+    font-size: 16px;
+  }
 }
 
-/* Short landscape screens, such as phones rotated sideways */
-@media (orientation: landscape) and (max-height: 500px) {
+/* =========================================
+   Phone / Tablet - Landscape
+========================================= */
+
+@media (max-width: 900px) and (orientation: landscape) {
   .inventory-window {
-    width: min(680px, calc(100vw - 20px));
-    max-height: calc(100dvh - 16px);
+    width: 96vw;
+    height: 94dvh;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .inventory-header h2 {
+    font-size: 17px;
   }
 
   .inventory-content {
     display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-    align-items: start;
-    gap: 10px;
-    padding: 10px;
-    overflow-x: hidden;
-    overflow-y: auto;
+    grid-template-columns:
+      minmax(0, 1.5fr)
+      minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 6px;
+    overflow: hidden;
   }
 
   .inventory-panel {
-    width: auto;
     min-width: 0;
+    min-height: 0;
+    padding: 6px;
+    overflow-y: auto;
+  }
+
+  .inventory-panel h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
   }
 
   .inventory-slot-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 6px;
+    gap: 5px;
   }
 
   .inventory-details-content {
-    padding: 8px 4px;
+    gap: 8px;
+    padding: 4px;
   }
 
   .inventory-details-icon {
     width: 56px;
     height: 56px;
+  }
+
+  .inventory-details-name {
+    font-size: 14px;
+  }
+
+  .inventory-details-info {
+    font-size: 11px;
   }
 }
