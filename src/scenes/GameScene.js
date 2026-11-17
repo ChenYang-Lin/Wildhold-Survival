@@ -146,6 +146,14 @@ export default class GameScene extends Phaser.Scene {
     // this.input.keyboard.on("keydown-O", () => {
     //   this.buildingManager.testMoveBuilding();
     // });
+
+    this.game.events.on(Phaser.Core.Events.PAUSE, () => {
+      console.log("[Game] PAUSED", performance.now());
+    });
+
+    this.game.events.on(Phaser.Core.Events.RESUME, () => {
+      console.log("[Game] RESUMED", performance.now());
+    });
   }
 
   createEntities() {
@@ -366,7 +374,7 @@ export default class GameScene extends Phaser.Scene {
     this.placementSystem.update();
     this.combatSystem.update(time, delta);
 
-    this.staminaUI.update();
+    // this.staminaUI.update();
 
     this.dayNightSystem.update(delta);
     this.base.update();
@@ -392,5 +400,39 @@ export default class GameScene extends Phaser.Scene {
         this.scene.restart();
       });
     }
+
+    // // Temporary Phaser timing diagnostic
+    // this.debugTiming ??= {
+    //   wallStart: performance.now(),
+    //   gameDelta: 0,
+    //   rawDelta: 0,
+    //   frames: 0,
+    // };
+
+    // const loop = this.game.loop;
+
+    // this.debugTiming.gameDelta += delta;
+    // this.debugTiming.rawDelta += loop.rawDelta ?? 0;
+    // this.debugTiming.frames++;
+
+    // const wallElapsed = performance.now() - this.debugTiming.wallStart;
+
+    // if (wallElapsed >= 1000) {
+    //   console.log("[Game Timing]", {
+    //     realTime: Math.round(wallElapsed),
+    //     gameTime: Math.round(this.debugTiming.gameDelta),
+    //     rawGameTime: Math.round(this.debugTiming.rawDelta),
+    //     frames: this.debugTiming.frames,
+    //     lastDelta: Math.round(delta),
+    //     lastRawDelta: Math.round(loop.rawDelta ?? 0),
+    //     fps: Math.round(loop.actualFps),
+    //     smoothStep: loop.smoothStep,
+    //   });
+
+    //   this.debugTiming.wallStart = performance.now();
+    //   this.debugTiming.gameDelta = 0;
+    //   this.debugTiming.rawDelta = 0;
+    //   this.debugTiming.frames = 0;
+    // }
   }
 }

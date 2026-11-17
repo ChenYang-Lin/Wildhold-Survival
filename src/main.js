@@ -19,6 +19,11 @@ const config = {
     zoom: 1,
   },
 
+  fps: {
+    smoothStep: true,
+    panicMax: 10,
+  },
+
   resolution: 1,
 
   physics: {
