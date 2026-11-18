@@ -3,7 +3,7 @@ export default class InventorySystem {
     this.scene = scene;
 
     // Starter equipment for testing.
-    this.ownedEquipment = new Set(["wooden_sword", "steel_helmet", "steel_armor", "leather_boots"]);
+    this.ownedEquipment = new Set(["wooden_sword", "bow", "steel_helmet", "steel_armor", "leather_boots"]);
 
     this.inventory = Array(20).fill(null);
 

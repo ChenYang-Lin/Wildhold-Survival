@@ -3,10 +3,23 @@ export const EQUIPMENT = {
     id: "wooden_sword",
     name: "Wooden Sword",
     category: "weapon",
+    attackType: "melee",
     icon: "equipment_sword_wooden",
     bonuses: {
       damage: 5,
       attackSpeedMultiplier: 1.1,
+    },
+  },
+
+  bow: {
+    id: "bow",
+    name: "Bow",
+    category: "weapon",
+    attackType: "ranged",
+    icon: "equipment_bow_short",
+    bonuses: {
+      damage: 3,
+      attackSpeedMultiplier: 1.5,
     },
   },
 
