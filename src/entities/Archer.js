@@ -1,5 +1,5 @@
 import Enemy from "./Enemy.js";
-import EnemyProjectile from "./EnemyProjectile.js";
+import ArrowProjectile from "./ArrowProjectile.js";
 
 export default class Archer extends Enemy {
   constructor(scene, x, y, stats = {}, campNode) {
@@ -41,14 +41,12 @@ export default class Archer extends Enemy {
   shootArrow(damage) {
     const target = this.ai.getAttackTarget();
 
-    // The target may have been destroyed or removed.
     if (!target?.active || !target.body?.enable) return;
-
     if (!this.body?.enable) return;
 
     const angle = Phaser.Math.Angle.Between(this.body.center.x, this.body.center.y, target.body.center.x, target.body.center.y);
 
-    const projectile = new EnemyProjectile(this.scene, this.body.center.x, this.body.center.y, angle, damage);
+    const projectile = new ArrowProjectile(this.scene, this.body.center.x, this.body.center.y, angle, damage);
 
     this.scene.enemyProjectiles.add(projectile);
   }
