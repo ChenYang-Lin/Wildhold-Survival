@@ -1,4 +1,5 @@
-import { meleeCombo, sprintAttack } from "../data/attacks.js";
+import { meleeCombo, sprintAttack, rangedAttack } from "../data/attacks.js";
+import ArrowProjectile from "../entities/ArrowProjectile.js";
 
 export default class AttackComponent {
   constructor(owner) {
@@ -31,6 +32,13 @@ export default class AttackComponent {
     this.comboQueued = false;
 
     return this.startAttack(sprintAttack);
+  }
+
+  startRangedAttack() {
+    this.comboIndex = 0;
+    this.comboQueued = false;
+
+    return this.startAttack(rangedAttack);
   }
 
   startBasicMelee() {
@@ -68,14 +76,18 @@ export default class AttackComponent {
 
     this.playAttackAnimation(attack, duration);
 
-    // Schedule hit
+    // Schedule attack action
     this.hitTimerEvent = this.owner.scene.time.delayedCall(hitDelay, () => {
       this.hitTimerEvent = null;
 
       if (!this.owner.active) return;
       if (!this.currentAttack) return;
 
-      this.createHitbox(attack);
+      if (attack.type === "ranged") {
+        this.fireArrow(attack);
+      } else {
+        this.createHitbox(attack);
+      }
     });
 
     // Schedule attack completion
@@ -252,6 +264,47 @@ export default class AttackComponent {
         this.hitbox = null;
       }
     });
+  }
+
+  fireArrow(attack) {
+    const facing = this.owner.movement.facing;
+
+    const directions = {
+      up: { x: 0, y: -1 },
+      down: { x: 0, y: 1 },
+      left: { x: -1, y: 0 },
+      right: { x: 1, y: 0 },
+    };
+
+    const direction = directions[facing];
+
+    if (!direction) return;
+
+    const body = this.owner.body;
+    const offset = 16;
+    const firePointOffsetY = -17;
+
+    const x = body.center.x + direction.x * offset;
+    const y = body.center.y + firePointOffsetY + direction.y * offset;
+
+    const angle = Math.atan2(direction.y, direction.x);
+
+    let damage = this.owner.stats.damage * attack.damageMultiplier;
+
+    const isCritical = Math.random() < this.owner.stats.critChance;
+
+    if (isCritical) {
+      damage *= this.owner.stats.critDamage;
+    }
+
+    const projectile = new ArrowProjectile(this.owner.scene, x, y, angle, damage, "player", {
+      direction: facing,
+      force: 140,
+      flinchDuration: 200,
+      isCritical,
+    });
+
+    this.owner.scene.projectiles.add(projectile);
   }
 
   startLunge(lunge) {

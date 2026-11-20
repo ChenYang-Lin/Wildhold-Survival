@@ -1,3 +1,15 @@
+export const rangedAttack = {
+  type: "ranged",
+  damageMultiplier: 1,
+  hitTimeRatio: 0.8,
+  animation: {
+    up: "survivor_shoot_up",
+    down: "survivor_shoot_down",
+    left: "survivor_shoot_left",
+    right: "survivor_shoot_right",
+  },
+};
+
 const melee1 = {
   type: "melee",
   damageMultiplier: 1,

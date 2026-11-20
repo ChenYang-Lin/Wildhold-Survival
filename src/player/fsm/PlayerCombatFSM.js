@@ -29,22 +29,26 @@ export default class PlayerCombatFSM {
   enterAttack(input) {
     if (this.state === this.STATE_ATTACK) return;
 
-    let started;
-
     const isDashing = this.owner.movementFSM.state === this.owner.movementFSM.STATE_DASH;
 
     const isSprintAttack = this.owner.movementFSM.sprintAttackEligible && input.moveVector.lengthSq() > 0;
+
+    let started;
 
     if (isDashing || isSprintAttack) {
       started = this.owner.attack.startSprintAttack();
       this.owner.movementFSM.resetSprintAttackWindow();
     } else {
-      started = this.owner.attack.startBasicMelee();
+      const weapon = this.owner.scene.equipmentSystem.getEquippedWeapon();
+
+      if (weapon?.attackType === "ranged") {
+        started = this.owner.attack.startRangedAttack();
+      } else {
+        started = this.owner.attack.startBasicMelee();
+      }
     }
 
-    if (!started) {
-      return;
-    }
+    if (!started) return;
 
     this.state = this.STATE_ATTACK;
   }
