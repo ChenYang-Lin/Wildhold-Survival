@@ -35,8 +35,29 @@ export default class AttackComponent {
   }
 
   startRangedAttack(input) {
+    if (this.currentAttack) return false;
+
     this.comboIndex = 0;
     this.comboQueued = false;
+
+    const target = input?.isMobile ? this.getNearestEnemy(rangedAttack.targetRange) : null;
+
+    let targetX;
+    let targetY;
+
+    if (target) {
+      targetX = target.body.center.x;
+      targetY = target.body.center.y;
+    } else if (!input?.isMobile) {
+      targetX = input?.aimWorldX;
+      targetY = input?.aimWorldY;
+    }
+
+    // Store the target or mouse position for this attack.
+    this.rangedAim = { target, targetX, targetY };
+
+    // Update facing before the shooting animation starts.
+    this.updateRangedFacing();
 
     return this.startAttack(rangedAttack, input);
   }
@@ -151,6 +172,7 @@ export default class AttackComponent {
     this.comboIndex = 0;
     this.comboQueued = false;
     this.comboWindowOpen = false;
+    this.rangedAim = null;
   }
 
   playAttackAnimation(attack, duration) {
@@ -168,6 +190,34 @@ export default class AttackComponent {
 
       // Phaser animation timeScale: naturalDuration / desiredDuration
       this.owner.anims.timeScale = naturalDuration / duration;
+    }
+  }
+
+  updateRangedFacing() {
+    const body = this.owner.body;
+    const aim = this.rangedAim;
+
+    let targetX = aim?.targetX;
+    let targetY = aim?.targetY;
+
+    if (aim?.target?.active && aim.target.body?.enable) {
+      targetX = aim.target.body.center.x;
+      targetY = aim.target.body.center.y;
+    }
+
+    if (!Number.isFinite(targetX) || !Number.isFinite(targetY)) {
+      return;
+    }
+
+    const dx = targetX - body.center.x;
+    const dy = targetY - body.center.y;
+
+    if (dx === 0 && dy === 0) return;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      this.owner.movement.facing = dx > 0 ? "right" : "left";
+    } else {
+      this.owner.movement.facing = dy > 0 ? "down" : "up";
     }
   }
 
@@ -266,32 +316,30 @@ export default class AttackComponent {
     });
   }
 
-  fireArrow(attack, input) {
+  fireArrow(attack) {
     const body = this.owner.body;
     const scene = this.owner.scene;
+    const aim = this.rangedAim;
 
-    let targetX;
-    let targetY;
+    let targetX = aim?.targetX;
+    let targetY = aim?.targetY;
 
-    if (input?.isMobile) {
-      // Mobile: aim at the nearest valid enemy.
-      const target = this.getNearestEnemy(attack.targetRange);
-
-      if (target) {
-        targetX = target.body.center.x;
-        targetY = target.body.center.y;
-      }
-    } else {
-      // PC: aim at the mouse's world position.
-      targetX = input?.aimWorldX;
-      targetY = input?.aimWorldY;
+    // Use the enemy's current body center.
+    if (aim?.target?.active && aim.target.body?.enable) {
+      targetX = aim.target.body.center.x;
+      targetY = aim.target.body.center.y;
     }
 
-    let dx = targetX - body.center.x;
-    let dy = targetY - body.center.y;
+    // Calculate the actual arrow origin (the bow position).
+    const arrowOriginOffsetY = -22;
+    const originX = body.center.x;
+    const originY = body.center.y + arrowOriginOffsetY;
 
-    // If no valid target exists, or the aim position
-    // is too close to the player, use the current facing.
+    // Calculate direction from the arrow origin to the target.
+    let dx = targetX - originX;
+    let dy = targetY - originY;
+
+    // Fallback to the player's facing direction.
     if (!Number.isFinite(dx) || !Number.isFinite(dy) || (dx === 0 && dy === 0)) {
       const directions = {
         up: { x: 0, y: -1 },
@@ -306,7 +354,6 @@ export default class AttackComponent {
       dy = direction.y;
     }
 
-    // Normalize the direction.
     const length = Math.hypot(dx, dy);
 
     const directionX = dx / length;
@@ -314,16 +361,16 @@ export default class AttackComponent {
 
     const angle = Math.atan2(directionY, directionX);
 
-    // Spawn the arrow slightly in front of the player.
+    // Move the arrow slightly forward from the bow.
     const offset = 16;
-    const arrowSpawnOffsetY = -22;
 
-    const x = body.center.x + directionX * offset;
-    const y = body.center.y + arrowSpawnOffsetY + directionY * offset;
+    const x = originX + directionX * offset;
+    const y = originY + directionY * offset;
 
-    // Convert the aiming direction into a cardinal
-    // direction for the enemy's knockback.
     const facing = Math.abs(directionX) > Math.abs(directionY) ? (directionX > 0 ? "right" : "left") : directionY > 0 ? "down" : "up";
+
+    // Keep the player's facing synchronized with the arrow.
+    this.owner.movement.facing = facing;
 
     let damage = this.owner.stats.damage * attack.damageMultiplier;
 
