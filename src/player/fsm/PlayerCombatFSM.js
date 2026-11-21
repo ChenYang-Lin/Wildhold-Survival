@@ -42,7 +42,7 @@ export default class PlayerCombatFSM {
       const weapon = this.owner.scene.equipmentSystem.getEquippedWeapon();
 
       if (weapon?.attackType === "ranged") {
-        started = this.owner.attack.startRangedAttack();
+        started = this.owner.attack.startRangedAttack(input);
       } else {
         started = this.owner.attack.startBasicMelee();
       }

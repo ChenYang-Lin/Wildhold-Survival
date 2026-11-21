@@ -34,11 +34,11 @@ export default class AttackComponent {
     return this.startAttack(sprintAttack);
   }
 
-  startRangedAttack() {
+  startRangedAttack(input) {
     this.comboIndex = 0;
     this.comboQueued = false;
 
-    return this.startAttack(rangedAttack);
+    return this.startAttack(rangedAttack, input);
   }
 
   startBasicMelee() {
@@ -54,7 +54,7 @@ export default class AttackComponent {
     return this.startAttack(meleeCombo[this.comboIndex]);
   }
 
-  startAttack(attack) {
+  startAttack(attack, input = null) {
     if (this.currentAttack) return false;
 
     this.currentAttack = attack;
@@ -84,7 +84,7 @@ export default class AttackComponent {
       if (!this.currentAttack) return;
 
       if (attack.type === "ranged") {
-        this.fireArrow(attack);
+        this.fireArrow(attack, input);
       } else {
         this.createHitbox(attack);
       }
@@ -266,28 +266,64 @@ export default class AttackComponent {
     });
   }
 
-  fireArrow(attack) {
-    const facing = this.owner.movement.facing;
-
-    const directions = {
-      up: { x: 0, y: -1 },
-      down: { x: 0, y: 1 },
-      left: { x: -1, y: 0 },
-      right: { x: 1, y: 0 },
-    };
-
-    const direction = directions[facing];
-
-    if (!direction) return;
-
+  fireArrow(attack, input) {
     const body = this.owner.body;
+    const scene = this.owner.scene;
+
+    let targetX;
+    let targetY;
+
+    if (input?.isMobile) {
+      // Mobile: aim at the nearest valid enemy.
+      const target = this.getNearestEnemy(attack.targetRange);
+
+      if (target) {
+        targetX = target.body.center.x;
+        targetY = target.body.center.y;
+      }
+    } else {
+      // PC: aim at the mouse's world position.
+      targetX = input?.aimWorldX;
+      targetY = input?.aimWorldY;
+    }
+
+    let dx = targetX - body.center.x;
+    let dy = targetY - body.center.y;
+
+    // If no valid target exists, or the aim position
+    // is too close to the player, use the current facing.
+    if (!Number.isFinite(dx) || !Number.isFinite(dy) || (dx === 0 && dy === 0)) {
+      const directions = {
+        up: { x: 0, y: -1 },
+        down: { x: 0, y: 1 },
+        left: { x: -1, y: 0 },
+        right: { x: 1, y: 0 },
+      };
+
+      const direction = directions[this.owner.movement.facing];
+
+      dx = direction.x;
+      dy = direction.y;
+    }
+
+    // Normalize the direction.
+    const length = Math.hypot(dx, dy);
+
+    const directionX = dx / length;
+    const directionY = dy / length;
+
+    const angle = Math.atan2(directionY, directionX);
+
+    // Spawn the arrow slightly in front of the player.
     const offset = 16;
-    const firePointOffsetY = -17;
+    const arrowSpawnOffsetY = -22;
 
-    const x = body.center.x + direction.x * offset;
-    const y = body.center.y + firePointOffsetY + direction.y * offset;
+    const x = body.center.x + directionX * offset;
+    const y = body.center.y + arrowSpawnOffsetY + directionY * offset;
 
-    const angle = Math.atan2(direction.y, direction.x);
+    // Convert the aiming direction into a cardinal
+    // direction for the enemy's knockback.
+    const facing = Math.abs(directionX) > Math.abs(directionY) ? (directionX > 0 ? "right" : "left") : directionY > 0 ? "down" : "up";
 
     let damage = this.owner.stats.damage * attack.damageMultiplier;
 
@@ -297,14 +333,41 @@ export default class AttackComponent {
       damage *= this.owner.stats.critDamage;
     }
 
-    const projectile = new ArrowProjectile(this.owner.scene, x, y, angle, damage, "player", {
+    const projectile = new ArrowProjectile(scene, x, y, angle, damage, "player", {
       direction: facing,
       force: 140,
       flinchDuration: 200,
       isCritical,
     });
 
-    this.owner.scene.projectiles.add(projectile);
+    scene.projectiles.add(projectile);
+  }
+
+  getNearestEnemy(range) {
+    const enemies = this.owner.scene.combatSystem.enemies.getChildren();
+
+    const playerX = this.owner.body.center.x;
+    const playerY = this.owner.body.center.y;
+
+    let nearestEnemy = null;
+    let nearestDistance = range;
+
+    for (const enemy of enemies) {
+      if (!enemy.active || !enemy.body?.enable) continue;
+      if (enemy.health?.isDead) continue;
+
+      const dx = enemy.body.center.x - playerX;
+      const dy = enemy.body.center.y - playerY;
+
+      const distance = Math.hypot(dx, dy);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestEnemy = enemy;
+      }
+    }
+
+    return nearestEnemy;
   }
 
   startLunge(lunge) {

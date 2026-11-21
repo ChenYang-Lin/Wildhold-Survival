@@ -209,6 +209,9 @@ export default class InputController {
 
     // Mouse click
     this.onPointerDown = (pointer) => {
+      this.state.aimWorldX = pointer.worldX;
+      this.state.aimWorldY = pointer.worldY;
+
       if (this.isOverBuildingInfoCard(pointer)) {
         this.scene.buildingInteractionSystem.handlePointerDown(pointer);
         return;
